@@ -14,121 +14,74 @@
 </head>
 <body>
   <main>
+    <sl-drawer label="Settings" placement="top" class="drawer-placement-top">
+      These are some settings
+    </sl-drawer>
     <div class="search-bar">
       <sl-input type="text" placeholder="Search"></sl-input>
-      <sl-icon-button name="search" label="Run Search Button"></sl-icon-button>
+      <sl-icon-button name="search" label="Run Search"></sl-icon-button>
+      <sl-icon-button name="pencil" label="Edit"></sl-icon-button>
+      <sl-icon-button name="gear" label="Open Settings"></sl-icon-button>
     </div>
     <div class="table-contents">
       <sl-card class="table-header">
         <div class="table-row">
-          <div class="table-cell">Test</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">TestTestTest</div>
+          <div class="table-cell">Recipe</div>
+          <div class="table-cell">Author</div>
+          <div class="table-cell">Allergens</div>
+          <div class="table-cell">Reference</div>
         </div>
       </sl-card>
       <sl-card>
         <div class="table-row">
-          <div class="table-cell">Test</div>
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
+          <div class="table-cell">
+            Recipe Name
+          </div>
+          <div class="table-cell">
+            Author Name
+          </div>
+          <div class="table-cell">
+          </div>
+          <div class="table-cell">
+            <a href="http://www.example.com/" target="_blank">
+              Example Reference
+            </a>
+          </div>
         </div>
       </sl-card>
       <sl-card>
         <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
+          <div class="table-cell">
+            Recipe Name
+          </div>
+          <div class="table-cell">
+            Author Name
+          </div>
+          <div class="table-cell">
+            <sl-tag variant="warning">Allergen 1</sl-tag>
+            <sl-tag variant="warning">Allergen 2</sl-tag>
+          </div>
+          <div class="table-cell">
+            Example Reference, Page 2
+          </div>
         </div>
       </sl-card>
       <sl-card>
         <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">TestTestTest</div>
-          <div class="table-cell">TestTest</div>
-          <div class="table-cell">Test</div>
+          <div class="table-cell">
+            Recipe Name
+          </div>
+          <div class="table-cell">
+            Author Name
+          </div>
+          <div class="table-cell">
+            <sl-tag variant="warning">Allergen 1</sl-tag>
+          </div>
+          <div class="table-cell">
+            <a href="http://www.example.com/" target="_blank">
+              Example Reference
+            </a>
+          </div>
         </div>
       </sl-card>
     </div>
