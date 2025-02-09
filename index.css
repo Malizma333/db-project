@@ -2,4 +2,20 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 3vh 3vw;
+}
+
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-bar sl-input {
+  flex: 1
+}
+
+.search-bar sl-icon-button {
+  margin: 0 1vw;
 }
