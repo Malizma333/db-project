@@ -1,0 +1,64 @@
+body {
+  font-family: "Questrial", serif;
+  font-weight: 400;
+  font-style: normal;
+  overflow: hidden;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 94vh;
+}
+
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.search-bar sl-input {
+  flex: 1;
+}
+
+.search-bar sl-icon-button {
+  margin: 0 1vw;
+}
+
+.table-contents {
+  display: flex;
+  flex-direction: column;
+  flex: 10;
+  overflow-y: auto;
+}
+
+.table-contents sl-card {
+  --border-radius: 0;
+}
+
+.table-header {
+  font-weight: 900;
+  position: sticky;
+  top: 0;
+}
+
+.table-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-cell {
+  flex: 1;
+}
+
+.page-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
