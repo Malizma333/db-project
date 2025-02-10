@@ -1,30 +1,29 @@
-import './style';
+import './index.css';
 import '@shoelace-style/shoelace/dist/themes/dark.css';
-import { SlCard, SlDialog, SlDrawer, SlIconButton, SlInput, SlTag, SlTooltip } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlDialog, SlIconButton, SlTag, SlTooltip } from '@shoelace-style/shoelace/dist/react';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
 import { useState } from 'preact/hooks';
+import Settings from './components/settings';
+import Toolbar from './components/toolbar';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
 
 export default function App() {
-  const [settingsOpen, setOpen] = useState(false);
-  const [dialogOpen, setDiaOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
-    <div class="sl-theme-dark">
-      <SlDrawer open={settingsOpen} onSlAfterHide={() => setOpen(false)} label="Settings" placement="top" class="drawer-placement-top">
-        These are some settings
-      </SlDrawer>
-      <SlDialog open={dialogOpen} onSlAfterHide={() => setDiaOpen(false)} label="Random Recipe" class="dialog-overview">
-        Recipe Name
+    <div class="sl-theme-dark app-container">
+      <Settings settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} />
+      <SlDialog
+        class="dialog-overview"
+        open={dialogOpen}
+        onSlAfterHide={() => setDialogOpen(false)}
+        label="Random Recipe"
+      >
+        (Random Recipe Name Here)
       </SlDialog>
-      <div class="search-bar">
-        <SlInput type="text" placeholder="Search" />
-        <SlIconButton name="search" label="Run Search" />
-        <SlIconButton name="pencil" label="Edit Mode" />
-        <SlIconButton name="gear" label="Search Settings" onClick={() => setOpen(true)} />
-        <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => setDiaOpen(true)} />
-      </div>
+      <Toolbar setSettingsOpen={setSettingsOpen} setDialogOpen={setDialogOpen} />
       <div class="table-contents">
         <SlCard class="table-header">
           <div class="table-row">

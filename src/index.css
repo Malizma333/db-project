@@ -5,14 +5,14 @@ html {
   font-size: small;
 }
 
-.sl-theme-dark {
+.app-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 94vh;
 }
 
-.search-bar {
+.toolbar {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -20,7 +20,7 @@ html {
   flex: 1;
 }
 
-.search-bar sl-input {
+.toolbar sl-input {
   flex: 1;
 }
 
