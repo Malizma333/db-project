@@ -45,49 +45,75 @@
             Author Name
           </div>
           <div class="table-cell">
-          </div>
-          <div class="table-cell">
-            <a href="http://www.example.com/" target="_blank">
-              Example Reference
-            </a>
-          </div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">
-            Recipe Name
-          </div>
-          <div class="table-cell">
-            Author Name
-          </div>
-          <div class="table-cell">
             <sl-tag variant="warning">Allergen 1</sl-tag>
             <sl-tag variant="warning">Allergen 2</sl-tag>
           </div>
           <div class="table-cell">
-            Example Reference, Page 2
-          </div>
-        </div>
-      </sl-card>
-      <sl-card>
-        <div class="table-row">
-          <div class="table-cell">
-            Recipe Name
-          </div>
-          <div class="table-cell">
-            Author Name
-          </div>
-          <div class="table-cell">
-            <sl-tag variant="warning">Allergen 1</sl-tag>
-          </div>
-          <div class="table-cell">
             <a href="http://www.example.com/" target="_blank">
               Example Reference
             </a>
           </div>
         </div>
       </sl-card>
+      <sl-card>
+        <div class="table-row">
+          <div class="table-cell">
+            <sl-input value="Recipe Name">
+            </sl-input>
+          </div>
+          <div class="table-cell">
+            <sl-input value="Author Name">
+            </sl-input>
+          </div>
+          <div class="table-cell">
+            <sl-tag variant="warning" class="allergen-box">
+              Allergen 1
+              <sl-icon-button name="x"></sl-icon-button>
+            </sl-tag>
+            <sl-tag variant="warning" class="allergen-box">
+              Allergen 2
+              <sl-icon-button name="x"></sl-icon-button>
+            </sl-tag>
+            <sl-icon-button name="plus"></sl-icon-button>
+          </div>
+          <div class="table-cell">
+            <sl-input value="Example Reference">
+            </sl-input>
+            <sl-input value="http://www.example.com/">
+            </sl-input>
+          </div>
+          <div class="table-end">
+            <sl-icon-button name="trash"></sl-icon-button>
+          </div>
+        </div>
+      </sl-card>
+      <sl-card>
+        <div class="table-row">
+          <div class="table-cell">
+            <sl-input placeholder="Recipe">
+            </sl-input>
+          </div>
+          <div class="table-cell">
+            <sl-input placeholder="Author">
+            </sl-input>
+          </div>
+          <div class="table-cell">
+            <sl-icon-button name="plus"></sl-icon-button>
+          </div>
+          <div class="table-cell">
+            <sl-input placeholder="Resource Label">
+            </sl-input>
+            <sl-input placeholder="Resource Link">
+            </sl-input>
+          </div>
+          <div class="table-end">
+            <sl-icon-button name="trash"></sl-icon-button>
+          </div>
+        </div>
+      </sl-card>
+      <div class="table-row">
+        <sl-icon-button name="plus" class="add-recipe-button"></sl-icon-button>
+      </div>
     </div>
     <div class="page-buttons">
       <sl-icon-button disabled name="chevron-double-left"></sl-icon-button>
