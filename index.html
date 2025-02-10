@@ -22,10 +22,18 @@
     </sl-dialog>
     <div class="search-bar">
       <sl-input type="text" placeholder="Search"></sl-input>
-      <sl-icon-button name="search" label="Run Search"></sl-icon-button>
-      <sl-icon-button name="pencil" label="Edit"></sl-icon-button>
-      <sl-icon-button name="gear" label="Open Settings"></sl-icon-button>
-      <sl-icon-button name="shuffle" label="Generate Recipe"></sl-icon-button>
+      <sl-tooltip content="Search Recipes">
+        <sl-icon-button name="search" label="Run Search"></sl-icon-button>
+      </sl-tooltip>
+      <sl-tooltip content="Edit Recipes">
+        <sl-icon-button name="pencil" label="Edit Mode"></sl-icon-button>
+      </sl-tooltip>
+      <sl-tooltip content="Search Settings">
+        <sl-icon-button name="gear" label="Search Settings"></sl-icon-button>
+      </sl-tooltip>
+      <sl-tooltip content="Generate Random Recipe">
+        <sl-icon-button name="shuffle" label="Generate Random Recipe"></sl-icon-button>
+      </sl-tooltip>
     </div>
     <div class="table-contents">
       <sl-card class="table-header">
@@ -68,13 +76,19 @@
           <div class="table-cell">
             <sl-tag variant="warning" class="allergen-box">
               Allergen 1
-              <sl-icon-button name="x"></sl-icon-button>
+              <sl-tooltip content="Remove Allergen">
+                <sl-icon-button name="x" label="Remove Allergen"></sl-icon-button>
+              </sl-tooltip>
             </sl-tag>
             <sl-tag variant="warning" class="allergen-box">
               Allergen 2
-              <sl-icon-button name="x"></sl-icon-button>
+              <sl-tooltip content="Remove Allergen">
+                <sl-icon-button name="x" label="Remove Allergen"></sl-icon-button>
+              </sl-tooltip>
             </sl-tag>
-            <sl-icon-button name="plus"></sl-icon-button>
+            <sl-tooltip content="Add Allergen">
+              <sl-icon-button name="plus" label="Add Allergen"></sl-icon-button>
+            </sl-tooltip>
           </div>
           <div class="table-cell">
             <sl-input value="Example Reference">
@@ -83,7 +97,9 @@
             </sl-input>
           </div>
           <div class="table-end">
-            <sl-icon-button name="trash"></sl-icon-button>
+            <sl-tooltip content="Remove Recipe">
+              <sl-icon-button name="trash" label="Remove Recipe"></sl-icon-button>
+            </sl-tooltip>
           </div>
         </div>
       </sl-card>
@@ -98,7 +114,9 @@
             </sl-input>
           </div>
           <div class="table-cell">
-            <sl-icon-button name="plus"></sl-icon-button>
+            <sl-tooltip content="Add Allergen">
+              <sl-icon-button name="plus" label="Add Allergen"></sl-icon-button>
+            </sl-tooltip>
           </div>
           <div class="table-cell">
             <sl-input placeholder="Resource Label">
@@ -107,20 +125,32 @@
             </sl-input>
           </div>
           <div class="table-end">
-            <sl-icon-button name="trash"></sl-icon-button>
+            <sl-tooltip content="Remove Recipe">
+              <sl-icon-button name="trash" label="Remove Recipe"></sl-icon-button>
+            </sl-tooltip>
           </div>
         </div>
       </sl-card>
       <div class="table-row">
-        <sl-icon-button name="plus" class="add-recipe-button"></sl-icon-button>
+        <sl-tooltip content="Create New Recipe">
+          <sl-icon-button name="plus" label="Create New Recipe" class="add-recipe-button"></sl-icon-button>
+        </sl-tooltip>
       </div>
     </div>
     <div class="page-buttons">
-      <sl-icon-button disabled name="chevron-double-left"></sl-icon-button>
-      <sl-icon-button disabled name="chevron-left"></sl-icon-button>
+      <sl-tooltip content="First Page">
+        <sl-icon-button disabled name="chevron-double-left" label="First Page"></sl-icon-button>
+      </sl-tooltip>
+      <sl-tooltip content="Previous Page">
+        <sl-icon-button disabled name="chevron-left" label="Previous Page"></sl-icon-button>
+      </sl-tooltip>
       1
-      <sl-icon-button name="chevron-right"></sl-icon-button>
-      <sl-icon-button name="chevron-double-right"></sl-icon-button>
+      <sl-tooltip content="Next Page">
+        <sl-icon-button name="chevron-right" label="Next Page"></sl-icon-button>
+      </sl-tooltip>
+      <sl-tooltip content="Last Page">
+        <sl-icon-button name="chevron-double-right" label="Last Page"></sl-icon-button>
+      </sl-tooltip>
     </div>
   </main>
 </body>
