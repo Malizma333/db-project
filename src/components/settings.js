@@ -1,4 +1,3 @@
-import '@shoelace-style/shoelace/dist/themes/dark.css';
 import { SlDrawer } from '@shoelace-style/shoelace/dist/react';
 
 export default function Settings({ settingsOpen, setSettingsOpen }) {
