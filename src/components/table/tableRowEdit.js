@@ -5,10 +5,10 @@ export default function TableRowEdit({name, author, allergens, reference}) {
     <SlCard>
       <div class="table-row">
         <div class="table-cell">
-          <sl-input value={name} />
+          <sl-input value={name} placeholder="Recipe Name" />
         </div>
         <div class="table-cell">
-          <sl-input value={author} />
+          <sl-input value={author} placeholder="Author Name" />
         </div>
         <div class="table-cell">
           {allergens.map((allergen, index) => {
@@ -26,7 +26,7 @@ export default function TableRowEdit({name, author, allergens, reference}) {
           </SlTooltip>
         </div>
         <div class="table-cell">
-          <sl-input value={reference} />
+          <sl-input value={reference} placeholder="Reference" />
         </div>
         <div class="table-end">
           <SlTooltip content="Remove Recipe">

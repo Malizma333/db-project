@@ -15,21 +15,21 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/')
 // arbitrary test values, will retrieve from database
 const numPages = 10
 const pageData = [
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
-  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
+  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
 ]
 
 export default function App() {
