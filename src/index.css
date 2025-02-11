@@ -28,7 +28,7 @@ html {
   display: flex;
   flex-direction: column;
   flex: 10;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .table-contents sl-card {
@@ -46,6 +46,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 3vh;
 }
 
 .table-cell {

@@ -22,6 +22,14 @@ const pageData = [
   {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
   {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
   {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
+  {name: "Recipe Name 2", author: "Author Name 2", allergens: ["Allergen 1"], reference: "Some Book" },
 ]
 
 export default function App() {
@@ -40,7 +48,7 @@ export default function App() {
         editMode={editMode}
         setEditMode={setEditMode}
       />
-      <Table editMode={editMode} pageData={pageData} />
+      <Table editMode={editMode} pageData={pageData.slice(pageNumber * 10, (pageNumber + 1) * 10)} />
       <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} numPages={numPages} />
     </div>
   );
