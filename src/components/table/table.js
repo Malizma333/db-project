@@ -3,14 +3,15 @@ import TableHeader from './tableHeader';
 import TableRow from './tableRow';
 import TableRowEdit from './tableRowEdit';
 
-export default function Table({ editMode }) {
+export default function Table({ editMode, pageData }) {
   return (
     <div class="table-contents">
       <TableHeader />
-      {editMode ?
-        <TableRowEdit /> :
-        <TableRow />
-      }
+      {pageData.map((row) => {
+        return editMode ?
+          <TableRowEdit name={row.name} author={row.author} allergens={row.allergens} reference={row.reference} /> :
+          <TableRow name={row.name} author={row.author} allergens={row.allergens} reference={row.reference} />
+      })}
       {/* <div class="table-row">
         <SlTooltip content="Create New Recipe">
           <SlIconButton name="plus" label="Create New Recipe" class="add-recipe-button" />

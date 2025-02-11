@@ -12,6 +12,18 @@ import PageNav from './components/pageNav';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
 
+// arbitrary test values, will retrieve from database
+const numPages = 10
+const pageData = [
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+  {name: "Recipe Name", author: "Author Name", allergens: ["Allergen 1", "Allergen 2"], reference: "http://www.example.com/" },
+]
+
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,8 +40,8 @@ export default function App() {
         editMode={editMode}
         setEditMode={setEditMode}
       />
-      <Table editMode={editMode} />
-      <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} />
+      <Table editMode={editMode} pageData={pageData} />
+      <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} numPages={numPages} />
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 
-const numPages = 10 // arbitrary test value
-
-export default function PageNav({ pageNumber, setPageNumber }) {
+export default function PageNav({ pageNumber, setPageNumber, numPages }) {
   const gotoNextPage = () => setPageNumber(Math.min(numPages - 1, pageNumber + 1))
   const gotoPrevPage = () => setPageNumber(Math.max(0, pageNumber - 1))
   const gotoFirstPage = () => setPageNumber(0)

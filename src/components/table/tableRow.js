@@ -1,23 +1,24 @@
 import { SlCard, SlTag } from '@shoelace-style/shoelace/dist/react';
 
-export default function TableRow() {
+export default function TableRow({name, author, allergens, reference}) {
   return (
     <SlCard>
       <div class="table-row">
         <div class="table-cell">
-          Recipe Name
+          {name}
         </div>
         <div class="table-cell">
-          Author Name
+          {author}
         </div>
         <div class="table-cell">
-          <SlTag variant="warning">Allergen 1</SlTag>
-          <SlTag variant="warning">Allergen 2</SlTag>
+          {allergens.map((allergen, index) => {
+            return (
+              <SlTag key={index} variant="warning">{allergen}</SlTag>
+            )
+          })}
         </div>
         <div class="table-cell">
-          <a href="http://www.example.com/" target="_blank" rel="noreferrer">
-            Example Reference
-          </a>
+          {reference}
         </div>
       </div>
     </SlCard>
