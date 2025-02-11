@@ -7,7 +7,7 @@ import { useState } from 'preact/hooks';
 import Settings from './components/settings';
 import Toolbar from './components/toolbar';
 import RecipeDialog from './components/recipeDialog';
-import Table from './components/table';
+import Table from './components/table/table';
 import PageNav from './components/pageNav';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
