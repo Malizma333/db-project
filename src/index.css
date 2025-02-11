@@ -36,6 +36,7 @@ html {
 }
 
 .table-header {
+  font-size: medium;
   font-weight: 900;
   position: sticky;
   top: 0;
