@@ -16,13 +16,19 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
+  const [editMode, setEditMode] = useState(false);
 
   return (
     <div class="sl-theme-dark app-container">
       <Settings settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} />
       <RecipeDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
-      <Toolbar setSettingsOpen={setSettingsOpen} setDialogOpen={setDialogOpen} />
-      <Table />
+      <Toolbar
+        setSettingsOpen={setSettingsOpen}
+        setDialogOpen={setDialogOpen}
+        editMode={editMode}
+        setEditMode={setEditMode}
+      />
+      <Table editMode={editMode} />
       <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} />
     </div>
   );

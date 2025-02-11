@@ -3,12 +3,14 @@ import TableHeader from './tableHeader';
 import TableRow from './tableRow';
 import TableRowEdit from './tableRowEdit';
 
-export default function Table() {
+export default function Table({ editMode }) {
   return (
     <div class="table-contents">
       <TableHeader />
-      <TableRow />
-      <TableRowEdit />
+      {editMode ?
+        <TableRowEdit /> :
+        <TableRow />
+      }
       {/* <div class="table-row">
         <SlTooltip content="Create New Recipe">
           <SlIconButton name="plus" label="Create New Recipe" class="add-recipe-button" />
