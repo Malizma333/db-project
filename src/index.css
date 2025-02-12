@@ -1,14 +1,17 @@
+@font-face {
+  font-family: 'Questrial';
+  src: url(./assets/Questrial-Regular.ttf) format('truetype');
+}
+
 html {
   color-scheme: dark;
   font-family: 'Questrial', 'Helvetica';
-  font-weight: 400;
   font-size: small;
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   height: 94vh;
 }
 
@@ -16,7 +19,6 @@ html {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   flex: 1;
 }
 
@@ -28,7 +30,7 @@ html {
   display: flex;
   flex-direction: column;
   flex: 10;
-  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .table-contents sl-card {
@@ -37,7 +39,7 @@ html {
 
 .table-header {
   font-size: medium;
-  font-weight: 900;
+  font-weight: bold;
   position: sticky;
   top: 0;
 }
@@ -45,7 +47,6 @@ html {
 .table-row {
   display: flex;
   align-items: center;
-  justify-content: center;
   height: 30px;
 }
 

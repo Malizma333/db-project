@@ -10,6 +10,7 @@ import RecipeDialog from './components/recipeDialog';
 import Table from './components/table/table';
 import PageNav from './components/pageNav';
 
+// used for importing icons without copying into public directory
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
 
 // arbitrary test values, will retrieve from database
