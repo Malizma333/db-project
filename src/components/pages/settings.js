@@ -7,9 +7,9 @@ export default function Settings({ settingsOpen, setSettingsOpen }) {
       open={settingsOpen}
       onSlAfterHide={() => setSettingsOpen(false)}
       placement="top"
-      label="Settings"
+      label="Search Settings"
     >
-      These are some settings
+      These are some search settings
     </SlDrawer>
   )
 }
