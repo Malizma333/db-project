@@ -8,7 +8,7 @@ export default function TableHeader({ editMode }) {
         <div class="table-cell">Author</div>
         <div class="table-cell">Allergens</div>
         <div class="table-cell">Reference</div>
-        {editMode && <div class="table-end add-recipe-button">
+        {editMode && <div class="add-recipe-button">
           <SlTooltip content="Create Recipe">
             <SlIconButton name="plus" label="Create Recipe" />
           </SlTooltip>

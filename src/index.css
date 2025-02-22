@@ -42,6 +42,7 @@ html {
   font-weight: bold;
   position: sticky;
   top: 0;
+  z-index: 1;
 }
 
 .table-row {
@@ -53,11 +54,6 @@ html {
 .table-cell {
   display: flex;
   flex: 1;
-}
-
-.table-end {
-  position: absolute;
-  right: 1vw;
 }
 
 .page-buttons {

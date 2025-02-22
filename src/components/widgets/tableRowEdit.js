@@ -1,14 +1,14 @@
-import { SlCard, SlTooltip, SlIconButton, SlTag } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
 
 export default function TableRowEdit({name, author, allergens, reference}) {
   return (
     <SlCard>
       <div class="table-row">
         <div class="table-cell">
-          <sl-input value={name} placeholder="Recipe Name" />
+          <SlInput value={name} placeholder="Recipe Name" />
         </div>
         <div class="table-cell">
-          <sl-input value={author} placeholder="Author Name" />
+          <SlInput value={author} placeholder="Author Name" />
         </div>
         <div class="table-cell">
           {allergens.map((allergen, index) => {
@@ -26,9 +26,9 @@ export default function TableRowEdit({name, author, allergens, reference}) {
           </SlTooltip>
         </div>
         <div class="table-cell">
-          <sl-input value={reference} placeholder="Reference" />
+          <SlInput value={reference} placeholder="Reference" />
         </div>
-        <div class="table-end">
+        <div>
           <SlTooltip content="Remove Recipe">
             <SlIconButton name="trash" label="Remove Recipe" />
           </SlTooltip>
