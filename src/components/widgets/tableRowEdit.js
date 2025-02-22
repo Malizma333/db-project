@@ -28,7 +28,7 @@ export default function TableRowEdit({name, author, allergens, reference}) {
         <div class="table-cell">
           <SlInput value={reference} placeholder="Reference" />
         </div>
-        <div>
+        <div class="table-end">
           <SlTooltip content="Remove Recipe">
             <SlIconButton name="trash" label="Remove Recipe" />
           </SlTooltip>

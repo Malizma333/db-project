@@ -49,11 +49,19 @@ html {
   display: flex;
   align-items: center;
   height: 30px;
+  position: relative;
 }
 
 .table-cell {
+  align-items: start;
   display: flex;
   flex: 1;
+  justify-content: start;
+}
+
+.table-end {
+  position: absolute;
+  right: 0;
 }
 
 .page-buttons {

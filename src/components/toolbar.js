@@ -5,7 +5,7 @@ const guest = false
 export default function Toolbar({ setSettingsOpen, setRecipeDialogOpen, setLoginDialogOpen, editMode, setEditMode }) {
   return (
     <div class="toolbar">
-      <SlInput type="search" placeholder="Search">
+      <SlInput clearable type="search" placeholder="Search">
         <SlIconButton name="search" label="Run Search" slot="suffix" />
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsOpen(true)} />
