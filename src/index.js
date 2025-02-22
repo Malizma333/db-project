@@ -10,30 +10,12 @@ import RecipeDialog from './components/pages/recipeDialog';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
-
+import { DB_DATA } from './api/temp';
 // used for importing icons without copying into public directory
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
 
-// arbitrary test values, will retrieve from database
-const pageData = [
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-  {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
-]
 const rowsPerPage = 10;
-const numPages = Math.ceil(pageData.length / rowsPerPage);
+const numPages = Math.ceil(DB_DATA.pageData.length / rowsPerPage);
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -41,20 +23,23 @@ export default function App() {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
   const [editMode, setEditMode] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <div class="sl-theme-dark app-container">
       <Settings settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} />
       <RecipeDialog dialogOpen={recipeDialogOpen} setDialogOpen={setRecipeDialogOpen} />
-      <LoginDialog dialogOpen={loginDialogOpen} setDialogOpen={setLoginDialogOpen} />
+      <LoginDialog dialogOpen={loginDialogOpen} setDialogOpen={setLoginDialogOpen} setLoggedIn={setLoggedIn} />
       <Toolbar
         setSettingsOpen={setSettingsOpen}
         setRecipeDialogOpen={setRecipeDialogOpen}
+        setEditMode={setEditMode}
         setLoginDialogOpen={setLoginDialogOpen}
         editMode={editMode}
-        setEditMode={setEditMode}
+        loggedIn={loggedIn}
+        setLoggedIn={setLoggedIn}
       />
-      <Table editMode={editMode} pageData={pageData.slice(pageNumber * rowsPerPage, (pageNumber + 1) * rowsPerPage)} />
+      <Table editMode={editMode} pageData={DB_DATA.pageData.slice(pageNumber * rowsPerPage, (pageNumber + 1) * rowsPerPage)} />
       <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} numPages={numPages} />
     </div>
   );

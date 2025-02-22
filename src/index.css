@@ -79,3 +79,11 @@ html {
 .add-recipe-button {
   font-size: 2em;
 }
+
+.password-field {
+  margin-bottom: 1em;
+}
+
+.password-field::part(form-control-help-text) {
+  color: red;
+}
