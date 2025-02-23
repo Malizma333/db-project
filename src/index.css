@@ -72,10 +72,6 @@ html {
   flex: 1;
 }
 
-.allergen-box sl-icon-button {
-  margin-right: -1em;
-}
-
 .add-recipe-button {
   font-size: 2em;
 }

@@ -13,7 +13,9 @@ export default function TableRow({name, author, allergens, reference}) {
         <div class="table-cell">
           {allergens.map((allergen, index) => {
             return (
-              <SlTag key={index} variant="warning">{allergen}</SlTag>
+              <SlTag key={index} variant="warning" size="small">
+                {allergen}
+              </SlTag>
             )
           })}
         </div>

@@ -13,11 +13,8 @@ export default function TableRowEdit({name, author, allergens, reference}) {
         <div class="table-cell">
           {allergens.map((allergen, index) => {
             return (
-              <SlTag key={index} variant="warning" class="allergen-box">
+              <SlTag key={index} variant="warning" class="allergen-box" removable size="small">
                 {allergen}
-                <SlTooltip content="Remove Allergen">
-                  <SlIconButton name="x" label="Remove Allergen" />
-                </SlTooltip>
               </SlTag>
             )
           })}
