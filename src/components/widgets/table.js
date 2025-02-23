@@ -1,17 +1,109 @@
-import TableRow from './tableRow';
-import TableRowEdit from './tableRowEdit';
-import { SlCard, SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
+
+const styles = {
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    flex: "10",
+    overflowX: "hidden",
+  },
+  header: {
+    fontSize: "large",
+    fontWeight: "bold",
+    position: "sticky",
+    top: "0",
+    zIndex: "1",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    height: "30px",
+    position: "relative",
+  },
+  cell: {
+    alignItems: "start",
+    display: "flex",
+    flex: "1",
+    justifyContent: "start",
+  },
+  end: {
+    position: "absolute",
+    right: "0",
+  },
+}
+
+function TableRow({name, author, allergens, reference}) {
+  return (
+    <SlCard style={{"--border-radius": "0"}}>
+      <div style={styles.row}>
+        <div style={styles.cell}>
+          {name}
+        </div>
+        <div style={styles.cell}>
+          {author}
+        </div>
+        <div style={styles.cell}>
+          {allergens.map((allergen, index) => {
+            return (
+              <SlTag key={index} variant="warning" size="small">
+                {allergen}
+              </SlTag>
+            )
+          })}
+        </div>
+        <div style={styles.cell}>
+          {reference}
+        </div>
+      </div>
+    </SlCard>
+  )
+}
+
+function TableRowEdit({name, author, allergens, reference}) {
+  return (
+    <SlCard style={{"--border-radius": "0"}}>
+      <div style={styles.row}>
+        <div style={styles.cell}>
+          <SlInput value={name} placeholder="Recipe Name" />
+        </div>
+        <div style={styles.cell}>
+          <SlInput value={author} placeholder="Author Name" />
+        </div>
+        <div style={styles.cell}>
+          {allergens.map((allergen, index) => {
+            return (
+              <SlTag key={index} variant="warning" removable size="small">
+                {allergen}
+              </SlTag>
+            )
+          })}
+          <SlTooltip content="Add Allergen">
+            <SlIconButton name="plus" label="Add Allergen" />
+          </SlTooltip>
+        </div>
+        <div style={styles.cell}>
+          <SlInput value={reference} placeholder="Reference" />
+        </div>
+        <div style={styles.end}>
+          <SlTooltip content="Remove Recipe">
+            <SlIconButton name="trash" label="Remove Recipe" />
+          </SlTooltip>
+        </div>
+      </div>
+    </SlCard>
+  )
+}
 
 export default function Table({ editMode, pageData }) {
   return (
-    <div class="table-contents">
-      <SlCard class="table-header">
-        <div class="table-row">
-          <div class="table-cell">Recipe</div>
-          <div class="table-cell">Author</div>
-          <div class="table-cell">Allergens</div>
-          <div class="table-cell">Reference</div>
-          {editMode && <div class="table-end add-recipe-button">
+    <div style={styles.root}>
+      <SlCard style={{...styles.header, "--border-radius": "0"}}>
+        <div style={styles.row}>
+          <div style={styles.cell}>Recipe</div>
+          <div style={styles.cell}>Author</div>
+          <div style={styles.cell}>Allergens</div>
+          <div style={styles.cell}>Reference</div>
+          {editMode && <div style={{...styles.end, fontSize: "2em"}}>
             <SlTooltip content="Create Recipe">
               <SlIconButton name="plus" label="Create Recipe" />
             </SlTooltip>

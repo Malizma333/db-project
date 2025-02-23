@@ -1,13 +1,34 @@
 import { SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 
+const styles = {
+  root: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: "1",
+  }
+}
+
 export default function PageNav({ pageNumber, setPageNumber, numPages }) {
-  const gotoNextPage = () => setPageNumber(Math.min(numPages - 1, pageNumber + 1))
-  const gotoPrevPage = () => setPageNumber(Math.max(0, pageNumber - 1))
-  const gotoFirstPage = () => setPageNumber(0)
-  const gotoLastPage = () => setPageNumber(numPages - 1)
+  function gotoNextPage() {
+    setPageNumber(Math.min(numPages - 1, pageNumber + 1));
+  }
+
+  function gotoPrevPage() {
+    setPageNumber(Math.max(0, pageNumber - 1));
+  }
+
+  function gotoFirstPage() {
+    setPageNumber(0);
+  }
+
+  function gotoLastPage() {
+    setPageNumber(numPages - 1);
+  }
 
   return (
-    <div class="page-buttons">
+    <div style={styles.root}>
       <SlTooltip content="First Page">
         <SlIconButton
           disabled={pageNumber === 0}

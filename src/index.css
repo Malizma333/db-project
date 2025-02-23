@@ -5,81 +5,11 @@
 
 html {
   color-scheme: dark;
-  font-family: 'Questrial', 'Helvetica';
+  font-family: 'Helvetica';
   font-size: large;
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 94vh;
-}
-
-.toolbar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex: 1;
-}
-
-.toolbar sl-input {
-  flex: 1;
-}
-
-.table-contents {
-  display: flex;
-  flex-direction: column;
-  flex: 10;
-  overflow-x: hidden;
-}
-
-.table-contents sl-card {
-  --border-radius: 0;
-}
-
-.table-header {
-  font-size: medium;
-  font-weight: bold;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.table-row {
-  display: flex;
-  align-items: center;
-  height: 30px;
-  position: relative;
-}
-
-.table-cell {
-  align-items: start;
-  display: flex;
-  flex: 1;
-  justify-content: start;
-}
-
-.table-end {
-  position: absolute;
-  right: 0;
-}
-
-.page-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.add-recipe-button {
-  font-size: 2em;
-}
-
-.password-field {
-  margin-bottom: 1em;
-}
-
-.password-field::part(form-control-help-text) {
+/* TODO: Make this inline */
+sl-input[type="password"]::part(form-control-help-text) {
   color: red;
 }
