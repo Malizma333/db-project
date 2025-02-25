@@ -17,14 +17,16 @@ export const DB_DATA = {
     {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
     {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book" },
   ],
-  loggedIn: false
+  loggedIn: false,
+  allAllergens: ["Gluten", "Nuts", "Cheese", "Shellfish"],
+  allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"]
 }
 
 export function validPassword (user, pass) {
   return user === 'test' && pass === 'test';
 }
 
-let socket = new WebSocket("ws://localhost:5000")
-socket.onmessage = function(event) {
-  console.log(event.data)
-}
+// let socket = new WebSocket("ws://localhost:5000")
+// socket.onmessage = function(event) {
+//   console.log(event.data)
+// }

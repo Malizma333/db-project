@@ -5,14 +5,14 @@ const styles = {
   root: {
     alignItems: 'center',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
   },
   menu: {
     height: '8em',
   }
 }
 
-export default function TagPicker({ availableTags, initTags }) {
+export default function TagPicker({ availableTags, variant, initTags=[] }) {
   const [ currentTags, setTags ] = useState(initTags);
   function onRemoveTag(i) {
     console.log('Remove', i, currentTags[i])
@@ -28,7 +28,7 @@ export default function TagPicker({ availableTags, initTags }) {
     <div style={styles.root}>
       {currentTags.map((tagName, index) => {
         return (
-          <SlTag key={index} variant="warning" removable size="small" onSlRemove={() => onRemoveTag(index)}>
+          <SlTag key={index} variant={variant} removable size="small" onSlRemove={() => onRemoveTag(index)}>
             {tagName}
           </SlTag>
         )

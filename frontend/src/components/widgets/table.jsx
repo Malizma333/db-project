@@ -1,5 +1,6 @@
 import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
+import { DB_DATA } from '../../api/temp';
 
 const styles = {
   root: {
@@ -71,7 +72,7 @@ function TableRowEdit({name, author, allergens, reference}) {
           <SlInput value={author} placeholder="Author Name" />
         </div>
         <div style={styles.cell}>
-          <TagPicker initTags={allergens} availableTags={["Cheese", "Gluten", "Nuts", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other"]}/>
+          <TagPicker variant="warning" initTags={allergens} availableTags={DB_DATA.allAllergens}/>
        </div>
         <div style={styles.cell}>
           <SlInput value={reference} placeholder="Reference" />
