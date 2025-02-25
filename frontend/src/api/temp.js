@@ -19,7 +19,8 @@ export const DB_DATA = {
   ],
   loggedIn: false,
   allAllergens: ["Gluten", "Nuts", "Cheese", "Shellfish"],
-  allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"]
+  allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
+  columns: ["name", "author", "allergens", "reference", "ingredients"]
 }
 
 export function validPassword (user, pass) {

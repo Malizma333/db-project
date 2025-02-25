@@ -1,7 +1,7 @@
 ## Developing Locally
 
 ```bash
-# First time setup
+# First time frontend setup
 cd frontend && npm i
 
 # Running the frontend (localhost:8080)
