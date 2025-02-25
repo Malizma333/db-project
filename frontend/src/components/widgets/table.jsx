@@ -1,4 +1,5 @@
 import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
+import TagPicker from './tagPicker';
 
 const styles = {
   root: {
@@ -70,17 +71,8 @@ function TableRowEdit({name, author, allergens, reference}) {
           <SlInput value={author} placeholder="Author Name" />
         </div>
         <div style={styles.cell}>
-          {allergens.map((allergen, index) => {
-            return (
-              <SlTag key={index} variant="warning" removable size="small">
-                {allergen}
-              </SlTag>
-            )
-          })}
-          <SlTooltip content="Add Allergen">
-            <SlIconButton name="plus" label="Add Allergen" />
-          </SlTooltip>
-        </div>
+          <TagPicker initTags={allergens} availableTags={["Cheese", "Gluten", "Nuts", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other", "Other"]}/>
+       </div>
         <div style={styles.cell}>
           <SlInput value={reference} placeholder="Reference" />
         </div>

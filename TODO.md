@@ -8,12 +8,6 @@
   - Filter by ingredients
   - Filter by author name
   - Visible columns
-- Create general component for tag management (settings menu, edit view)
-  - Remove tags with X button
-  - Add tags with + button
-    - Creates input for typing tag name into
-    - Dropdown text of which items exist (based on input text)
-    - Enter to confirm
 - Create mock backend
   - fake username/password function
   - get requests for fake data
@@ -37,7 +31,3 @@
   - Update allergens/ingredients in recipe
     1) Tag management component with internal state
     2) Send update request on tag creation/removal
-- Create docker compose file for production
-  - Build frontend and run deployment mode
-  - Run backend in deployment mode
-  - Use production database
