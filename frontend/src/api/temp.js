@@ -23,3 +23,8 @@ export const DB_DATA = {
 export function validPassword (user, pass) {
   return user === 'test' && pass === 'test';
 }
+
+let socket = new WebSocket("ws://localhost:5000")
+socket.onmessage = function(event) {
+  console.log(event.data)
+}

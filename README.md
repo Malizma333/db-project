@@ -18,4 +18,4 @@ docker-compose down
 docker-compose down --rmi all
 ```
 
-The [preact](https://preactjs.com/) frontend will be located at `localhost:8080` and the [flask](https://flask.palletsprojects.com/en/stable/) backend at `localhost:5000`.
+The frontend will be located at `localhost:8080` and the backend at `localhost:5000`.
