@@ -9,7 +9,7 @@ An over-engineered school project for displaying recipes from a database.
 Some helpful docker commands
 ```bash
 # Whenever you start developing, initialize the frontend and backend containers
-docker-compose up --force-recreate
+docker-compose -f compose.dev.yaml up --force-recreate
 
 # Finished developing
 docker-compose down
