@@ -1,6 +1,6 @@
 {
-  "name": "Recipe App",
-  "short_name": "Recipe App",
+  "name": "Recipe Viewer",
+  "short_name": "Recipe Viewer",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -8,7 +8,7 @@
   "theme_color": "#aa7e69",
   "icons": [
     {
-      "src": "/assets/icon.png",
+      "src": "./icon.png",
       "type": "image/png",
       "sizes": "512x512"
     }

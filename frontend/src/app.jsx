@@ -1,5 +1,4 @@
 import '@shoelace-style/shoelace/dist/themes/dark.css';
-import './index.css';
 
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
 import { useState } from 'preact/hooks';
