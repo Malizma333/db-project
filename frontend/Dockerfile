@@ -1,8 +1,6 @@
 FROM node:18-alpine
-WORKDIR /frontend-app
-COPY package-lock.json ./
-COPY package.json ./
-RUN npm i
+WORKDIR /usr/src/frontend
+COPY package*.json .
+RUN npm install
 COPY . .
 EXPOSE 8080
-CMD ["npm", "run", "dev"]

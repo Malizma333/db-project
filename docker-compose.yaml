@@ -1,34 +1,26 @@
 services:
-  # database:
-  #   image: "postgres:9.6-alpine"
-  #   container_name: kanban-postgres
-  #   volumes:
-  #     - kanban-data:/var/lib/postgresql/data
-  #   ports:
-  #     - 5432:5432
-  #   environment:
-  #     - POSTGRES_DB:kanban
-  #     - POSTGRES_USER:kanban
-  #     - POSTGRES_PASSWORD:kanban
-
   backend:
     build: ./backend
-    container_name: recipe-backend
-    # environment:
-    #   - DB_SERVER=kanban-postgres
     ports:
       - 5000:5000
-    # links:
-    #   - kanban-postgres
+    volumes:
+      - ./backend:/usr/src/backend
+    command: python3 -m flask run --host=0.0.0.0 --debug
+    stdin_open: true
+    tty: true
 
   frontend:
     build: ./frontend
-    container_name: recipe-frontend
     ports:
       - 8080:8080
-    links:
+    depends_on:
       - backend
-
-
-# volumes:
-#   kanban-data:
+    volumes:
+      - ./frontend:/usr/src/frontend
+      - /usr/src/frontend/node_modules/
+    environment:
+      # Live reload bs
+      - WDS_SOCKET_HOST=127.0.0.1 
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm run dev
