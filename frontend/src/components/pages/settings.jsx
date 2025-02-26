@@ -1,6 +1,7 @@
 import { SlCheckbox, SlDrawer, SlIconButton, SlInput, SlRadioGroup } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
 import { DB_DATA } from '../../api/temp';
+import { useState } from 'preact/hooks';
 
 const styles = {
   settingContainer: {
@@ -15,13 +16,30 @@ const styles = {
   }
 }
 
-function MultiInputs() {
+function FilterPicker({ columnName, columnOptions }) {
+  const [included, setIncluded] = useState([]);
+  const [excluded, setExcluded] = useState([]);
+
   return (
-    <div>
-      <SlInput type="text">
-        <SlIconButton name="x" slot="suffix" onClick={() => console.log("test")}></SlIconButton>
-      </SlInput>
-      <SlIconButton name="plus"></SlIconButton>
+    <div style={styles.settingContainer}>
+      <div style={styles.filterContainer}>
+        Include {columnName}
+        <TagPicker
+          variant="success"
+          available={columnOptions.filter(tag => !excluded.includes(tag))}
+          selected={included}
+          setSelected={setIncluded}
+        />
+      </div>
+      <div style={styles.filterContainer}>
+        Exclude {columnName}
+        <TagPicker
+          variant="danger"
+          available={columnOptions.filter(tag => !included.includes(tag))}
+          selected={excluded}
+          setSelected={setExcluded}
+        />
+      </div>
     </div>
   )
 }
@@ -47,36 +65,16 @@ export default function Settings({ settingsOpen, setSettingsOpen }) {
       <div style={styles.settingContainer}>
         <div style={styles.filterContainer}>
           Visible Columns
-          {DB_DATA.columns.map((column, index) => {
+          {DB_DATA.columns.map((column, _) => {
             return (
               <SlCheckbox size="small">{column}</SlCheckbox>
             )
           })}
         </div>
       </div>
-      <div style={styles.settingContainer}>
-        <MultiInputs></MultiInputs>
-      </div>
-      <div style={styles.settingContainer}>
-        <div style={styles.filterContainer}>
-          Include Allergens
-          <TagPicker variant="success" availableTags={DB_DATA.allAllergens} />
-        </div>
-        <div style={styles.filterContainer}>
-          Exclude Allergens
-          <TagPicker variant="danger" availableTags={DB_DATA.allAllergens} />
-        </div>
-      </div>
-      <div style={styles.settingContainer}>
-        <div style={styles.filterContainer}>
-          Include Ingredients
-          <TagPicker variant="success" availableTags={DB_DATA.allIngredients} />
-        </div>
-        <div style={styles.filterContainer}>
-          Exclude Ingredients
-          <TagPicker variant="danger" availableTags={DB_DATA.allIngredients} />
-        </div>
-      </div>
+      <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}/>
+      <FilterPicker columnName={"Allergens"} columnOptions={DB_DATA.allAllergens}/>
+      <FilterPicker columnName={"Ingredients"} columnOptions={DB_DATA.allIngredients}/>
     </SlDrawer>
   )
 }

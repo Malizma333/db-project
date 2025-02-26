@@ -1,4 +1,3 @@
-import { useState } from "preact/hooks";
 import { SlTag, SlIconButton, SlDropdown, SlMenu, SlMenuItem } from '@shoelace-style/shoelace/dist/react';
 
 const styles = {
@@ -12,35 +11,34 @@ const styles = {
   }
 }
 
-export default function TagPicker({ availableTags, variant, initTags=[] }) {
-  const [ currentTags, setTags ] = useState(initTags);
+export default function TagPicker({ available, variant, selected, setSelected }) {
   function onRemoveTag(i) {
-    console.log('Remove', i, currentTags[i])
-    setTags(currentTags.slice(0, i).concat(currentTags.slice(i + 1)))
+    console.log('Remove', i, selected[i])
+    setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
   }
 
   function onAddTag(name) {
     console.log('Add', name)
-    setTags(currentTags.concat([name]))
+    setSelected(selected.concat([name]))
   }
 
   return (
     <div style={styles.root}>
-      {currentTags.map((tagName, index) => {
+      {selected.map((tag, index) => {
         return (
           <SlTag key={index} variant={variant} removable size="small" onSlRemove={() => onRemoveTag(index)}>
-            {tagName}
+            {tag}
           </SlTag>
         )
       })}
-      {currentTags.length < availableTags.length &&
+      {selected.length < available.length &&
         <SlDropdown>
           <SlIconButton slot="trigger" name="plus"></SlIconButton>
           <SlMenu style={styles.menu} onSlSelect={(e) => onAddTag(e.detail.item.value)}>
-            {availableTags.filter((tag) => !currentTags.includes(tag)).map((tagName, index) => {
+            {available.filter((tag) => !selected.includes(tag)).map((tag, _) => {
               return (
-                <SlMenuItem value={tagName}>
-                  {tagName}
+                <SlMenuItem value={tag}>
+                  {tag}
                 </SlMenuItem>
               )
             })}

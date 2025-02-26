@@ -72,7 +72,7 @@ function TableRowEdit({name, author, allergens, reference}) {
           <SlInput value={author} placeholder="Author Name" />
         </div>
         <div style={styles.cell}>
-          <TagPicker variant="warning" initTags={allergens} availableTags={DB_DATA.allAllergens}/>
+          <TagPicker variant="warning" available={DB_DATA.allAllergens} selected={allergens} setSelected={(val) => console.log(val)}/>
        </div>
         <div style={styles.cell}>
           <SlInput value={reference} placeholder="Reference" />

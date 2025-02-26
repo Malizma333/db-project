@@ -20,6 +20,7 @@ export const DB_DATA = {
   loggedIn: false,
   allAllergens: ["Gluten", "Nuts", "Cheese", "Shellfish"],
   allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
+  allAuthors: ["Alice", "Bob"],
   columns: ["name", "author", "allergens", "reference", "ingredients"]
 }
 
