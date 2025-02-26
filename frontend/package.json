@@ -12,7 +12,8 @@
   "dependencies": {
     "@shoelace-style/shoelace": "^2.20.0",
     "preact": "^10.1.0",
-    "preact-render-to-string": "^5.1.2"
+    "preact-render-to-string": "^5.1.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",

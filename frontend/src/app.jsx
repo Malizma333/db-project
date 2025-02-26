@@ -3,8 +3,8 @@ import '@shoelace-style/shoelace/dist/themes/dark.css';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
 import { useState } from 'preact/hooks';
 
-import Settings from './components/pages/settings';
-import Toolbar from './components/toolbar';
+import SettingsDrawer from './components/pages/settingsDrawer';
+import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
@@ -24,20 +24,16 @@ const styles = {
 }
 
 export default function App() {
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <div class="sl-theme-dark" style={styles.root}>
-      <Settings settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} />
-      <LoginDialog dialogOpen={loginDialogOpen} setDialogOpen={setLoginDialogOpen} setLoggedIn={setLoggedIn} />
+      <SettingsDrawer />
+      <LoginDialog setLoggedIn={setLoggedIn} />
       <Toolbar
-        setSettingsOpen={setSettingsOpen}
         setEditMode={setEditMode}
-        setLoginDialogOpen={setLoginDialogOpen}
         editMode={editMode}
         loggedIn={loggedIn}
         setLoggedIn={setLoggedIn}

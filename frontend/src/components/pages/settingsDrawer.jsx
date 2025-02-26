@@ -1,7 +1,8 @@
-import { SlCheckbox, SlDrawer, SlIconButton, SlInput, SlRadioGroup } from '@shoelace-style/shoelace/dist/react';
+import { SlCheckbox, SlDrawer } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
 import { DB_DATA } from '../../api/temp';
 import { useState } from 'preact/hooks';
+import { useSettingsViewStore } from '../../stores/view';
 
 const styles = {
   settingContainer: {
@@ -44,11 +45,14 @@ function FilterPicker({ columnName, columnOptions }) {
   )
 }
 
-export default function Settings({ settingsOpen, setSettingsOpen }) {
+export default function SettingsDrawer() {
+  const settingsVisible = useSettingsViewStore((state) => state.visible);
+  const hideSettings = useSettingsViewStore((state) => state.hide);
+
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
     if (e.eventPhase === Event.AT_TARGET) {
-      setSettingsOpen(false);
+      hideSettings();
     } else {
       e.preventDefault()
     }
@@ -57,7 +61,7 @@ export default function Settings({ settingsOpen, setSettingsOpen }) {
   return (
     <SlDrawer
       class="drawer-placement-top"
-      open={settingsOpen}
+      open={settingsVisible}
       onSlHide={(e) => onHide(e)}
       placement="top"
       label="Search Settings"
