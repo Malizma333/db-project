@@ -24,18 +24,21 @@ const styles = {
     position: "relative",
   },
   cell: {
-    alignItems: "start",
+    alignItems: "center",
     display: "flex",
-    flex: "1",
+    flex: "3",
     justifyContent: "start",
+    overflow: "auto hidden",
   },
   end: {
-    position: "absolute",
-    right: "0",
+    alignItems: "center",
+    display: "flex",
+    flex: "1",
+    justifyContent: "end",
   },
 }
 
-function TableRow({name, author, allergens, reference}) {
+function TableRow({ name, author, allergens, reference, ingredients }) {
   const { getColumnVisible } = useAppStore();
 
   return (
@@ -48,23 +51,21 @@ function TableRow({name, author, allergens, reference}) {
           {author}
         </div>}
         {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
-          {allergens.map((allergen, index) => {
-            return (
-              <SlTag key={index} variant="warning" size="small">
-                {allergen}
-              </SlTag>
-            )
-          })}
+          <TagPicker variant="warning" selected={allergens} viewMode />
         </div>}
         {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>
           {reference}
         </div>}
+        {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>
+          <TagPicker variant="primary" selected={ingredients} viewMode />
+        </div>}
+        <div style={styles.end}></div>
       </div>
     </SlCard>
   )
 }
 
-function TableRowEdit({name, author, allergens, reference}) {
+function TableRowEdit({ name, author, allergens, reference, ingredients }) {
   const { getColumnVisible } = useAppStore();
 
   return (
@@ -79,8 +80,11 @@ function TableRowEdit({name, author, allergens, reference}) {
         {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
           <TagPicker variant="warning" available={DB_DATA.allAllergens} selected={allergens} setSelected={(val) => console.log(val)}/>
         </div>}
-        {getColumnVisible(COLUMN_MASK.REFERENCE) &&<div style={styles.cell}>
+        {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>
           <SlInput value={reference} placeholder="Reference" />
+        </div>}
+        {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>
+          <TagPicker variant="primary" available={DB_DATA.allIngredients} selected={ingredients} setSelected={(val) => console.log(val)}/>
         </div>}
         <div style={styles.end}>
           <SlTooltip content="Remove Recipe">
@@ -103,17 +107,16 @@ export default function Table({ pageData }) {
           {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>Author</div>}
           {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>Allergens</div>}
           {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>Reference</div>}
-          {editMode && <div style={{...styles.end, fontSize: "2em"}}>
-            <SlTooltip content="Create Recipe">
+          {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>Ingredients</div>}
+          <div style={{...styles.end, fontSize: "2em"}}>
+            {editMode && <SlTooltip content="Create Recipe">
               <SlIconButton name="plus" label="Create Recipe" />
-            </SlTooltip>
-          </div>}
+            </SlTooltip>}
+          </div>
         </div>
       </SlCard>
       {pageData.map((row) => {
-        return editMode ?
-          <TableRowEdit name={row.name} author={row.author} allergens={row.allergens} reference={row.reference} /> :
-          <TableRow name={row.name} author={row.author} allergens={row.allergens} reference={row.reference} />
+        return editMode ? <TableRowEdit {...row} /> : <TableRow {...row} />
       })}
     </div>
   )

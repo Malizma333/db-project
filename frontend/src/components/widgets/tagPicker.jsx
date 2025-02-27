@@ -4,6 +4,7 @@ const styles = {
   root: {
     alignItems: 'center',
     display: 'flex',
+    height: '2em',
     justifyContent: 'start',
   },
   menu: {
@@ -11,7 +12,7 @@ const styles = {
   }
 }
 
-export default function TagPicker({ available, variant, selected, setSelected }) {
+export default function TagPicker({ available=undefined, variant, selected, setSelected=undefined, viewMode=false }) {
   function onRemoveTag(i) {
     setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
   }
@@ -24,12 +25,12 @@ export default function TagPicker({ available, variant, selected, setSelected })
     <div style={styles.root}>
       {selected.map((tag, index) => {
         return (
-          <SlTag key={index} variant={variant} removable size="small" onSlRemove={() => onRemoveTag(index)}>
+          <SlTag key={index} variant={variant} removable={!viewMode} size="small" onSlRemove={() => onRemoveTag(index)}>
             {tag}
           </SlTag>
         )
       })}
-      {selected.length < available.length &&
+      {!viewMode && selected.length < available.length &&
         <SlDropdown>
           <SlIconButton slot="trigger" name="plus"></SlIconButton>
           <SlMenu style={styles.menu} onSlSelect={(e) => onAddTag(e.detail.item.value)}>

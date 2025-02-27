@@ -113,6 +113,11 @@ export default function SettingsDrawer() {
             checked={getColumnVisible(COLUMN_MASK.REFERENCE)}
             onSlChange={() => toggleColumn(COLUMN_MASK.REFERENCE)}
           >Reference</SlCheckbox>
+          <SlCheckbox
+            size="small"
+            checked={getColumnVisible(COLUMN_MASK.INGREDIENTS)}
+            onSlChange={() => toggleColumn(COLUMN_MASK.INGREDIENTS)}
+          >Ingredients</SlCheckbox>
         </div>
       </div>
       <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}/>
