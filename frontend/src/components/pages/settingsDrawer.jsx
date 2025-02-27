@@ -2,7 +2,7 @@ import { SlCheckbox, SlDrawer } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
 import { DB_DATA } from '../../api/temp';
 import { useState } from 'preact/hooks';
-import { useSettingsViewStore } from '../../stores/view';
+import { useAppStore, VIEW } from '../../store';
 
 const styles = {
   settingContainer: {
@@ -46,13 +46,13 @@ function FilterPicker({ columnName, columnOptions }) {
 }
 
 export default function SettingsDrawer() {
-  const settingsVisible = useSettingsViewStore((state) => state.visible);
-  const hideSettings = useSettingsViewStore((state) => state.hide);
+  const settingsVisible = useAppStore((state) => state.view) === VIEW.SEARCH_SETTINGS;
+  const setMainView = useAppStore((state) => state.setMainView);
 
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
     if (e.eventPhase === Event.AT_TARGET) {
-      hideSettings();
+      setMainView();
     } else {
       e.preventDefault()
     }

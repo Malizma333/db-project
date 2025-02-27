@@ -1,6 +1,6 @@
 // arbitrary test values, will retrieve from database
 export const DB_DATA = {
-  pageData: [
+  collectionData: [
     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },
     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/" },

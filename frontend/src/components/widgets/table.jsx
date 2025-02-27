@@ -1,7 +1,7 @@
 import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
 import { DB_DATA } from '../../api/temp';
-import { useEditModeStore } from '../../stores/userState';
+import { useAppStore } from '../../store';
 
 const styles = {
   root: {
@@ -89,7 +89,7 @@ function TableRowEdit({name, author, allergens, reference}) {
 }
 
 export default function Table({ pageData }) {
-  const editMode = useEditModeStore((state) => state.enabled)
+  const { editMode } = useAppStore();
 
   return (
     <div style={styles.root}>

@@ -1,8 +1,7 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useState } from 'preact/hooks';
 import { validPassword } from '../../api/temp';
-import { useLoginViewStore } from '../../stores/view';
-import { useLoggedInStore } from '../../stores/userState';
+import { useAppStore, VIEW } from '../../store';
 
 const styles = {
   passwordField: {
@@ -14,12 +13,10 @@ export default function LoginDialog() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const loginOpen = useLoginViewStore((state) => state.visible);
-  const closeLogin = useLoginViewStore((state) => state.hide);
-  const logIn = useLoggedInStore((state) => state.logIn);
+  const { view, logIn, setMainView } = useAppStore();
 
   function onCloseDialog() {
-    closeLogin();
+    setMainView();
     setUsername("");
     setPassword("");
     setHelpText("");
@@ -37,7 +34,7 @@ export default function LoginDialog() {
   return (
     <SlDialog
       class="dialog-overview"
-      open={loginOpen}
+      open={view === VIEW.LOGIN_PROMPT}
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
@@ -56,7 +53,7 @@ export default function LoginDialog() {
         placeholder="Password"
         passwordToggle
       />
-      <SlButton onClick={() => onLogIn(true)}>
+      <SlButton onClick={() => onLogIn()}>
         Log In
       </SlButton>
     </SlDialog>
