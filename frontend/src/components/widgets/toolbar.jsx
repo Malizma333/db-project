@@ -1,5 +1,6 @@
 import { SlInput, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import { useLoginViewStore, useSettingsViewStore } from '../../stores/view';
+import { useEditModeStore, useLoggedInStore } from '../../stores/userState';
 
 const styles = {
   root: {
@@ -10,13 +11,18 @@ const styles = {
   }
 }
 
-export default function Toolbar({ editMode, setEditMode, loggedIn, setLoggedIn }) {
+export default function Toolbar() {
   const openSettings = useSettingsViewStore((state) => state.show);
   const openLogin = useLoginViewStore((state) => state.show);
+  const editMode = useEditModeStore((state) => state.enabled);
+  const disableEditMode = useEditModeStore((state) => state.disable);
+  const toggleEditMode = useEditModeStore((state) => state.toggle);
+  const logOut = useLoggedInStore((state) => state.logOut);
+  const loggedIn = useLoggedInStore((state) => state.loggedIn);
 
-  function logOut() {
-    setLoggedIn(false);
-    setEditMode(false);
+  function onLogOut() {
+    logOut();
+    disableEditMode();
   }
 
   return (
@@ -25,10 +31,10 @@ export default function Toolbar({ editMode, setEditMode, loggedIn, setLoggedIn }
         <SlIconButton name="search" label="Run Search" slot="suffix" />
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => openSettings()}/>
-      {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => setEditMode(!editMode)} label="Edit Mode" />}
+      {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => toggleEditMode()} label="Edit Mode" />}
       <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")} />
       {!loggedIn && <SlIconButton name="person-circle" label="Log In" onClick={() => openLogin()}/>}
-      {loggedIn && <SlIconButton name="box-arrow-right" label="Log Out" onClick={() => logOut()} />}
+      {loggedIn && <SlIconButton name="box-arrow-right" label="Log Out" onClick={() => onLogOut()} />}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
 import { DB_DATA } from '../../api/temp';
+import { useEditModeStore } from '../../stores/userState';
 
 const styles = {
   root: {
@@ -87,7 +88,9 @@ function TableRowEdit({name, author, allergens, reference}) {
   )
 }
 
-export default function Table({ editMode, pageData }) {
+export default function Table({ pageData }) {
+  const editMode = useEditModeStore((state) => state.enabled)
+
   return (
     <div style={styles.root}>
       <SlCard style={{...styles.header, "--border-radius": "0"}}>

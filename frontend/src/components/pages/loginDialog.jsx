@@ -2,6 +2,7 @@ import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react
 import { useState } from 'preact/hooks';
 import { validPassword } from '../../api/temp';
 import { useLoginViewStore } from '../../stores/view';
+import { useLoggedInStore } from '../../stores/userState';
 
 const styles = {
   passwordField: {
@@ -9,12 +10,13 @@ const styles = {
   },
 }
 
-export default function LoginDialog({ setLoggedIn }) {
+export default function LoginDialog() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
   const loginOpen = useLoginViewStore((state) => state.visible);
   const closeLogin = useLoginViewStore((state) => state.hide);
+  const logIn = useLoggedInStore((state) => state.logIn);
 
   function onCloseDialog() {
     closeLogin();
@@ -25,7 +27,7 @@ export default function LoginDialog({ setLoggedIn }) {
 
   function onLogIn() {
     if (validPassword(username, password)) {
-      setLoggedIn(true);
+      logIn();
       onCloseDialog();
     } else {
       setHelpText("Invalid username or password");

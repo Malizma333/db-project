@@ -13,12 +13,10 @@ const styles = {
 
 export default function TagPicker({ available, variant, selected, setSelected }) {
   function onRemoveTag(i) {
-    console.log('Remove', i, selected[i])
     setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
   }
 
   function onAddTag(name) {
-    console.log('Add', name)
     setSelected(selected.concat([name]))
   }
 

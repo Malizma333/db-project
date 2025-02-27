@@ -25,20 +25,13 @@ const styles = {
 
 export default function App() {
   const [pageNumber, setPageNumber] = useState(0);
-  const [editMode, setEditMode] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <div class="sl-theme-dark" style={styles.root}>
       <SettingsDrawer />
-      <LoginDialog setLoggedIn={setLoggedIn} />
-      <Toolbar
-        setEditMode={setEditMode}
-        editMode={editMode}
-        loggedIn={loggedIn}
-        setLoggedIn={setLoggedIn}
-      />
-      <Table editMode={editMode} pageData={DB_DATA.pageData.slice(pageNumber * rowsPerPage, (pageNumber + 1) * rowsPerPage)} />
+      <LoginDialog />
+      <Toolbar />
+      <Table pageData={DB_DATA.pageData.slice(pageNumber * rowsPerPage, (pageNumber + 1) * rowsPerPage)} />
       <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} numPages={numPages} />
     </div>
   );
