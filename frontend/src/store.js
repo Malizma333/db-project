@@ -16,12 +16,12 @@ const initStoreState = {
   editMode: false,
   loggedIn: false,
   page: 0,
-  numRecipesPerPage: 10,
+  numRowsPerPage: 10,
   numRecipesInCollection: DB_DATA.collectionData.length
 }
 
 const computed = createComputed((state) => ({
-  numPages: Math.ceil(state.numRecipesInCollection / state.numRecipesPerPage)
+  numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage)
 }))
 
 export const useAppStore = create(
@@ -39,7 +39,8 @@ export const useAppStore = create(
       gotoFirstPage: () => set({ page: 0 }),
       gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
       gotoNextPage: () => set((state) => ({ page: Math.min(get().numPages - 1, state.page + 1) })),
-      gotoLastPage: () => set((state) => ({ page: get().numPages - 1 }))
+      gotoLastPage: () => set(() => ({ page: get().numPages - 1 })),
+      setRowsPerPage: (val) => set({ numRowsPerPage: val }),
     })
   )
 );

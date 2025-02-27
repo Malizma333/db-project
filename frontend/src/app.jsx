@@ -21,14 +21,14 @@ const styles = {
 }
 
 export default function App() {
-  const { page, numRecipesPerPage } = useAppStore();
+  const { page, numRowsPerPage } = useAppStore();
 
   return (
     <div class="sl-theme-dark" style={styles.root}>
       <SettingsDrawer />
       <LoginDialog />
       <Toolbar />
-      <Table pageData={DB_DATA.collectionData.slice(page * numRecipesPerPage, (page + 1) * numRecipesPerPage)} />
+      <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)} />
       <PageNav />
     </div>
   );

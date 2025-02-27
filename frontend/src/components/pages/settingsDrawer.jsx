@@ -1,4 +1,4 @@
-import { SlCheckbox, SlDrawer } from '@shoelace-style/shoelace/dist/react';
+import { SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
 import { DB_DATA } from '../../api/temp';
 import { useState } from 'preact/hooks';
@@ -46,8 +46,18 @@ function FilterPicker({ columnName, columnOptions }) {
 }
 
 export default function SettingsDrawer() {
-  const settingsVisible = useAppStore((state) => state.view) === VIEW.SEARCH_SETTINGS;
-  const setMainView = useAppStore((state) => state.setMainView);
+  const { view, numRowsPerPage, setMainView, setRowsPerPage, gotoFirstPage } = useAppStore();
+  const minRowsPerPage = 1;
+  const maxRowsPerPage = 20;
+
+  function onSetRowsPerPage(value) {
+    if (isNaN(value)) {
+      return;
+    }
+
+    setRowsPerPage(Math.min(maxRowsPerPage, Math.max(minRowsPerPage, value)));
+    gotoFirstPage();
+  }
 
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -61,11 +71,22 @@ export default function SettingsDrawer() {
   return (
     <SlDrawer
       class="drawer-placement-top"
-      open={settingsVisible}
+      open={view === VIEW.SEARCH_SETTINGS}
       onSlHide={(e) => onHide(e)}
       placement="top"
       label="Search Settings"
     >
+      <div style={styles.settingContainer}>
+        <div style={styles.filterContainer}>
+          Recipes Per Page
+          <SlInput
+            type="number"
+            value={numRowsPerPage}
+            min={minRowsPerPage}
+            max={maxRowsPerPage}
+            onSlBlur={(e) => onSetRowsPerPage(parseInt(e.target.value))}></SlInput>
+        </div>
+      </div>
       <div style={styles.settingContainer}>
         <div style={styles.filterContainer}>
           Visible Columns
