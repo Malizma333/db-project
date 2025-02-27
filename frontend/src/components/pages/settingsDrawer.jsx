@@ -2,7 +2,7 @@ import { SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/rea
 import TagPicker from '../widgets/tagPicker';
 import { DB_DATA } from '../../api/temp';
 import { useState } from 'preact/hooks';
-import { useAppStore, VIEW } from '../../store';
+import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
 
 const styles = {
   settingContainer: {
@@ -46,7 +46,10 @@ function FilterPicker({ columnName, columnOptions }) {
 }
 
 export default function SettingsDrawer() {
-  const { view, numRowsPerPage, setMainView, setRowsPerPage, gotoFirstPage } = useAppStore();
+  const {
+    view, numRowsPerPage,
+    getColumnVisible, toggleColumn, setMainView, setRowsPerPage, gotoFirstPage
+  } = useAppStore();
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;
 
@@ -90,11 +93,26 @@ export default function SettingsDrawer() {
       <div style={styles.settingContainer}>
         <div style={styles.filterContainer}>
           Visible Columns
-          {DB_DATA.columns.map((column, _) => {
-            return (
-              <SlCheckbox size="small">{column}</SlCheckbox>
-            )
-          })}
+          <SlCheckbox
+            size="small"
+            checked={getColumnVisible(COLUMN_MASK.NAME)}
+            onSlChange={() => toggleColumn(COLUMN_MASK.NAME)}
+          >Recipe Name</SlCheckbox>
+          <SlCheckbox
+            size="small"
+            checked={getColumnVisible(COLUMN_MASK.AUTHOR)}
+            onSlChange={() => toggleColumn(COLUMN_MASK.AUTHOR)}
+          >Author</SlCheckbox>
+          <SlCheckbox
+                size="small"
+                checked={getColumnVisible(COLUMN_MASK.ALLERGENS)}
+              onSlChange={() => toggleColumn(COLUMN_MASK.ALLERGENS)}
+          >Allergens</SlCheckbox>
+          <SlCheckbox
+            size="small"
+            checked={getColumnVisible(COLUMN_MASK.REFERENCE)}
+            onSlChange={() => toggleColumn(COLUMN_MASK.REFERENCE)}
+          >Reference</SlCheckbox>
         </div>
       </div>
       <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}/>

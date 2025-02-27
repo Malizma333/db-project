@@ -11,13 +11,22 @@ export const VIEW = Object.freeze({
   LOGIN_PROMPT: 5,
 });
 
+export const COLUMN_MASK = Object.freeze({
+  NAME: 1,
+  AUTHOR: 2,
+  ALLERGENS: 4,
+  REFERENCE: 8,
+  INGREDIENTS: 16
+});
+
 const initStoreState = {
   view: VIEW.MAIN,
   editMode: false,
   loggedIn: false,
   page: 0,
   numRowsPerPage: 10,
-  numRecipesInCollection: DB_DATA.collectionData.length
+  numRecipesInCollection: DB_DATA.collectionData.length,
+  visibleColumns: COLUMN_MASK.NAME | COLUMN_MASK.AUTHOR | COLUMN_MASK.REFERENCE,
 }
 
 const computed = createComputed((state) => ({
@@ -41,6 +50,8 @@ export const useAppStore = create(
       gotoNextPage: () => set((state) => ({ page: Math.min(get().numPages - 1, state.page + 1) })),
       gotoLastPage: () => set(() => ({ page: get().numPages - 1 })),
       setRowsPerPage: (val) => set({ numRowsPerPage: val }),
+      getColumnVisible: (mask) => ((get().visibleColumns & mask) > 0),
+      toggleColumn: (mask) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
     })
   )
 );

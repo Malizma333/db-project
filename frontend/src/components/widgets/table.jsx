@@ -1,7 +1,7 @@
 import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
 import { DB_DATA } from '../../api/temp';
-import { useAppStore } from '../../store';
+import { COLUMN_MASK, useAppStore } from '../../store';
 
 const styles = {
   root: {
@@ -36,16 +36,18 @@ const styles = {
 }
 
 function TableRow({name, author, allergens, reference}) {
+  const { getColumnVisible } = useAppStore();
+
   return (
     <SlCard style={{"--border-radius": "0"}}>
       <div style={styles.row}>
-        <div style={styles.cell}>
+        {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>
           {name}
-        </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>
           {author}
-        </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
           {allergens.map((allergen, index) => {
             return (
               <SlTag key={index} variant="warning" size="small">
@@ -53,31 +55,33 @@ function TableRow({name, author, allergens, reference}) {
               </SlTag>
             )
           })}
-        </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>
           {reference}
-        </div>
+        </div>}
       </div>
     </SlCard>
   )
 }
 
 function TableRowEdit({name, author, allergens, reference}) {
+  const { getColumnVisible } = useAppStore();
+
   return (
     <SlCard style={{"--border-radius": "0"}}>
       <div style={styles.row}>
-        <div style={styles.cell}>
+        {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>
           <SlInput value={name} placeholder="Recipe Name" />
-        </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>
           <SlInput value={author} placeholder="Author Name" />
-        </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
           <TagPicker variant="warning" available={DB_DATA.allAllergens} selected={allergens} setSelected={(val) => console.log(val)}/>
-       </div>
-        <div style={styles.cell}>
+        </div>}
+        {getColumnVisible(COLUMN_MASK.REFERENCE) &&<div style={styles.cell}>
           <SlInput value={reference} placeholder="Reference" />
-        </div>
+        </div>}
         <div style={styles.end}>
           <SlTooltip content="Remove Recipe">
             <SlIconButton name="trash" label="Remove Recipe" />
@@ -89,16 +93,16 @@ function TableRowEdit({name, author, allergens, reference}) {
 }
 
 export default function Table({ pageData }) {
-  const { editMode } = useAppStore();
+  const { editMode, getColumnVisible } = useAppStore();
 
   return (
     <div style={styles.root}>
       <SlCard style={{...styles.header, "--border-radius": "0"}}>
         <div style={styles.row}>
-          <div style={styles.cell}>Recipe</div>
-          <div style={styles.cell}>Author</div>
-          <div style={styles.cell}>Allergens</div>
-          <div style={styles.cell}>Reference</div>
+          {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>Recipe Name</div>}
+          {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>Author</div>}
+          {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>Allergens</div>}
+          {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>Reference</div>}
           {editMode && <div style={{...styles.end, fontSize: "2em"}}>
             <SlTooltip content="Create Recipe">
               <SlIconButton name="plus" label="Create Recipe" />
