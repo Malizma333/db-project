@@ -11,6 +11,7 @@ import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
 import { DB_DATA } from './api/temp';
 import { useAppStore } from './store';
+import ChangePassDialog from './components/pages/changePassDialog';
 
 const styles = {
   root: {
@@ -27,6 +28,7 @@ export default function App() {
     <div class="sl-theme-dark" style={styles.root}>
       <SettingsDrawer />
       <LoginDialog />
+      <ChangePassDialog />
       <Toolbar />
       <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)} />
       <PageNav />

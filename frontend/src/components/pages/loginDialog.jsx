@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useState } from 'preact/hooks';
-import { validPassword } from '../../api/temp';
+import { validCreds } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
 
 const styles = {
@@ -23,7 +23,7 @@ export default function LoginDialog() {
   }
 
   function onLogIn() {
-    if (validPassword(username, password)) {
+    if (validCreds(username, password)) {
       logIn();
       onCloseDialog();
     } else {
