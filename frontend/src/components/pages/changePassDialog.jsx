@@ -28,17 +28,17 @@ export default function ChangePassDialog() {
     setHelpText("");
 
     if (!correctPassword(oldPassword)) {
-      setHelpText("Old password must match\n");
+      setHelpText("Old password must match");
       return;
     }
 
     if (!validPassword(newPassword)) {
-      setHelpText("New password must be 8 - 20 characters\n");
+      setHelpText("New password must be 8 - 20 characters");
       return;
     }
 
     if (rePassword !== newPassword) {
-      setHelpText("New passwords do not match\n");
+      setHelpText("New passwords do not match");
       return;
     }
 

@@ -1,14 +1,9 @@
+- Notifications
+  - Logged in
+  - Logged out
+  - Username changed
+  - Password changed
 - Make user toolbar icon a dropdown, and don't change the icon to just log out
-  - Logout option
-  - Change username option
-    - Validate username 3-20 characters
-    - Validate username uniqueness
-    - Must enter account password
-  - Change password option
-    - Old password
-    - New password
-    - Reenter new password
-    - Validate matching
   - Manage collections option
     - Another pop-up
     - Shows a scroll list of collections

@@ -23,12 +23,12 @@ export const DB_DATA = {
   columns: ["name", "author", "allergens", "reference", "ingredients"]
 }
 
-const USER_DATA = {
+export const USER_DATA = {
   username: "test",
   password: "test"
 }
 
-export function validCreds (user, pass) {
+export function correctCredentials (user, pass) {
   return user === USER_DATA.username && pass === USER_DATA.password;
 }
 
@@ -36,12 +36,25 @@ export function correctPassword (pass) {
   return pass === USER_DATA.password;
 }
 
+// TODO: special characters?
 export function validPassword (pass) {
   return 8 <= pass.length && pass.length <= 20;
 }
 
+export function validUsername (name) {
+  return 8 <= name.length && name.length <= 20;
+}
+
+export function uniqueUsername (name) {
+  return name !== USER_DATA.username;
+}
+
 export function changePassword (pass) {
   USER_DATA.password = pass;
+}
+
+export function changeUsername (name) {
+  USER_DATA.username = name;
 }
 
 // let socket = new WebSocket("ws://localhost:5000")

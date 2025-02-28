@@ -1,5 +1,6 @@
-import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem } from '@shoelace-style/shoelace/dist/react';
+import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
+import { USER_DATA } from '../../api/temp';
 
 const styles = {
   root: {
@@ -7,7 +8,10 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     flex: "1",
-  }
+  },
+  nameLabel: {
+    fontWeight: "900",
+  },
 }
 
 export default function Toolbar() {
@@ -67,7 +71,8 @@ export default function Toolbar() {
       {loggedIn &&
         <SlDropdown>
           <SlIconButton slot="trigger" name="person-circle" label="Account"></SlIconButton>
-          <SlMenu style={styles.menu} onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
+          <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
+            <SlMenuLabel style={styles.nameLabel}>{USER_DATA.username}</SlMenuLabel>
             <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
               View Collections
             </SlMenuItem>

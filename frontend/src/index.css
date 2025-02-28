@@ -4,7 +4,11 @@ html {
   font-size: large;
 }
 
-/* TODO: Make this inline */
 sl-input[type="password"]::part(form-control-help-text) {
   color: red;
+}
+
+sl-menu-label::part(base) {
+  font-size: x-large;
+  font-weight: bold;
 }
