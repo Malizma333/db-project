@@ -21,7 +21,6 @@ const styles = {
 
 export default function Toolbar() {
   const {
-    editMode,
     loggedIn,
     setSettingsView,
     setLoginView,
@@ -29,7 +28,6 @@ export default function Toolbar() {
     setChangeUserView,
     setCollectionsView,
     disableEditMode,
-    toggleEditMode,
     logOut
   } = useAppStore();
 
@@ -70,10 +68,9 @@ export default function Toolbar() {
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
-      {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => toggleEditMode()} label="Edit Mode"></SlIconButton>}
       <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")}></SlIconButton>
-      {!loggedIn && <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>}
-      {loggedIn &&
+      {!loggedIn ?
+        <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar> :
         <SlDropdown>
           <SlAvatar
             style={styles.avatar}

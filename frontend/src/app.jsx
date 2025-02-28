@@ -13,6 +13,7 @@ import { DB_DATA } from './api/temp';
 import { useAppStore } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
+import ModeButton from './components/widgets/modeButton';
 
 const styles = {
   root: {
@@ -23,7 +24,7 @@ const styles = {
 }
 
 export default function App() {
-  const { page, numRowsPerPage } = useAppStore();
+  const { page, numRowsPerPage, loggedIn } = useAppStore();
 
   return (
     <div class="sl-theme-dark" style={styles.root}>
@@ -34,6 +35,7 @@ export default function App() {
       <Toolbar></Toolbar>
       <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)}></Table>
       <PageNav></PageNav>
+      {loggedIn && <ModeButton></ModeButton>}
     </div>
   );
 }

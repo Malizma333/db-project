@@ -3,9 +3,12 @@
   - Logged out
   - Username changed
   - Password changed
+- Make demo random recipe ui
+  - Make a specific filter query? Wait till api done?
 - Make user toolbar icon a dropdown, and don't change the icon to just log out
   - Manage collections option
     - Another pop-up
     - Shows a scroll list of collections
       - name, number of recipes, share button to copy link
       - buttons to edit name, add new collections, delete collections
+  - Display collection name somewhere in current page
