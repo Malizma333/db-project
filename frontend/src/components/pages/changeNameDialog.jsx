@@ -4,7 +4,7 @@ import { changeUsername, correctPassword, uniqueUsername, validUsername } from '
 import { useAppStore, VIEW } from '../../store';
 
 const styles = {
-  passwordField: {
+  inputField: {
     marginBottom: "1em",
   },
 }
@@ -51,13 +51,16 @@ export default function ChangeNameDialog() {
       label="Change Username"
     >
       <SlInput
+        style={styles.inputField}
+        helpText="Must be 8 - 20 characters"
         type="text"
         value={newUsername}
         onSlChange={(e) => setNewUsername(e.target.value)}
         placeholder="New Username"
       />
       <SlInput
-        style={styles.passwordField}
+        className="errorHelp"
+        style={styles.inputField}
         helpText={helpText}
         type="password"
         value={password}

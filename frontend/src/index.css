@@ -4,7 +4,7 @@ html {
   font-size: large;
 }
 
-sl-input[type="password"]::part(form-control-help-text) {
+sl-input.errorHelp::part(form-control-help-text) {
   color: red;
 }
 

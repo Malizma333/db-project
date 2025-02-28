@@ -4,7 +4,7 @@ import { correctCredentials } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
 
 const styles = {
-  passwordField: {
+  inputField: {
     marginBottom: "1em",
   },
 }
@@ -40,13 +40,15 @@ export default function LoginDialog() {
       label="Log In"
     >
       <SlInput
+        style={styles.inputField}
         type="text"
         value={username}
         onSlChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
       />
       <SlInput
-        style={styles.passwordField}
+        className="errorHelp"
+        style={styles.inputField}
         helpText={helpText}
         type="password"
         value={password}

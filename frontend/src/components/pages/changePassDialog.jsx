@@ -4,7 +4,7 @@ import { changePassword, correctPassword, validPassword } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
 
 const styles = {
-  rePasswordField: {
+  inputField: {
     marginBottom: "1em",
   },
 }
@@ -54,13 +54,16 @@ export default function ChangePassDialog() {
       label="Change Password"
     >
       <SlInput
+        style={styles.inputField}
         type="password"
+        helpText="Must be 8 - 20 characters"
         value={oldPassword}
         onSlChange={(e) => setOldPassword(e.target.value)}
         placeholder="Old Password"
         passwordToggle
       />
       <SlInput
+        style={styles.inputField}
         type="password"
         value={newPassword}
         onSlChange={(e) => setNewPassword(e.target.value)}
@@ -68,7 +71,8 @@ export default function ChangePassDialog() {
         passwordToggle
       />
       <SlInput
-        style={styles.rePasswordField}
+        className="errorHelp"
+        style={styles.inputField}
         helpText={helpText}
         type="password"
         value={rePassword}
