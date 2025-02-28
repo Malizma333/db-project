@@ -30,7 +30,7 @@ function FilterPicker({ columnName, columnOptions }) {
           available={columnOptions.filter(tag => !excluded.includes(tag))}
           selected={included}
           setSelected={setIncluded}
-        />
+        ></TagPicker>
       </div>
       <div style={styles.filterContainer}>
         Exclude {columnName}
@@ -39,7 +39,7 @@ function FilterPicker({ columnName, columnOptions }) {
           available={columnOptions.filter(tag => !included.includes(tag))}
           selected={excluded}
           setSelected={setExcluded}
-        />
+        ></TagPicker>
       </div>
     </div>
   )
@@ -120,9 +120,9 @@ export default function SettingsDrawer() {
           >Ingredients</SlCheckbox>
         </div>
       </div>
-      <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}/>
-      <FilterPicker columnName={"Allergens"} columnOptions={DB_DATA.allAllergens}/>
-      <FilterPicker columnName={"Ingredients"} columnOptions={DB_DATA.allIngredients}/>
+      <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}></FilterPicker>
+      <FilterPicker columnName={"Allergens"} columnOptions={DB_DATA.allAllergens}></FilterPicker>
+      <FilterPicker columnName={"Ingredients"} columnOptions={DB_DATA.allIngredients}></FilterPicker>
     </SlDrawer>
   )
 }

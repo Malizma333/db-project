@@ -27,13 +27,13 @@ export default function App() {
 
   return (
     <div class="sl-theme-dark" style={styles.root}>
-      <SettingsDrawer />
-      <LoginDialog />
-      <ChangeNameDialog />
-      <ChangePassDialog />
-      <Toolbar />
-      <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)} />
-      <PageNav />
+      <SettingsDrawer></SettingsDrawer>
+      <LoginDialog></LoginDialog>
+      <ChangeNameDialog></ChangeNameDialog>
+      <ChangePassDialog></ChangePassDialog>
+      <Toolbar></Toolbar>
+      <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)}></Table>
+      <PageNav></PageNav>
     </div>
   );
 }

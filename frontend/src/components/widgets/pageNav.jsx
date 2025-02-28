@@ -22,7 +22,7 @@ export default function PageNav() {
           name="chevron-double-left"
           onClick={gotoFirstPage}
           label="First Page"
-        />
+        ></SlIconButton>
       </SlTooltip>
       <SlTooltip content="Previous Page">
         <SlIconButton
@@ -30,7 +30,7 @@ export default function PageNav() {
           name="chevron-left"
           onClick={gotoPrevPage}
           label="Previous Page"
-        />
+        ></SlIconButton>
       </SlTooltip>
       {page + 1}
       <SlTooltip content="Next Page">
@@ -39,7 +39,7 @@ export default function PageNav() {
           name="chevron-right"
           onClick={gotoNextPage}
           label="Next Page"
-        />
+        ></SlIconButton>
       </SlTooltip>
       <SlTooltip content="Last Page">
         <SlIconButton
@@ -47,7 +47,7 @@ export default function PageNav() {
           name="chevron-double-right"
           onClick={gotoLastPage}
           label="Last Page"
-        />
+        ></SlIconButton>
       </SlTooltip>
     </div>
   )

@@ -67,12 +67,12 @@ export default function Toolbar() {
   return (
     <div style={styles.root}>
       <SlInput clearable type="search" placeholder="Search" style={{flex: "1"}}>
-        <SlIconButton name="search" label="Run Search" slot="suffix" />
+        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>
-      <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}/>
-      {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => toggleEditMode()} label="Edit Mode" />}
-      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")} />
-      {!loggedIn && <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()} />}
+      <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
+      {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => toggleEditMode()} label="Edit Mode"></SlIconButton>}
+      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")}></SlIconButton>
+      {!loggedIn && <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>}
       {loggedIn &&
         <SlDropdown>
           <SlAvatar

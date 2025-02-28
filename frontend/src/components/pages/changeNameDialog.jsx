@@ -57,7 +57,7 @@ export default function ChangeNameDialog() {
         value={newUsername}
         onSlChange={(e) => setNewUsername(e.target.value)}
         placeholder="New Username"
-      />
+      ></SlInput>
       <SlInput
         className="errorHelp"
         style={styles.inputField}
@@ -67,7 +67,7 @@ export default function ChangeNameDialog() {
         onSlChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         passwordToggle
-      />
+      ></SlInput>
       <SlButton onClick={() => onChangeUsername()}>
         Confirm
       </SlButton>

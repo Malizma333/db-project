@@ -45,7 +45,7 @@ export default function LoginDialog() {
         value={username}
         onSlChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
-      />
+      ></SlInput>
       <SlInput
         className="errorHelp"
         style={styles.inputField}
@@ -55,7 +55,7 @@ export default function LoginDialog() {
         onSlChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         passwordToggle
-      />
+      ></SlInput>
       <SlButton onClick={() => onLogIn()}>
         Log In
       </SlButton>

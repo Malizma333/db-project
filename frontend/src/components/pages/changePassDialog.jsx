@@ -61,7 +61,7 @@ export default function ChangePassDialog() {
         onSlChange={(e) => setOldPassword(e.target.value)}
         placeholder="Old Password"
         passwordToggle
-      />
+      ></SlInput>
       <SlInput
         style={styles.inputField}
         type="password"
@@ -69,7 +69,7 @@ export default function ChangePassDialog() {
         onSlChange={(e) => setNewPassword(e.target.value)}
         placeholder="New Password"
         passwordToggle
-      />
+      ></SlInput>
       <SlInput
         className="errorHelp"
         style={styles.inputField}
@@ -79,7 +79,7 @@ export default function ChangePassDialog() {
         onSlChange={(e) => setRePassword(e.target.value)}
         placeholder="Retype New Password"
         passwordToggle
-      />
+      ></SlInput>
       <SlButton onClick={() => onSetPassword()}>
         Confirm
       </SlButton>
