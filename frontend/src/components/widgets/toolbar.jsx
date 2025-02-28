@@ -1,4 +1,4 @@
-import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel } from '@shoelace-style/shoelace/dist/react';
+import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel, SlAvatar } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
 import { USER_DATA } from '../../api/temp';
 
@@ -11,6 +11,11 @@ const styles = {
   },
   nameLabel: {
     fontWeight: "900",
+  },
+  avatar: {
+    "--size": "1.75em",
+    cursor: "pointer",
+    marginLeft: "8px",
   },
 }
 
@@ -67,10 +72,15 @@ export default function Toolbar() {
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}/>
       {loggedIn && <SlIconButton name={editMode ? "eye" : "pencil"} onClick={() => toggleEditMode()} label="Edit Mode" />}
       <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")} />
-      {!loggedIn && <SlIconButton name="person-circle" label="Log In" onClick={() => setLoginView()}/>}
+      {!loggedIn && <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()} />}
       {loggedIn &&
         <SlDropdown>
-          <SlIconButton slot="trigger" name="person-circle" label="Account"></SlIconButton>
+          <SlAvatar
+            style={styles.avatar}
+            slot="trigger"
+            initials={USER_DATA.username[0]}
+            label="Avatar with username initial"
+          ></SlAvatar>
           <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
             <SlMenuLabel style={styles.nameLabel}>{USER_DATA.username}</SlMenuLabel>
             <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
@@ -89,7 +99,6 @@ export default function Toolbar() {
           </SlMenu>
         </SlDropdown>
       }
-      {/* {loggedIn && <SlIconButton name="box-arrow-right" label="Log Out" onClick={() => onLogOut()} />} */}
     </div>
   )
 }
