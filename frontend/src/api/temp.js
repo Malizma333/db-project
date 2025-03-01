@@ -1,6 +1,17 @@
 // TODO: arbitrary test values, will retrieve from database
 
 export const DB_DATA = {
+  collectionArray: [
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"},
+    {name: "First Collection", numRecipes: 2, id: "test_string"}
+  ],
   collectionData: [
     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
     {name: "Spaghetti", author: "Bob", allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },

@@ -11,9 +11,6 @@ const styles = {
     alignItems: "center",
     flex: "1",
   },
-  nameLabel: {
-    fontWeight: "900",
-  },
   avatar: {
     "--size": "1.75em",
     cursor: "pointer",
@@ -90,7 +87,7 @@ export default function Toolbar() {
             label="Avatar with username initial"
           ></SlAvatar>
           <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
-            <SlMenuLabel style={styles.nameLabel}>{USER_DATA.username}</SlMenuLabel>
+            <SlMenuLabel className="userMenuLabel">{USER_DATA.username}</SlMenuLabel>
             <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
               View Collections
             </SlMenuItem>

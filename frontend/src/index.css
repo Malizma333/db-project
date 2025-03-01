@@ -8,10 +8,15 @@ sl-input.errorHelp::part(form-control-help-text) {
   color: red;
 }
 
-/* TODO: specify this to only be user menu username */
-sl-menu-label::part(base) {
+sl-menu-label.userMenuLabel::part(base) {
   font-size: x-large;
   font-weight: bold;
+}
+
+sl-input.collectionsName::part(base) {
+  background-color: transparent;
+  font-weight: bold;
+  margin-left: -1em;
 }
 
 .sl-toast-stack {
