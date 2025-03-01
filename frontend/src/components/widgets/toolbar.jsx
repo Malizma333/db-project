@@ -1,6 +1,6 @@
 import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel, SlAvatar } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
-import { USER_DATA } from '../../api/temp';
+import { DB_DATA, USER_DATA } from '../../api/temp';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 
@@ -42,6 +42,11 @@ export default function Toolbar() {
 
   const logOutAlert = useRef(null);
 
+  function onRandomRecipe() {
+    const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
+    console.log(DB_DATA.collectionData[ind]);
+  }
+
   function onLogOut() {
     logOut();
     disableEditMode();
@@ -74,7 +79,7 @@ export default function Toolbar() {
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
-      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => console.log("Random recipe")}></SlIconButton>
+      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>
       {!loggedIn ?
         <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar> :
         <SlDropdown>

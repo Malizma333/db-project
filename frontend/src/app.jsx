@@ -26,6 +26,8 @@ const styles = {
 export default function App() {
   const { page, numRowsPerPage, loggedIn } = useAppStore();
 
+  let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
+
   return (
     <div style={styles.root}>
       <SettingsDrawer></SettingsDrawer>
@@ -33,7 +35,7 @@ export default function App() {
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
       <Toolbar></Toolbar>
-      <Table pageData={DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage)}></Table>
+      <Table pageData={pageData}></Table>
       <PageNav></PageNav>
       {loggedIn && <ModeButton></ModeButton>}
     </div>

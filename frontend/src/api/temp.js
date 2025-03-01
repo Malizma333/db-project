@@ -1,23 +1,11 @@
-// arbitrary test values, will retrieve from database
+// TODO: arbitrary test values, will retrieve from database
+
 export const DB_DATA = {
   collectionData: [
     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
+    {name: "Spaghetti", author: "Bob", allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
   ],
-  allAllergens: ["Gluten", "Nuts", "Cheese", "Shellfish"],
+  allAllergens: ["Gluten", "Nuts", "Shellfish"],
   allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
   allAuthors: ["Alice", "Bob"],
   columns: ["name", "author", "allergens", "reference", "ingredients"]
@@ -36,7 +24,6 @@ export function correctPassword (pass) {
   return pass === USER_DATA.password;
 }
 
-// TODO: special characters?
 export function validPassword (pass) {
   return 8 <= pass.length && pass.length <= 20;
 }
