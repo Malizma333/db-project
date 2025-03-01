@@ -1,7 +1,7 @@
 import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel, SlAvatar } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
 import { USER_DATA } from '../../api/temp';
-import { Notification } from './notification';
+import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 
 const styles = {
@@ -69,7 +69,7 @@ export default function Toolbar() {
 
   return (
     <div style={styles.root}>
-      <Notification variant="success" message="Log out successful" ref={logOutAlert}></Notification>
+      <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
       <SlInput clearable type="search" placeholder="Search" style={{flex: "1"}}>
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>

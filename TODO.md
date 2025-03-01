@@ -1,8 +1,3 @@
-- Notifications
-  - Logged in
-  - Logged out
-  - Username changed
-  - Password changed
 - Make demo random recipe ui
   - Make a specific filter query? Wait till api done?
 - Make user toolbar icon a dropdown, and don't change the icon to just log out

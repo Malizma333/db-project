@@ -1,7 +1,8 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { correctCredentials } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
+import { SlNotification } from '../widgets/notification';
 
 const styles = {
   inputField: {
@@ -15,6 +16,7 @@ export default function LoginDialog() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
+  const logInAlert = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -27,6 +29,7 @@ export default function LoginDialog() {
     if (correctCredentials(username, password)) {
       logIn();
       onCloseDialog();
+      logInAlert.current.base.toast();
     } else {
       setHelpText("Invalid username or password");
     }
@@ -39,6 +42,7 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
+      <SlNotification message="Logged in successfully" variant="success" ref={logInAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"

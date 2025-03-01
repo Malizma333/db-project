@@ -1,7 +1,8 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { changePassword, correctPassword, validPassword } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
+import { SlNotification } from '../widgets/notification';
 
 const styles = {
   inputField: {
@@ -16,6 +17,7 @@ export default function ChangePassDialog() {
   const [newPassword, setNewPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
   const [helpText, setHelpText] = useState("");
+  const changePassAlert = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -44,6 +46,7 @@ export default function ChangePassDialog() {
 
     changePassword(newPassword);
     onCloseDialog();
+    changePassAlert.current.base.toast();
   }
 
   return (
@@ -53,6 +56,7 @@ export default function ChangePassDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Password"
     >
+      <SlNotification message="Password changed successfully" variant="success" ref={changePassAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="password"

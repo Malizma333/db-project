@@ -1,7 +1,8 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { changeUsername, correctPassword, uniqueUsername, validUsername } from '../../api/temp';
 import { useAppStore, VIEW } from '../../store';
+import { SlNotification } from '../widgets/notification';
 
 const styles = {
   inputField: {
@@ -15,6 +16,7 @@ export default function ChangeNameDialog() {
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
+  const changeNameAlert = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -41,6 +43,7 @@ export default function ChangeNameDialog() {
 
     changeUsername(newUsername);
     onCloseDialog();
+    changeNameAlert.current.base.toast();
   }
 
   return (
@@ -50,6 +53,7 @@ export default function ChangeNameDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
+      <SlNotification message="Changed username successfully" variant="success" ref={changeNameAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         helpText="Must be 8 - 20 characters"

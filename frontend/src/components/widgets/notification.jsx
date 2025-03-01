@@ -1,6 +1,6 @@
 import { SlAlert, SlIcon } from "@shoelace-style/shoelace/dist/react";
 
-export function Notification({ message, variant = 'primary', duration = 3000 }) {
+export function SlNotification({ message, variant = 'primary', duration = 3000 }) {
   const icons = {
     "primary": "info-circle",
     "success": "check2-circle",
