@@ -27,7 +27,7 @@ export default function App() {
   const { page, numRowsPerPage, loggedIn } = useAppStore();
 
   return (
-    <div class="sl-theme-dark" style={styles.root}>
+    <div style={styles.root}>
       <SettingsDrawer></SettingsDrawer>
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
