@@ -21,7 +21,6 @@ export const COLUMN_MASK = Object.freeze({
 
 const initStoreState = {
   view: VIEW.MAIN,
-  editMode: false,
   loggedIn: false,
   page: 0,
   numRowsPerPage: 10,
@@ -30,8 +29,9 @@ const initStoreState = {
 }
 
 const computed = createComputed((state) => ({
-  numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage)
-}))
+  numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage),
+  editMode: state.loggedIn && true // TODO: Determine if current collection belongs to current user
+}));
 
 export const useAppStore = create(
   computed(
@@ -43,9 +43,6 @@ export const useAppStore = create(
       setChangeUserView: () => set({ view: VIEW.CHANGE_USERNAME }),
       setChangePassView: () => set({ view: VIEW.CHANGE_PASSWORD }),
       setCollectionsView: () => set({ view: VIEW.COLLECTIONS_LIST }),
-      disableEditMode: () => set({ editMode: false }),
-      enableEditMode: () => set({ editMode: true }),
-      toggleEditMode: () => set((state) => ({ editMode: !state.editMode })),
       logIn: () => set({ loggedIn: true }),
       logOut: () => set({ loggedIn: false }),
       gotoFirstPage: () => set({ page: 0 }),

@@ -13,7 +13,6 @@ import { DB_DATA } from './api/temp';
 import { useAppStore } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
-import ModeButton from './components/widgets/modeButton';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 
 const styles = {
@@ -39,7 +38,6 @@ export default function App() {
       <Toolbar></Toolbar>
       <Table pageData={pageData}></Table>
       <PageNav></PageNav>
-      {loggedIn && <ModeButton></ModeButton>}
     </div>
   );
 }

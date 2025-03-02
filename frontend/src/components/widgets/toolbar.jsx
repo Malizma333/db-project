@@ -26,7 +26,6 @@ export default function Toolbar() {
     setChangePassView,
     setChangeUserView,
     setCollectionsView,
-    disableEditMode,
     logOut
   } = useAppStore();
 
@@ -46,7 +45,6 @@ export default function Toolbar() {
 
   function onLogOut() {
     logOut();
-    disableEditMode();
     logOutAlert.current.base.toast();
   }
 

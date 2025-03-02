@@ -1,4 +1,4 @@
-import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput, SlInclude } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
 import { DB_DATA } from '../../api/temp';
 import { COLUMN_MASK, useAppStore } from '../../store';
@@ -39,7 +39,7 @@ const styles = {
 }
 
 function TableRow({ name, author, allergens, reference, ingredients }) {
-  const { getColumnVisible } = useAppStore();
+  const { editMode, getColumnVisible } = useAppStore();
 
   return (
     <SlCard style={{"--border-radius": "0"}}>
@@ -59,35 +59,9 @@ function TableRow({ name, author, allergens, reference, ingredients }) {
         {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>
           <TagPicker variant="primary" selected={ingredients} viewMode></TagPicker>
         </div>}
-        <div style={styles.end}></div>
-      </div>
-    </SlCard>
-  )
-}
-
-function TableRowEdit({ name, author, allergens, reference, ingredients }) {
-  const { getColumnVisible } = useAppStore();
-
-  return (
-    <SlCard style={{"--border-radius": "0"}}>
-      <div style={styles.row}>
-        {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>
-          <SlInput value={name} placeholder="Recipe Name"></SlInput>
-        </div>}
-        {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>
-          <SlInput value={author} placeholder="Author Name"></SlInput>
-        </div>}
-        {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
-          <TagPicker variant="warning" available={DB_DATA.allAllergens} selected={allergens} setSelected={(val) => console.log(val)}></TagPicker>
-        </div>}
-        {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>
-          <SlInput value={reference} placeholder="Reference"></SlInput>
-        </div>}
-        {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>
-          <TagPicker variant="primary" available={DB_DATA.allIngredients} selected={ingredients} setSelected={(val) => console.log(val)}></TagPicker>
-        </div>}
         <div style={styles.end}>
-          <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>
+          {editMode && <SlIconButton name="pencil" label="Edit Recipe"></SlIconButton>}
+          {editMode && <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>}
         </div>
       </div>
     </SlCard>
@@ -112,7 +86,7 @@ export default function Table({ pageData }) {
         </div>
       </SlCard>
       {pageData.map((row) => {
-        return editMode ? <TableRowEdit {...row}></TableRowEdit> : <TableRow {...row}></TableRow>
+        return <TableRow editMode={editMode} {...row}></TableRow>;
       })}
     </div>
   )
