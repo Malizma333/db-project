@@ -87,9 +87,7 @@ function TableRowEdit({ name, author, allergens, reference, ingredients }) {
           <TagPicker variant="primary" available={DB_DATA.allIngredients} selected={ingredients} setSelected={(val) => console.log(val)}></TagPicker>
         </div>}
         <div style={styles.end}>
-          <SlTooltip content="Remove Recipe">
-            <SlIconButton name="trash" label="Remove Recipe"></SlIconButton>
-          </SlTooltip>
+          <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>
         </div>
       </div>
     </SlCard>
@@ -109,9 +107,7 @@ export default function Table({ pageData }) {
           {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>Reference</div>}
           {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>Ingredients</div>}
           <div style={{...styles.end, fontSize: "2em"}}>
-            {editMode && <SlTooltip content="Create Recipe">
-              <SlIconButton name="plus" label="Create Recipe"></SlIconButton>
-            </SlTooltip>}
+            {editMode && <SlIconButton name="plus" label="New Recipe"></SlIconButton>}
           </div>
         </div>
       </SlCard>

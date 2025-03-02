@@ -72,7 +72,7 @@ export default function Toolbar() {
   return (
     <div style={styles.root}>
       <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
-      <SlInput clearable type="search" placeholder="Search" style={{flex: "1"}}>
+      <SlInput clearable type="search" placeholder={`Search ${DB_DATA.collectionArray[0].name}...`} style={{flex: "1"}}>
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>

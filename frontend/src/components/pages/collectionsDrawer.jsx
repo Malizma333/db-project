@@ -47,6 +47,12 @@ export default function CollectionsDrawer() {
       label="Collections"
     >
       <div style={styles.root}>
+        <SlInput
+          style={styles.collectionCard}
+          clearable
+          type="search"
+          placeholder="Find a collection..."
+        ></SlInput>
         {DB_DATA.collectionArray.map((collection) => {
           return (
             <SlCard style={styles.collectionCard}>
