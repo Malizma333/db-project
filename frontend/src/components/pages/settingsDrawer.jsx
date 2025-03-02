@@ -64,11 +64,12 @@ export default function SettingsDrawer() {
 
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
-    if (e.eventPhase === Event.AT_TARGET) {
-      setMainView();
-    } else {
-      e.preventDefault()
+    if (e.eventPhase !== Event.AT_TARGET) {
+      e.preventDefault();
+      return;
     }
+
+    setMainView();
   }
 
   return (

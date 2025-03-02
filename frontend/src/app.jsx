@@ -10,10 +10,12 @@ import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
 import { DB_DATA } from './api/temp';
-import { useAppStore } from './store';
+import { useAppStore, VIEW } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
+import RecipeForm from './components/pages/recipeForm';
+import RecipeSummary from './components/pages/recipeSummary';
 
 const styles = {
   root: {
@@ -24,7 +26,7 @@ const styles = {
 }
 
 export default function App() {
-  const { page, numRowsPerPage, loggedIn } = useAppStore();
+  const { page, numRowsPerPage } = useAppStore();
 
   let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
 
@@ -38,6 +40,19 @@ export default function App() {
       <Toolbar></Toolbar>
       <Table pageData={pageData}></Table>
       <PageNav></PageNav>
+      <RecipeForm
+        formTitle="New Recipe"
+        submitLabel="Add Recipe"
+        submitMessage="Added recipe successfully"
+        viewState={VIEW.NEW_RECIPE_FORM}
+      ></RecipeForm>
+      <RecipeForm
+        formTitle="Update Recipe"
+        submitLabel="Update"
+        submitMessage="Updated recipe successfully"
+        viewState={VIEW.UPDATE_RECIPE_FORM}
+      ></RecipeForm>
+      <RecipeSummary></RecipeSummary>
     </div>
   );
 }

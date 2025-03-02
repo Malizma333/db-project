@@ -1,4 +1,4 @@
-import { SlDrawer, SlCard, SlCopyButton, SlInput, SlButton, SlIcon, SlIconButton } from "@shoelace-style/shoelace/dist/react";
+import { SlDrawer, SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
 import { DB_DATA } from "../../api/temp";
 
@@ -34,9 +34,7 @@ export default function CollectionsDrawer() {
     }
   }
 
-  function onAddCollection() {
-    console.log("Add collection");
-  }
+  // TODO: Make sure collection searching works with placeholder recipe names
 
   return (
     <SlDrawer
@@ -61,6 +59,7 @@ export default function CollectionsDrawer() {
                   className="collectionsName"
                   filled
                   value={collection.name}
+                  placeholder={`Collection ${collection.id}`}
                 ></SlInput>
                 <SlCopyButton
                   value={window.location.origin + "/?id=" + collection.id}
@@ -70,13 +69,17 @@ export default function CollectionsDrawer() {
                 >
                   <SlIcon name="share" slot="copy-icon"></SlIcon>
                 </SlCopyButton>
-                <SlIconButton name="trash" label="Delete Collection"></SlIconButton>
+                <SlTooltip content="Delete Collection">
+                  <SlIconButton name="trash" label="Delete Collection"></SlIconButton>
+                </SlTooltip>
               </div>
               Included recipes: {collection.numRecipes}
             </SlCard>
           );
         })}
-        <SlIconButton name="plus" label="Add Collection" style={{fontSize: "2em"}}></SlIconButton>
+        <SlTooltip content="Add Collection">
+          <SlIconButton name="plus" label="Add Collection" style={{fontSize: "2em"}}></SlIconButton>
+        </SlTooltip>
       </div>
     </SlDrawer>
   )

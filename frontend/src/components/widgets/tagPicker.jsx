@@ -12,7 +12,7 @@ const styles = {
   }
 }
 
-export default function TagPicker({ available=undefined, variant, selected, setSelected=undefined, viewMode=false }) {
+export default function TagPicker({ variant, selected, available=undefined, setSelected=undefined, viewMode=false }) {
   function onRemoveTag(i) {
     setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
   }

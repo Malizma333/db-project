@@ -39,7 +39,7 @@ const styles = {
 }
 
 function TableRow({ name, author, allergens, reference, ingredients }) {
-  const { editMode, getColumnVisible } = useAppStore();
+  const { editMode, getColumnVisible, setUpdateRecipeView, setRecipeSummaryView } = useAppStore();
 
   return (
     <SlCard style={{"--border-radius": "0"}}>
@@ -60,8 +60,17 @@ function TableRow({ name, author, allergens, reference, ingredients }) {
           <TagPicker variant="primary" selected={ingredients} viewMode></TagPicker>
         </div>}
         <div style={styles.end}>
-          {editMode && <SlIconButton name="pencil" label="Edit Recipe"></SlIconButton>}
-          {editMode && <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>}
+          {editMode && <>
+            <SlTooltip content="View Recipe">
+              <SlIconButton name="eye" label="View Recipe" onClick={() => setRecipeSummaryView()}></SlIconButton>
+            </SlTooltip>
+            <SlTooltip content="Edit Recipe">
+              <SlIconButton name="pencil" label="Edit Recipe" onClick={() => setUpdateRecipeView()}></SlIconButton>
+            </SlTooltip>
+            <SlTooltip content="Delete Recipe">
+              <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>
+            </SlTooltip>
+          </>}
         </div>
       </div>
     </SlCard>
@@ -69,7 +78,7 @@ function TableRow({ name, author, allergens, reference, ingredients }) {
 }
 
 export default function Table({ pageData }) {
-  const { editMode, getColumnVisible } = useAppStore();
+  const { editMode, getColumnVisible, setNewRecipeView } = useAppStore();
 
   return (
     <div style={styles.root}>
@@ -81,7 +90,11 @@ export default function Table({ pageData }) {
           {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>Reference</div>}
           {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>Ingredients</div>}
           <div style={{...styles.end, fontSize: "2em"}}>
-            {editMode && <SlIconButton name="plus" label="New Recipe"></SlIconButton>}
+            {editMode &&
+              <SlTooltip content="Create Recipe" placement="left">
+                <SlIconButton name="plus" label="Create Recipe" onClick={() => setNewRecipeView()}></SlIconButton>
+              </SlTooltip>
+            }
           </div>
         </div>
       </SlCard>

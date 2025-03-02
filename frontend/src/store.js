@@ -9,6 +9,9 @@ export const VIEW = Object.freeze({
   CHANGE_USERNAME: 3,
   CHANGE_PASSWORD: 4,
   LOGIN_PROMPT: 5,
+  NEW_RECIPE_FORM: 6,
+  UPDATE_RECIPE_FORM: 7,
+  RECIPE_SUMMARY: 8,
 });
 
 export const COLUMN_MASK = Object.freeze({
@@ -43,6 +46,9 @@ export const useAppStore = create(
       setChangeUserView: () => set({ view: VIEW.CHANGE_USERNAME }),
       setChangePassView: () => set({ view: VIEW.CHANGE_PASSWORD }),
       setCollectionsView: () => set({ view: VIEW.COLLECTIONS_LIST }),
+      setNewRecipeView: () => set({ view: VIEW.NEW_RECIPE_FORM }),
+      setUpdateRecipeView: () => set({ view: VIEW.UPDATE_RECIPE_FORM }),
+      setRecipeSummaryView: () => set({ view: VIEW.RECIPE_SUMMARY }),
       logIn: () => set({ loggedIn: true }),
       logOut: () => set({ loggedIn: false }),
       gotoFirstPage: () => set({ page: 0 }),
