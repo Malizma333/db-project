@@ -26,6 +26,7 @@ export default function Toolbar() {
     setChangePassView,
     setChangeUserView,
     setCollectionsView,
+    setRecipeSummaryView,
     logOut
   } = useAppStore();
 
@@ -41,6 +42,7 @@ export default function Toolbar() {
   function onRandomRecipe() {
     const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
     console.log(DB_DATA.collectionData[ind]);
+    setRecipeSummaryView();
   }
 
   function onLogOut() {
