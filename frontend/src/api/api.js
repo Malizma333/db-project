@@ -1,5 +1,10 @@
 // TODO: arbitrary test values, will retrieve from database
 
+const serverUrl = `http://${import.meta.env.VITE_SERVER_IP}:8008/recipeapp/dbrequest/`;
+const response = await fetch(`${serverUrl}?test_var=1&other_test_var=some+cool+text&otherstuff=3`);
+const data = await response.text();
+console.log(data);
+
 export const DB_DATA = {
   collectionArray: [
     {name: "First Collection", numRecipes: 2, id: "test_string"},
@@ -54,8 +59,3 @@ export function changePassword (pass) {
 export function changeUsername (name) {
   USER_DATA.username = name;
 }
-
-// let socket = new WebSocket("ws://localhost:5000")
-// socket.onmessage = function(event) {
-//   console.log(event.data)
-// }

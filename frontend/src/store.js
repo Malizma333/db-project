@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createComputed } from "zustand-computed";
-import { DB_DATA } from "./api/temp";
+import { DB_DATA } from "./api/api";
 
 export const VIEW = Object.freeze({
   SEARCH_SETTINGS: 0,
