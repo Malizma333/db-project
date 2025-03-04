@@ -1,6 +1,7 @@
 import { SlDialog } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore, VIEW } from '../../store';
 import TagPicker from '../widgets/tagPicker';
+import { DB_DATA } from '../../api/temp';
 
 const styles = {
   summaryField: {
@@ -9,7 +10,9 @@ const styles = {
 }
 
 export default function RecipeSummary() {
-  const { view, setMainView } = useAppStore();
+  const { activeRecipeId, view, setMainView } = useAppStore();
+
+  const recipeData = DB_DATA.collectionData[activeRecipeId];
 
   function onCloseDialog() {
     setMainView();
@@ -20,18 +23,22 @@ export default function RecipeSummary() {
       class="dialog-overview"
       open={view === VIEW.RECIPE_SUMMARY}
       onSlHide={(e) => onCloseDialog(e)}
-      label={"Recipe Name Here"}
+      label={recipeData.name}
     >
-      <div style={styles.summaryField}>{"Author Here"}</div>
-      <div style={styles.summaryField}>{"Reference Here"}</div>
+      <strong>Author(s)</strong>
+      <div style={styles.summaryField}>{recipeData.author}</div>
+      <strong>Reference</strong>
+      <div style={styles.summaryField}>{recipeData.reference}</div>
+      <strong>Allergens</strong>
       <TagPicker
         variant="primary"
-        selected={[]}
+        selected={recipeData.allergens}
         viewMode
       ></TagPicker>
+      <strong>Ingredients</strong>
       <TagPicker
         variant="primary"
-        selected={[]}
+        selected={recipeData.ingredients}
         viewMode
       ></TagPicker>
     </SlDialog>

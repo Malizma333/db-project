@@ -12,13 +12,20 @@ const styles = {
 }
 
 export default function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
-  const { view, setMainView } = useAppStore();
+  const { activeRecipeId, view, setMainView } = useAppStore();
 
+  const recipeData = DB_DATA.collectionData[activeRecipeId];
   const [recipeName, setRecipeName] = useState("");
   const [author, setAuthor] = useState("");
   const [reference, setReference] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [allergens, setAllergens] = useState([]);
+
+  setRecipeName(recipeData.name);
+  setAuthor(recipeData.author);
+  setReference(recipeData.reference);
+  setIngredients(recipeData.ingredients);
+  setAllergens(recipeData.allergens);
 
   const submitAlert = useRef(null);
 
@@ -30,14 +37,10 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
     }
 
     setMainView();
-    setRecipeName("");
-    setAuthor("");
-    setReference("");
-    setIngredients([]);
-    setAllergens([]);
   }
 
   function onAddRecipe(e) {
+    console.log({ activeRecipeId, recipeName, author, reference, allergens, ingredients });
     onCloseDialog(e);
     submitAlert.current.base.toast();
   }

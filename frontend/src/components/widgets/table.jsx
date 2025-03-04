@@ -1,6 +1,5 @@
-import { SlCard, SlTooltip, SlIconButton, SlTag, SlInput, SlInclude } from '@shoelace-style/shoelace/dist/react';
+import { SlCard, SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from './tagPicker';
-import { DB_DATA } from '../../api/temp';
 import { COLUMN_MASK, useAppStore } from '../../store';
 
 const styles = {
@@ -38,8 +37,24 @@ const styles = {
   },
 }
 
-function TableRow({ name, author, allergens, reference, ingredients }) {
-  const { editMode, getColumnVisible, setUpdateRecipeView, setRecipeSummaryView } = useAppStore();
+function TableRow({ id, name, author, allergens, reference, ingredients }) {
+  const {
+    editMode,
+    getColumnVisible,
+    setUpdateRecipeView,
+    setRecipeSummaryView,
+    setActiveRecipeId,
+  } = useAppStore();
+
+  function onViewRecipe() {
+    setRecipeSummaryView();
+    setActiveRecipeId(id);
+  }
+
+  function onEditRecipe() {
+    setUpdateRecipeView();
+    setActiveRecipeId(id);
+  }
 
   return (
     <SlCard style={{"--border-radius": "0"}}>
@@ -60,12 +75,12 @@ function TableRow({ name, author, allergens, reference, ingredients }) {
           <TagPicker variant="primary" selected={ingredients} viewMode></TagPicker>
         </div>}
         <div style={styles.end}>
-          {editMode && <>
             <SlTooltip content="View Recipe">
-              <SlIconButton name="eye" label="View Recipe" onClick={() => setRecipeSummaryView()}></SlIconButton>
+              <SlIconButton name="eye" label="View Recipe" onClick={() => onViewRecipe()}></SlIconButton>
             </SlTooltip>
+          {editMode && <>
             <SlTooltip content="Edit Recipe">
-              <SlIconButton name="pencil" label="Edit Recipe" onClick={() => setUpdateRecipeView()}></SlIconButton>
+              <SlIconButton name="pencil" label="Edit Recipe" onClick={() => onEditRecipe()}></SlIconButton>
             </SlTooltip>
             <SlTooltip content="Delete Recipe">
               <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>
@@ -98,8 +113,8 @@ export default function Table({ pageData }) {
           </div>
         </div>
       </SlCard>
-      {pageData.map((row) => {
-        return <TableRow editMode={editMode} {...row}></TableRow>;
+      {pageData.map((row, id) => {
+        return <TableRow editMode={editMode} id={id} {...row}></TableRow>;
       })}
     </div>
   )

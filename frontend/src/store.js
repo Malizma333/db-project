@@ -29,6 +29,7 @@ const initStoreState = {
   numRowsPerPage: 10,
   numRecipesInCollection: DB_DATA.collectionData.length,
   visibleColumns: COLUMN_MASK.NAME | COLUMN_MASK.AUTHOR | COLUMN_MASK.REFERENCE,
+  activeRecipeId: 0,
 }
 
 const computed = createComputed((state) => ({
@@ -58,6 +59,7 @@ export const useAppStore = create(
       setRowsPerPage: (val) => set({ numRowsPerPage: val }),
       getColumnVisible: (mask) => ((get().visibleColumns & mask) > 0),
       toggleColumn: (mask) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
+      setActiveRecipeId: (val) => set({ activeRecipeId: val }),
     })
   )
 );
