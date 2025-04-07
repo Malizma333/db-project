@@ -1,6 +1,6 @@
 import { SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
-import { DB_DATA } from '../../api/api';
+import { DB_DATA } from '../../api';
 import { useState } from 'preact/hooks';
 import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
 

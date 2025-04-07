@@ -495,7 +495,7 @@ export async function addIngredient(collection_id, recipe_name, ingredient) {
  * @param {string} recipe_name
  * @param {string} ingredient
  */
-export async function removeAllergen(collection_id, recipe_name, ingredient) {
+export async function removeIngredient(collection_id, recipe_name, ingredient) {
   const response = await makeRequest({
     type: "remove ingredient",
     auth: session_auth.auth,
