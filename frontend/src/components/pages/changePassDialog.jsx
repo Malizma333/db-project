@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { changePassword, correctPassword, validPassword } from '../../api/api';
+import { tempChangePwd, correctPassword, validPassword } from '../../api/api';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
@@ -44,7 +44,7 @@ export default function ChangePassDialog() {
       return;
     }
 
-    changePassword(newPassword);
+    tempChangePwd(newPassword);
     onCloseDialog();
     changePassAlert.current.base.toast();
   }

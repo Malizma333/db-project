@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { changeUsername, correctPassword, uniqueUsername, validUsername } from '../../api/api';
+import { tempChangeUser, correctPassword, uniqueUsername, validUsername } from '../../api/api';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
@@ -41,7 +41,7 @@ export default function ChangeNameDialog() {
       return;
     }
 
-    changeUsername(newUsername);
+    tempChangeUser(newUsername);
     onCloseDialog();
     changeNameAlert.current.base.toast();
   }
