@@ -122,7 +122,7 @@ not `401` (reserved for bad auth tokens).
   "collection_id": <int>,
   "recipe_name": <string>,
   "reference": <string>,
-  "author": <string>,
+  "authors": [<string>, ...],
   "ingredients": [<string>, ...],
   "allergens": [<string>, ...]
 }
