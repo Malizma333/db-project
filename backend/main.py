@@ -23,7 +23,7 @@ for root,dirs,files in os.walk(FILE_ROOT):
         with open(full_name, "rb") as f:
             print(full_name)
             print(full_name[len(FILE_ROOT):])
-            SERVABLE[full_name[len(FILE_ROOT):]] = (f.read(), EXTENSIONS[extension])
+            SERVABLE[full_name[len(FILE_ROOT):].replace("\\", "/")] = (f.read(), EXTENSIONS[extension])
 
 # SERVABLE = {
 #     "index.html": ["index.html", "text/html"],
