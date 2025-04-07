@@ -58,7 +58,7 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         length = int(self.headers["content-length"])
         body = self.rfile.read(length)
         if p.startswith("/api"):
-            ret = do_thing(json.parse(body.decode()))
+            ret = do_thing(json.loads(body.decode()))
             self.send_response(200)
             self.send_header("content-type", "application/json")
             self.end_headers()
