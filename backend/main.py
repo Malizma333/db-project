@@ -77,6 +77,12 @@ class RequestHandler(server.BaseHTTPRequestHandler):
             self.wfile.write(ret)
             return 200
 
+        self.send_response(404)
+        self.send_header("content-type", SERVABLE["/404.html"][1])
+        self.end_headers()
+        self.wfile.write(SERVABLE["/404.html"][0])
+        return 404
+
 ser = server.ThreadingHTTPServer(("",8008), RequestHandler)
 
 ser.serve_forever()
