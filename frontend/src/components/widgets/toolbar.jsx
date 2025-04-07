@@ -1,6 +1,6 @@
 import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel, SlAvatar } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
-import { DB_DATA, USER_DATA } from '../../api/api';
+import { DB_DATA, USER_DATA } from '../../api';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 

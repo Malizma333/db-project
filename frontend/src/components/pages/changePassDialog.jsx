@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { tempChangePwd, correctPassword, validPassword } from '../../api/api';
+import { tempChangePwd, correctPassword, validPassword } from '../../api';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 

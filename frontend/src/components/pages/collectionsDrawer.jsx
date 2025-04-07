@@ -1,6 +1,6 @@
 import { SlDrawer, SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
-import { DB_DATA } from "../../api/api";
+import { DB_DATA } from "../../api";
 
 const styles = {
   root: {
