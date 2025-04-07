@@ -119,7 +119,7 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "add recipe",
   "auth": <string>,
-  "collection id": <int>,
+  "collection_id": <int>,
   "recipe_name": <string>,
   "reference": <string>,
   "author": <string>,
