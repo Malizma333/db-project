@@ -88,7 +88,7 @@ Note that this will return either `401` or `200`.
   "type": "change username",
   "auth": <string>,
   "password": <string>,
-  "new username": <string>
+  "new_username": <string>
 }
 ```
 
@@ -104,7 +104,7 @@ not `401` (reserved for bad auth tokens).
   "type": "change password",
   "auth": <string>,
   "password": <string>,
-  "new password": <string>
+  "new_password": <string>
 }
 ```
 
@@ -120,7 +120,7 @@ not `401` (reserved for bad auth tokens).
   "type": "add recipe",
   "auth": <string>,
   "collection id": <int>,
-  "recipe name": <string>,
+  "recipe_name": <string>,
   "reference": <string>,
   "author": <string>,
   "ingredients": [<string>, ...],
@@ -136,8 +136,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "remove recipe",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>
+  "collection_id": <int>,
+  "recipe_name": <string>
 }
 ```
 
@@ -149,9 +149,9 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "rename recipe",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
-  "new recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
+  "new_recipe_name": <string>,
 }
 ```
 
@@ -162,15 +162,15 @@ not `401` (reserved for bad auth tokens).
 ```
 {
   "type": "filter recipe collection",
-  "collection id": <int>,
-  "recipe name": <string>,
-  "include allergens": [<string>, ...],
-  "exclude allergens": [<string>, ...],
-  "include ingredients": [<string>, ...],
-  "exclude ingredients": [<string>, ...],
+  "collection_id": <int>,
+  "recipe_name": <string>,
+  "include_allergens": [<string>, ...],
+  "exclude_allergens": [<string>, ...],
+  "include_ingredients": [<string>, ...],
+  "exclude_ingredients": [<string>, ...],
   "authors": [<string>, ...],
-  "view min": <int>,
-  "view max": <int>
+  "view_min": <int>,
+  "view_max": <int>
 }
 ```
 
@@ -202,7 +202,7 @@ not `401` (reserved for bad auth tokens).
   "type": "rename recipe collection",
   "auth": <string>,
   "id": <int>,
-  "new name": <string>
+  "new_name": <string>
 }
 ```
 
@@ -332,8 +332,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "change reference",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "reference": <string>
 }
 ```
@@ -346,8 +346,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "add allergen",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "allergen": <string>
 }
 ```
@@ -360,8 +360,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "remove allergen",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "allergen": <string>
 }
 ```
@@ -374,8 +374,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "add ingredient",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "ingredient": <string>
 }
 ```
@@ -388,8 +388,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "remove ingredient",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "ingredient": <string>
 }
 ```
@@ -402,8 +402,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "add author",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "author": <string>
 }
 ```
@@ -416,8 +416,8 @@ not `401` (reserved for bad auth tokens).
 {
   "type": "remove author",
   "auth": <string>,
-  "collection id": <int>,
-  "recipe name": <string>,
+  "collection_id": <int>,
+  "recipe_name": <string>,
   "author": <string>
 }
 ```
