@@ -1,7 +1,7 @@
 // TODO: arbitrary test values, will retrieve from database
 export async function init() {
   try {
-    const response = await fetch(`/recipeapp/dbrequest/?test_var=1&other_test_var=some+cool+text&otherstuff=3`);
+    const response = await fetch(`/api/?test_var=1&other_test_var=some+cool+text&otherstuff=3`);
     const data = await response.text();
     console.log(data);
   } catch(e) {
