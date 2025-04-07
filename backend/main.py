@@ -32,7 +32,7 @@ db_lock = threading.Lock()
 
 # return username, if it fails return -1
 def check_auth(token):
-    return
+    return "username"
 
 # This is where most db calls get handled. takes in parsed json. outputs object
 # ready to be run through `dumps`
@@ -56,9 +56,21 @@ def do_thing(body):
             if username == -1:
                 ret = {"type": "bad_auth_token"}
             else:
-                conn.execute(f"""INSERT INTO Recipe(collection_id, recipe_name, reference, authors, ingredients,
-                allergens) VALUES({body["collection_id"]},
-                )""")
+                recipe_params = (body["recipe_name"], body["reference"], username)
+                stores_params = (body["collection_id"], body["recipe_name"])
+                conn.execute(f"""INSERT INTO Recipe VALUES(?,?,?)""", recipe_params)
+                # may need to check if collection id is valid?
+                conn.execute(f"""INSERT INTO Stores 
+                VALUES(?,?)""", stores_params)
+                for ing in body["ingredients"]:
+                    conn.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
+                    conn.execute(f"""INSERT INTO Composes VALUES(?,?)""", (body["recipe_name"], ing))
+                for alg in body["allergens"]:
+                    conn.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
+                    conn.execute(f"""INSERT INTO Contains VALUES(?,?)""", (body["recipe_name"], alg))
+                for aut in body["authors"]:
+                    conn.execute(f"""INSERT INTO Author VALUES(?,?)""", (body["recipe_name"], aut))
+                conn.commit()
 
         conn.close()
     return ret
