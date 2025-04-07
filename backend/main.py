@@ -66,10 +66,10 @@ class RequestHandler(server.BaseHTTPRequestHandler):
     def do_POST(self):
         p = self.path
         if p.startswith("/recipeapp"):
-            p = p[11:]
+            p = p[10:]
         length = int(self.headers["content-length"])
         body = self.rfile.read(length)
-        if p.startswith("dbrequest"):
+        if p.startswith("/api"):
             ret = do_thing(body.decode())
             self.send_response(200)
             self.send_header("content-type", "application/json")
