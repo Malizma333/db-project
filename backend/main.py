@@ -1,3 +1,4 @@
+import threading
 from http import server
 import json
 import os
@@ -27,11 +28,40 @@ for root,dirs,files in os.walk(FILE_ROOT):
 TOKEN_LENGTH = 30
 TOKEN_CHARS = string.ascii_letters + string.digits
 
+db_lock = threading.Lock()
+
+# return username, if it fails return -1
+def check_auth(token):
+    return
+
 # This is where most db calls get handled. takes in parsed json. outputs object
 # ready to be run through `dumps`
 def do_thing(body):
-    print(f"POST request with body {body}")
-    return {"type":"response","greeting":"heyyyyyy"}
+    ret = None
+    with db_lock:
+        conn = sqlite3.connect('recipe.db')
+        if body["type"] == "login":
+            print("login doesn't work")
+        elif body["type"] == "logout":
+            print("logout doesn't work")
+        elif body["type"] == "is_logged_in":
+            print("is logged in doesn't work")
+        elif body["type"] == "change_username":
+            print("change username doesn't work")
+        elif body["type"] == "change_password":
+            print("change_password doesn't work")
+        # stuff above not implemented
+        elif body["type"] == "add_recipe":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                conn.execute(f"""INSERT INTO Recipe(collection_id, recipe_name, reference, authors, ingredients,
+                allergens) VALUES({body["collection_id"]},
+                )""")
+
+        conn.close()
+    return ret
 
 class RequestHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -80,10 +110,7 @@ if not os.path.isfile("recipe.db"):
         cur.execute(table)
     conn.commit()
     print("meow >:3")
-else:
-    conn = sqlite3.connect("recipe.db")
-    cur = conn.cursor()
-    # do queries or whatever here
+    conn.close()
 
 ser = server.ThreadingHTTPServer(("",8008), RequestHandler)
 
