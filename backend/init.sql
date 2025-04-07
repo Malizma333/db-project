@@ -1,7 +1,10 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE RecipeCollection (
   collection_name   VARCHAR(20),
   collection_id     INT PRIMARY KEY,
-  managed_by        VARCHAR(20) REFERENCES Account(username) NOT NULL
+  managed_by        VARCHAR(20) NOT NULL,
+  FOREIGN KEY(managed_by) REFERENCES Account(username)
 );
 
 CREATE TABLE Account (
@@ -24,7 +27,8 @@ CREATE TABLE Author (
 CREATE TABLE Recipe (
   recipe_name       VARCHAR(20) PRIMARY KEY,
   reference         VARCHAR(2083),
-  owned_by          VARCHAR(20) REFERENCES Account(username) NOT NULL
+  owned_by          VARCHAR(20) NOT NULL,
+  FOREIGN KEY(owned_by) REFERENCES Account(username)
 );
 
 CREATE TABLE Contains (

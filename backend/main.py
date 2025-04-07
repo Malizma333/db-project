@@ -79,6 +79,11 @@ if not os.path.isfile("recipe.db"):
     for table in sqlfile:
         cur.execute(table)
     conn.commit()
+    print("meow >:3")
+else:
+    conn = sqlite3.connect("recipe.db")
+    cur = conn.cursor()
+    # do queries or whatever here
 
 ser = server.ThreadingHTTPServer(("",8008), RequestHandler)
 
