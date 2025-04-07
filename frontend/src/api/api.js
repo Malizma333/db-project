@@ -5,7 +5,7 @@ function getErrorMessage(responseData) {
     parse_failed: "[ERROR] Parse failed",
     missing_keys: "[ERROR] Missing keys:",
     bad_values: "[ERROR] Bad values:",
-    bad_authentication: "[ERROR] Bad authentication",
+    bad_auth_token: "[ERROR] Bad authentication token",
     bad_fetch: "[ERROR] Bad fetch:",
   };
 
@@ -67,6 +67,8 @@ export async function login(username, password) {
     auth: data.auth,
     lifetime: data.lifetime,
   }
+
+  console.log(session_auth);
 }
 
 /**
@@ -85,6 +87,8 @@ export async function logout() {
   }
 
   session_auth = null;
+
+  console.log(session_auth);
 }
 
 /**

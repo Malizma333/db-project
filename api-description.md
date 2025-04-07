@@ -2,21 +2,19 @@
 
 For requests which succeed, but no response is listed, `200` is returned.
 
-For requests with a bad authentication token, `401` is returned.
-
-For requests with malformed JSON, one of the following is returned.
+For requests which error, one of the following is returned.
 
 ```
 400
 {
-  "type": "parse failed",
+  "type": "parse_failed",
 }
 ```
 
 ```
 400
 {
-  "type": "missing keys",
+  "type": "missing_keys",
   "keys": [<key>, ...]
 }
 ```
@@ -24,8 +22,15 @@ For requests with malformed JSON, one of the following is returned.
 ```
 400
 {
-  "type": "bad values",
+  "type": "bad_values",
   "values": [<value>, ...]
+}
+```
+
+```
+400
+{
+  "type": "bad_auth_token",
 }
 ```
 
@@ -52,9 +57,6 @@ For requests with malformed JSON, one of the following is returned.
 }
 ```
 
-Note that if this fails because of an incorrect username / password, a `400` of
-type `bad values` is returned, not `401` (reserved for bad auth tokens).
-
 # logout
 
 ## client -> server
@@ -77,7 +79,8 @@ type `bad values` is returned, not `401` (reserved for bad auth tokens).
 }
 ```
 
-Note that this will return either `401` or `200`.
+Note that this will return either `400` or `200` depending on the status of the
+auth token.
 
 # change username
 
@@ -92,8 +95,7 @@ Note that this will return either `401` or `200`.
 }
 ```
 
-Note that if the password is wrong, a `400` of type `bad values` is returned,
-not `401` (reserved for bad auth tokens).
+Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 # change password
 
@@ -108,8 +110,7 @@ not `401` (reserved for bad auth tokens).
 }
 ```
 
-Note that if the password is wrong, a `400` of type `bad values` is returned,
-not `401` (reserved for bad auth tokens).
+Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 # add recipe
 
