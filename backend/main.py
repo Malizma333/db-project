@@ -2,6 +2,7 @@ from http import server
 import json
 import os
 import string
+import sqlite3
 
 FILE_ROOT = os.path.join("..", "frontend", "dist")
 
@@ -70,6 +71,14 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(SERVABLE["/404.html"][0])
         return 404
+
+if not os.path.isfile("recipe.db"):
+    conn = sqlite3.connect("recipe.db")
+    cur = conn.cursor()
+    sqlfile = open('init.sql').read().split('\n\n')
+    for table in sqlfile:
+        cur.execute(table)
+    conn.commit()
 
 ser = server.ThreadingHTTPServer(("",8008), RequestHandler)
 
