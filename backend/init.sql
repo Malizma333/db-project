@@ -1,48 +1,48 @@
-CREATE RecipeCollection (
+CREATE TABLE RecipeCollection (
   collection_name   VARCHAR(20),
   collection_id     INT PRIMARY KEY,
   managed_by        VARCHAR(20) REFERENCES Account(username) NOT NULL
 );
 
-CREATE Account (
+CREATE TABLE Account (
   username          VARCHAR(20) PRIMARY KEY,
   password_hash     VARCHAR(20),
   password_salt     VARCHAR(20)
 );
 
-CREATE Stores (
+CREATE TABLE Stores (
   collection_id     INT REFERENCES RecipeCollection(id),
   recipe            VARCHAR(20) REFERENCES Recipe(recipe_name)
 );
 
-CREATE Author (
+CREATE TABLE Author (
   recipe_name       VARCHAR(20) REFERENCES Recipe(recipe_name),
   author_name       VARCHAR(20),
   PRIMARY KEY(recipe_name, author_name)
 );
 
-CREATE Recipe (
+CREATE TABLE Recipe (
   recipe_name       VARCHAR(20) PRIMARY KEY,
   reference         VARCHAR(2083),
   owned_by          VARCHAR(20) REFERENCES Account(username) NOT NULL
 );
 
-CREATE Contains (
+CREATE TABLE Contains (
   recipe_name       VARCHAR(20) REFERENCES Recipe(recipe_name),
   allergen_name     VARCHAR(20) REFERENCES Allergen(allergen_name),
   PRIMARY KEY(recipe_name, allergen_name)
 );
 
-CREATE Composes (
+CREATE TABLE Composes (
   recipe_name       VARCHAR(20) REFERENCES Recipe(recipe_name),
   ingredient_name   VARCHAR(20) REFERENCES Ingredient(ingredient_name),
   PRIMARY KEY(recipe_name, ingredient_name)
 );
 
-CREATE Allergen (
+CREATE TABLE Allergen (
   allergen_name     VARCHAR(20) PRIMARY KEY
 );
 
-CREATE Ingredient (
+CREATE TABLE Ingredient (
   ingredient_name   VARCHAR(20) PRIMARY KEY
 );
