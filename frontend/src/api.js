@@ -174,14 +174,12 @@ export async function addRecipe(collection_id, recipe_name, reference, authors, 
 
 /**
  * Removes recipe
- * @param {number} collection_id
  * @param {string} recipe_name
  */
-export async function removeRecipe(collection_id, recipe_name) {
+export async function removeRecipe(recipe_name) {
   const response = await makeRequest({
     type: "remove recipe",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
   });
 
@@ -194,15 +192,13 @@ export async function removeRecipe(collection_id, recipe_name) {
 
 /**
  * Renames recipe
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} new_recipe_name
  */
-export async function renameRecipe(collection_id, recipe_name, new_recipe_name) {
+export async function renameRecipe(recipe_name, new_recipe_name) {
   const response = await makeRequest({
     type: "rename recipe",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     new_recipe_name,
   });
@@ -403,15 +399,13 @@ export async function getRecipeCount(id) {
 
 /**
  * Change reference
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} reference
  */
-export async function changeReference(collection_id, recipe_name, reference) {
+export async function changeReference(recipe_name, reference) {
   const response = await makeRequest({
     type: "change reference",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     reference,
   });
@@ -425,15 +419,13 @@ export async function changeReference(collection_id, recipe_name, reference) {
 
 /**
  * Add allergen
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} allergen
  */
-export async function addAllergen(collection_id, recipe_name, allergen) {
+export async function addAllergen(recipe_name, allergen) {
   const response = await makeRequest({
     type: "add allergen",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     allergen,
   });
@@ -447,15 +439,13 @@ export async function addAllergen(collection_id, recipe_name, allergen) {
 
 /**
  * Remove allergen
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} allergen
  */
-export async function removeAllergen(collection_id, recipe_name, allergen) {
+export async function removeAllergen(recipe_name, allergen) {
   const response = await makeRequest({
     type: "remove allergen",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     allergen,
   });
@@ -469,15 +459,13 @@ export async function removeAllergen(collection_id, recipe_name, allergen) {
 
 /**
  * Add ingredient
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} ingredient
  */
-export async function addIngredient(collection_id, recipe_name, ingredient) {
+export async function addIngredient(recipe_name, ingredient) {
   const response = await makeRequest({
     type: "add ingredient",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     ingredient,
   });
@@ -491,15 +479,13 @@ export async function addIngredient(collection_id, recipe_name, ingredient) {
 
 /**
  * Remove ingredient
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} ingredient
  */
-export async function removeIngredient(collection_id, recipe_name, ingredient) {
+export async function removeIngredient(recipe_name, ingredient) {
   const response = await makeRequest({
     type: "remove ingredient",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     ingredient,
   });
@@ -513,15 +499,13 @@ export async function removeIngredient(collection_id, recipe_name, ingredient) {
 
 /**
  * Add author
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} author
  */
-export async function addAuthor(collection_id, recipe_name, author) {
+export async function addAuthor(recipe_name, author) {
   const response = await makeRequest({
     type: "add author",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     author,
   });
@@ -535,15 +519,13 @@ export async function addAuthor(collection_id, recipe_name, author) {
 
 /**
  * Remove author
- * @param {number} collection_id
  * @param {string} recipe_name
  * @param {string} author
  */
-export async function removeAuthor(collection_id, recipe_name, author) {
+export async function removeAuthor(recipe_name, author) {
   const response = await makeRequest({
     type: "remove author",
     auth: session_auth.auth,
-    collection_id,
     recipe_name,
     author,
   });
@@ -555,57 +537,59 @@ export async function removeAuthor(collection_id, recipe_name, author) {
   }
 }
 
-export const DB_DATA = {
-  collectionArray: [
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"}
-  ],
-  collectionData: [
-    {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
-    {name: "Spaghetti", author: "Bob", allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
-  ],
-  allAllergens: ["Gluten", "Nuts", "Shellfish"],
-  allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
-  allAuthors: ["Alice", "Bob"],
-  columns: ["name", "author", "allergens", "reference", "ingredients"]
-}
+// TODO: Replace below with above
 
-export const USER_DATA = {
-  username: "test",
-  password: "test"
-}
-
-export function correctCredentials (user, pass) {
-  return user === USER_DATA.username && pass === USER_DATA.password;
-}
-
-export function correctPassword (pass) {
-  return pass === USER_DATA.password;
-}
-
-export function validPassword (pass) {
-  return 8 <= pass.length && pass.length <= 20;
-}
-
-export function validUsername (name) {
-  return 8 <= name.length && name.length <= 20;
-}
-
-export function uniqueUsername (name) {
-  return name !== USER_DATA.username;
-}
-
-export function tempChangePwd (pass) {
-  USER_DATA.password = pass;
-}
-
-export function tempChangeUser (name) {
-  USER_DATA.username = name;
-}
+// export const DB_DATA = {
+//   collectionArray: [
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"},
+//     {name: "First Collection", numRecipes: 2, id: "test_string"}
+//   ],
+//   collectionData: [
+//     {name: "Ravioli", author: "Alice", allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
+//     {name: "Spaghetti", author: "Bob", allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
+//   ],
+//   allAllergens: ["Gluten", "Nuts", "Shellfish"],
+//   allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
+//   allAuthors: ["Alice", "Bob"],
+//   columns: ["name", "author", "allergens", "reference", "ingredients"]
+// }
+// 
+// export const USER_DATA = {
+//   username: "test",
+//   password: "test"
+// }
+// 
+// export function correctCredentials (user, pass) {
+//   return user === USER_DATA.username && pass === USER_DATA.password;
+// }
+// 
+// export function correctPassword (pass) {
+//   return pass === USER_DATA.password;
+// }
+// 
+// export function validPassword (pass) {
+//   return 8 <= pass.length && pass.length <= 20;
+// }
+// 
+// export function validUsername (name) {
+//   return 8 <= name.length && name.length <= 20;
+// }
+// 
+// export function uniqueUsername (name) {
+//   return name !== USER_DATA.username;
+// }
+// 
+// export function tempChangePwd (pass) {
+//   USER_DATA.password = pass;
+// }
+// 
+// export function tempChangeUser (name) {
+//   USER_DATA.username = name;
+// }

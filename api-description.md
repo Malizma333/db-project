@@ -137,7 +137,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "remove recipe",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>
 }
 ```
@@ -150,7 +149,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "rename recipe",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "new_recipe_name": <string>,
 }
@@ -333,7 +331,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "change reference",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "reference": <string>
 }
@@ -347,7 +344,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "add allergen",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "allergen": <string>
 }
@@ -361,7 +357,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "remove allergen",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "allergen": <string>
 }
@@ -375,7 +370,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "add ingredient",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "ingredient": <string>
 }
@@ -389,7 +383,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "remove ingredient",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "ingredient": <string>
 }
@@ -403,7 +396,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "add author",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "author": <string>
 }
@@ -417,7 +409,6 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 {
   "type": "remove author",
   "auth": <string>,
-  "collection_id": <int>,
   "recipe_name": <string>,
   "author": <string>
 }
