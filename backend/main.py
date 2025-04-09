@@ -40,6 +40,7 @@ def do_thing(body):
     ret = None
     with db_lock:
         conn = sqlite3.connect('recipe.db')
+        conn.execute("PRAGMA foreign_keys = ON;")
         if body["type"] == "login":
             print("login doesn't work")
         elif body["type"] == "logout":
@@ -50,6 +51,7 @@ def do_thing(body):
             print("change username doesn't work")
         elif body["type"] == "change_password":
             print("change_password doesn't work")
+
         # stuff above not implemented
         elif body["type"] == "add_recipe":
             username = check_auth(body["auth"])
@@ -71,6 +73,85 @@ def do_thing(body):
                 for aut in body["authors"]:
                     conn.execute(f"""INSERT INTO Author VALUES(?,?)""", (body["recipe_name"], aut))
                 conn.commit()
+
+        elif body["type"] == "remove_recipe":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                conn.execute("DELETE FROM Recipe WHERE recipe_name = ?", [body["recipe_name"]])
+                conn.commit()
+
+        # NOTE: Collection_id does not need to be passed in since recipe name is a primary key already (I think)
+        elif body["type"] == "rename_recipe":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["new_recipe_name"], body["recipe_name"], username)
+                conn.execute("""UPDATE Recipe SET recipe_name == ? 
+                WHERE recipe_name = ? AND owned_by = ?""", params)
+                conn.commit()
+        # TODO
+        elif body["type"] == "filter_recipe_collection":
+            print("not implemented yet")
+
+        elif body["type"] == "rename_recipe_collection":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["new_name"], body["id"], username)
+                conn.execute("""UPDATE RecipeCollection SET collection_name == ? 
+                                WHERE collection_id = ? AND managed_by = ?""", params)
+                conn.commit()
+
+        elif body["type"] == "add_recipe_collection":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                # TODO: have way to generate collection IDs
+                collect_params = (body["name"], 123, username)
+                conn.execute(f"""INSERT INTO RecipeCollection VALUES(?,?,?)""", collect_params)
+                conn.commit()
+
+        elif body["type"] == "remove_recipe_collection":
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["id"], username)
+                conn.execute("""DELETE FROM RecipeCollection WHERE collection_id = ?
+                AND managed_by = ?""", params)
+                conn.commit()
+
+        # TODO: ALL OF THESE
+        elif body["type"] == "get_owned_recipe_collections":
+            print("not implemented yet")
+        elif body["type"] == "get_allergens_in_collection":
+            print("not implemented yet")
+        elif body["type"] == "get_ingredients_in_collection":
+            print("not implemented yet")
+        elif body["type"] == "count_recipes_in_collection":
+            print("not implemented yet")
+
+        # TODO: currently working on these
+        elif body["type"] == "change_reference":
+            print("not implemented yet")
+        elif body["type"] == "add_allergen":
+            print("not implemented yet")
+        elif body["type"] == "remove_allergen":
+            print("not implemented yet")
+        elif body["type"] == "add_ingredient":
+            print("not implemented yet")
+        elif body["type"] == "remove_ingredient":
+            print("not implemented yet")
+        elif body["type"] == "add_author":
+            print("not implemented yet")
+        elif body["type"] == "remove_author":
+            print("not implemented yet")
+
 
         conn.close()
     return ret
@@ -120,6 +201,19 @@ if not os.path.isfile("recipe.db"):
     sqlfile = open('init.sql').read().split('\n\n')
     for table in sqlfile:
         cur.execute(table)
+    #testing code
+    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipies"}
+    #do_thing(v)
+    #v = {"type": "add_recipe", "auth": "s", "collection_id": 123, "recipe_name": "tunamelt", "reference": "kibbie's website", "authors": ("me", "my mom"), "ingredients": ("pecans", "butter", "kibble"), "allergens": ("peanuts", "shellfish")}
+    #do_thing(v)
+    #r = {"type": "remove_recipe_collection", "auth": "c", "id": 123}
+    #do_thing(r)
+    #testing code
+    # the following needs to be added back once account queries are implemented
+    # can't test otherwise due to foreign key constraints
+    # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
+    # add FOREIGN KEY(owned_by) REFERENCES Account(username) to Recipe
+
     conn.commit()
     print("meow >:3")
     conn.close()
