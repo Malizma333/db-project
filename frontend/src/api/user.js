@@ -50,6 +50,10 @@ export async function logout() {
 }
 
 async function loggedIn() {
+  if (!session_auth) {
+    return false;
+  }
+
   const response = await makeRequest({
     type: "is logged in",
     auth: session_auth.auth,
@@ -60,7 +64,7 @@ async function loggedIn() {
 
 /**
  * Checks if logged in
- * @returns {boolean} Logged in
+ * @returns {import("@tanstack/react-query").UseQueryResult<boolean>} Logged in
  */
 export function useLoggedIn() {
   return useQuery({

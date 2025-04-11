@@ -3,7 +3,7 @@ import TagPicker from '../widgets/tagPicker';
 import { useState } from 'preact/hooks';
 import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
 
-import { DB_DATA } from '../../api';
+import { DB_DATA } from '../../api/api';
 
 const styles = {
   settingContainer: {

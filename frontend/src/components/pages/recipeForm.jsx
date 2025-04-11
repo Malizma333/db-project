@@ -4,7 +4,7 @@ import { useAppStore } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
 
-import { DB_DATA } from '../../api';
+import { DB_DATA } from '../../api/api';
 
 const styles = {
   inputField: {

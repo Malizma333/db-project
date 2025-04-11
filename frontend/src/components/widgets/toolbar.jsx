@@ -3,7 +3,8 @@ import { useAppStore } from '../../store';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 
-import { DB_DATA, USER_DATA } from '../../api';
+import { DB_DATA, USER_DATA } from '../../api/api';
+import { logout, useLoggedIn } from '../../api/user';
 
 const styles = {
   root: {
@@ -21,15 +22,19 @@ const styles = {
 
 export default function Toolbar() {
   const {
-    loggedIn,
     setSettingsView,
     setLoginView,
     setChangePassView,
     setChangeUserView,
     setCollectionsView,
     setRecipeSummaryView,
-    logOut
   } = useAppStore();
+
+  const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
+
+  if (status === "error") {
+    console.error(error.message);
+  }
 
   const ACTION = {
     VIEW_COLLECTIONS: 0,
@@ -41,13 +46,14 @@ export default function Toolbar() {
   const logOutAlert = useRef(null);
 
   function onRandomRecipe() {
+    // TODO
     const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
     console.log(DB_DATA.collectionData[ind]);
     setRecipeSummaryView();
   }
 
-  function onLogOut() {
-    logOut();
+  async function onLogOut() {
+    await logout();
     logOutAlert.current.base.toast();
   }
 
@@ -79,31 +85,34 @@ export default function Toolbar() {
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
       <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>
       {!loggedIn ?
-        <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar> :
-        <SlDropdown>
-          <SlAvatar
-            style={styles.avatar}
-            slot="trigger"
-            initials={USER_DATA.username[0]}
-            label="Avatar with username initial"
-          ></SlAvatar>
-          <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
-            <SlMenuLabel className="userMenuLabel">{USER_DATA.username}</SlMenuLabel>
-            <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
-              View Collections
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.CHANGE_USERNAME}>
-              Change Username
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.CHANGE_PASSWORD}>
-              Change Password
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.LOGOUT}>
-              Log Out
-              <SlIcon name="box-arrow-right" slot="suffix"></SlIcon>
-            </SlMenuItem>
-          </SlMenu>
-        </SlDropdown>
+        (
+          <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>
+        ) : (
+          <SlDropdown>
+            <SlAvatar
+              style={styles.avatar}
+              slot="trigger"
+              initials={USER_DATA.username[0]}
+              label="Avatar with username initial"
+            ></SlAvatar>
+            <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
+              <SlMenuLabel className="userMenuLabel">{USER_DATA.username}</SlMenuLabel>
+              <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
+                View Collections
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.CHANGE_USERNAME}>
+                Change Username
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.CHANGE_PASSWORD}>
+                Change Password
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.LOGOUT}>
+                Log Out
+                <SlIcon name="box-arrow-right" slot="suffix"></SlIcon>
+              </SlMenuItem>
+            </SlMenu>
+          </SlDropdown>
+        )
       }
     </div>
   )

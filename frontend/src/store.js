@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createComputed } from "zustand-computed";
-import { DB_DATA } from "./api";
+import { DB_DATA } from "./api/api";
 
 export const VIEW = Object.freeze({
   SEARCH_SETTINGS: 0,
@@ -24,7 +24,6 @@ export const COLUMN_MASK = Object.freeze({
 
 const initStoreState = {
   view: VIEW.MAIN,
-  loggedIn: false,
   page: 0,
   numRowsPerPage: 10,
   numRecipesInCollection: DB_DATA.collectionData.length,
@@ -34,7 +33,7 @@ const initStoreState = {
 
 const computed = createComputed((state) => ({
   numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage),
-  editMode: state.loggedIn && true // TODO: Determine if current collection belongs to current user
+  editMode: true // TODO: Logged in && current collection belongs to current user
 }));
 
 export const useAppStore = create(
@@ -50,8 +49,6 @@ export const useAppStore = create(
       setNewRecipeView: () => set({ view: VIEW.NEW_RECIPE_FORM }),
       setUpdateRecipeView: () => set({ view: VIEW.UPDATE_RECIPE_FORM }),
       setRecipeSummaryView: () => set({ view: VIEW.RECIPE_SUMMARY }),
-      logIn: () => set({ loggedIn: true }),
-      logOut: () => set({ loggedIn: false }),
       gotoFirstPage: () => set({ page: 0 }),
       gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
       gotoNextPage: () => set((state) => ({ page: Math.min(get().numPages - 1, state.page + 1) })),
