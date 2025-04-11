@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { tempChangePwd, correctPassword, validPassword } from '../../api';
+import { changePassword } from '../../api/user';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
@@ -26,25 +26,20 @@ export default function ChangePassDialog() {
     setRePassword("");
   }
 
-  function onSetPassword() {
+  async function onSetPassword() {
     setHelpText("");
-
-    if (!correctPassword(oldPassword)) {
-      setHelpText("Old password must match");
-      return;
-    }
-
-    if (!validPassword(newPassword)) {
-      setHelpText("New password must be 8 - 20 characters");
-      return;
-    }
 
     if (rePassword !== newPassword) {
       setHelpText("New passwords do not match");
       return;
     }
 
-    tempChangePwd(newPassword);
+    try {
+      await changePassword(oldPassword, newPassword);
+    } catch (e) {
+      setHelpText(e.message);
+    }
+
     onCloseDialog();
     changePassAlert.current.base.toast();
   }

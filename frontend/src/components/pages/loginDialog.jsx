@@ -1,6 +1,6 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { correctCredentials } from '../../api';
+import { login } from '../../api/user';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
@@ -11,7 +11,7 @@ const styles = {
 }
 
 export default function LoginDialog() {
-  const { view, logIn, setMainView } = useAppStore();
+  const { view, setMainView } = useAppStore();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,13 +25,13 @@ export default function LoginDialog() {
     setHelpText("");
   }
 
-  function onLogIn() {
-    if (correctCredentials(username, password)) {
-      logIn();
+  async function onLogIn() {
+    try {
+      await login(username, password);
       onCloseDialog();
       logInAlert.current.base.toast();
-    } else {
-      setHelpText("Invalid username or password");
+    } catch (e) {
+      setHelpText(e.message);
     }
   }
 
