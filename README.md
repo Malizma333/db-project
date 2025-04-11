@@ -4,9 +4,6 @@
 # First time frontend setup
 cd frontend && npm i
 
-# Running the frontend (localhost:8080)
-cd frontend && npm run dev
-
-# Running the backend (localhost:5000)
-cd backend && python main.py
+# Build the frontend and start the web server
+bash run.sh
 ```
