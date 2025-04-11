@@ -9,13 +9,14 @@ import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
-import { DB_DATA } from './api';
 import { useAppStore, VIEW } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
+
+import { DB_DATA } from './api/api';
 
 const styles = {
   root: {

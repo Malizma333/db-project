@@ -1,8 +1,9 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { login } from '../../api/user';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
+
+import { login } from '../../api/user';
 
 const styles = {
   inputField: {
