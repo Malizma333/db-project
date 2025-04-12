@@ -2,7 +2,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE RecipeCollection (
   collection_name   VARCHAR(20),
-  collection_id     INT PRIMARY KEY,
+  collection_id     INTEGER PRIMARY KEY,
   managed_by        VARCHAR(20) NOT NULL
 );
 
@@ -13,7 +13,7 @@ CREATE TABLE Account (
 );
 
 CREATE TABLE Stores (
-  collection_id     INT,
+  collection_id     INTEGER,
   recipe            VARCHAR(20),
   owned_by          VARCHAR(20),
   FOREIGN KEY(recipe, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -25,7 +25,7 @@ CREATE TABLE Author (
   recipe_name       VARCHAR(20),
   owned_by          VARCHAR(20),
   author_name       VARCHAR(20),
-  PRIMARY KEY(author_name),
+  PRIMARY KEY(author_name, owned_by, recipe_name),
   FOREIGN KEY(recipe_name, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

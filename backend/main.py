@@ -40,7 +40,8 @@ def do_thing(body):
     ret = None
     with db_lock:
         conn = sqlite3.connect('recipe.db')
-        conn.execute("PRAGMA foreign_keys = ON;")
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
         if body["type"] == "login":
             print("login doesn't work")
         elif body["type"] == "logout":
@@ -60,21 +61,22 @@ def do_thing(body):
             else:
                 recipe_params = (body["recipe_name"], body["reference"], username)
                 stores_params = (body["collection_id"], body["recipe_name"], username)
-                conn.execute(f"""INSERT INTO Recipe VALUES(?,?,?)""", recipe_params)
+                cursor.execute(f"""INSERT INTO Recipe VALUES(?,?,?)""", recipe_params)
                 # may need to check if collection id is valid?
-                conn.execute(f"""INSERT INTO Stores 
+                cursor.execute(f"""INSERT INTO Stores 
                 VALUES(?,?,?)""", stores_params)
                 for ing in body["ingredients"]:
-                    conn.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
-                    conn.execute(f"""INSERT INTO Composes VALUES(?,?,?)""",
+                    cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
+                    cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""",
                                  (body["recipe_name"], username, ing))
                 for alg in body["allergens"]:
-                    conn.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
-                    conn.execute(f"""INSERT INTO Contains VALUES(?,?,?)""",
+                    cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
+                    cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""",
                                  (body["recipe_name"], username, alg))
                 for aut in body["authors"]:
-                    conn.execute(f"""INSERT INTO Author VALUES(?,?,?)""",
+                    cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""",
                                  (body["recipe_name"], username, aut))
+
                 conn.commit()
 
         elif body["type"] == "remove_recipe":
@@ -82,7 +84,7 @@ def do_thing(body):
             if username == -1:
                 ret = {"type": "bad_auth_token"}
             else:
-                conn.execute("DELETE FROM Recipe WHERE recipe_name = ? "
+                cursor.execute("DELETE FROM Recipe WHERE recipe_name = ? "
                              "AND owned_by = ?", (body["recipe_name"], username))
                 conn.commit()
 
@@ -93,7 +95,7 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["new_recipe_name"], body["recipe_name"], username)
-                conn.execute(f"""UPDATE Recipe SET recipe_name == ? 
+                cursor.execute(f"""UPDATE Recipe SET recipe_name == ? 
                 WHERE recipe_name = ? AND owned_by = ?""", params)
                 conn.commit()
         # TODO
@@ -106,7 +108,7 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["new_name"], body["id"], username)
-                conn.execute(f"""UPDATE RecipeCollection SET collection_name == ? 
+                cursor.execute(f"""UPDATE RecipeCollection SET collection_name == ? 
                                 WHERE collection_id = ? AND managed_by = ?""", params)
                 conn.commit()
 
@@ -115,10 +117,15 @@ def do_thing(body):
             if username == -1:
                 ret = {"type": "bad_auth_token"}
             else:
-                # TODO: have way to generate collection IDs
-                collect_params = (body["name"], 123, username)
-                conn.execute(f"""INSERT INTO RecipeCollection VALUES(?,?,?)""", collect_params)
+                collect_params = (body["name"], None, username)
+                cursor.execute(f"""INSERT INTO RecipeCollection VALUES(?,?,?)""", collect_params)
                 conn.commit()
+                cursor.execute(f"""SELECT collection_id FROM RecipeCollection 
+                WHERE collection_name = ? AND managed_by = ?""", (body["name"], username))
+                conn.commit()
+                temp = cursor.fetchall()
+                co_id = temp[0][0]
+                ret = {"type": "add_recipe_collection_response", "id": co_id}
 
         elif body["type"] == "remove_recipe_collection":
             username = check_auth(body["auth"])
@@ -126,28 +133,63 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["id"], username)
-                conn.execute(f"""DELETE FROM RecipeCollection WHERE collection_id = ?
+                cursor.execute(f"""DELETE FROM RecipeCollection WHERE collection_id = ?
                 AND managed_by = ?""", params)
                 conn.commit()
 
-        # TODO: ALL OF THESE
         elif body["type"] == "get_owned_recipe_collections":
-            print("not implemented yet")
-        elif body["type"] == "get_allergens_in_collection":
-            print("not implemented yet")
-        elif body["type"] == "get_ingredients_in_collection":
-            print("not implemented yet")
-        elif body["type"] == "count_recipes_in_collection":
-            print("not implemented yet")
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                cursor.execute("""SELECT collection_id FROM RecipeCollection 
+                WHERE managed_by = ?""", [username])
+                temp = cursor.fetchall()
+                conn.commit()
+                ids = []
+                for t in temp:
+                    ids.append(t[0])
+                ret = {"type": "get_owned_recipe_collections_response", "ids": ids}
 
-        # TODO: currently working on these
+        # NOTE: This query doesn't require authentification (no auth passed)
+        elif body["type"] == "get_allergens_in_collection":
+            cursor.execute("""SELECT DISTINCT allergen_name FROM Contains WHERE recipe_name = 
+            (SELECT recipe FROM STORES WHERE collection_id = ? AND owned_by = (SELECT managed_by 
+            FROM RecipeCollection WHERE collection_id = ?))""", (body["id"], body["id"]))
+            temp = cursor.fetchall()
+            conn.commit()
+            allergens = []
+            for t in temp:
+                allergens.append(t[0])
+            ret = {"type": "get_allergen_in_collection_response", "allergens": allergens}
+
+        # NOTE: This query doesn't require authentification (no auth passed)
+        elif body["type"] == "get_ingredients_in_collection":
+            cursor.execute("""SELECT DISTINCT ingredient_name FROM Composes WHERE recipe_name = 
+                        (SELECT recipe FROM STORES WHERE collection_id = ? AND owned_by = (SELECT managed_by 
+                        FROM RecipeCollection WHERE collection_id = ?))""", (body["id"], body["id"]))
+            temp = cursor.fetchall()
+            conn.commit()
+            ingredients = []
+            for t in temp:
+                ingredients.append(t[0])
+            ret = {"type": "get_ingredients_in_collection_response", "ingredients": ingredients}
+
+        elif body["type"] == "count_recipes_in_collection":
+            cursor.execute("""SELECT COUNT(*) FROM Stores 
+            WHERE collection_id = ?""", [body["id"]])
+            temp = cursor.fetchall()
+            conn.commit()
+            recipes = temp[0][0]
+            ret = {"type": "count_recipes_in_collection_response", "count": recipes}
+
         elif body["type"] == "change_reference":
             username = check_auth(body["auth"])
             if username == -1:
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["reference"], body["recipe_name"], username)
-                conn.execute(f"""UPDATE Recipe SET reference == ? 
+                cursor.execute(f"""UPDATE Recipe SET reference == ? 
                 WHERE recipe_name = ? AND owned_by = ?""", params)
                 conn.commit()
 
@@ -157,8 +199,8 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["recipe_name"], username, body["allergen"])
-                conn.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen"]])
-                conn.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
+                cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen"]])
+                cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
                 conn.commit()
 
         elif body["type"] == "remove_allergen":
@@ -167,18 +209,48 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 params = (body["recipe_name"], username, body["allergen"],)
-                conn.execute(f"""DELETE FROM Contains WHERE recipe_name = ? AND owned_by = ? 
+                cursor.execute(f"""DELETE FROM Contains WHERE recipe_name = ? AND owned_by = ? 
                 AND allergen_name = ?""",params)
                 conn.commit()
 
         elif body["type"] == "add_ingredient":
-            print("not implemented yet")
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["recipe_name"], username, body["ingredient"])
+                cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient"]])
+                cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""", params)
+                conn.commit()
+
         elif body["type"] == "remove_ingredient":
-            print("not implemented yet")
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["recipe_name"], username, body["ingredient"],)
+                cursor.execute(f"""DELETE FROM Composes WHERE recipe_name = ? AND owned_by = ? 
+                                AND ingredient_name = ?""", params)
+                conn.commit()
+
         elif body["type"] == "add_author":
-            print("not implemented yet")
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["recipe_name"], username, body["author"])
+                cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""", params)
+                conn.commit()
+
         elif body["type"] == "remove_author":
-            print("not implemented yet")
+            username = check_auth(body["auth"])
+            if username == -1:
+                ret = {"type": "bad_auth_token"}
+            else:
+                params = (body["recipe_name"], username, body["author"],)
+                cursor.execute(f"""DELETE FROM Author WHERE recipe_name = ? AND owned_by = ?
+                                                AND author_name = ?""", params)
+                conn.commit()
 
 
         conn.close()
@@ -231,16 +303,22 @@ if not os.path.isfile("recipe.db"):
         cur.execute(table)
     #testing code
     #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipies"}
+    #print(do_thing(v))
+    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Dog Food Recipes"}
+    #print(do_thing(v))
+    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "tunamelt", "reference": "kibbie's website", "authors": ["me", "my mom"], "ingredients": ["pecans", "butter", "kibble"], "allergens": ["peanuts", "shellfish"]}
     #do_thing(v)
-    #v = {"type": "add_recipe", "auth": "s", "collection_id": 123, "recipe_name": "tunamelt", "reference": "kibbie's website", "authors": ("me", "my mom"), "ingredients": ("pecans", "butter", "kibble"), "allergens": ("peanuts", "shellfish")}
+    #v = {"type": "add_recipe", "auth": "s", "collection_id": 2, "recipe_name": "cookies", "reference": "Frankie's website", "authors": ["Breanna"], "ingredients": ["sugar", "spice", "chicken"], "allergens": []}
     #do_thing(v)
-    #r = {"type": "add_allergen", "auth": "c", "recipe_name": "tunamelt", "allergen": "cat fur"}
-    #do_thing(r)
+    #r = {"type": "count_recipes_in_collection", "id": 1}
+    #print(do_thing(r))
     #testing code
     # the following needs to be added back once account queries are implemented
     # can't test otherwise due to foreign key constraints
     # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
     # add FOREIGN KEY(owned_by) REFERENCES Account(username) to Recipe
+    # for remove ingredient and allergen: should I remove these from alg/ing
+    # if there are none in any current recipies?
 
     conn.commit()
     print("meow >:3")
