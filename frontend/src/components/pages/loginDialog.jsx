@@ -12,7 +12,7 @@ const styles = {
 }
 
 export default function LoginDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setClientUsername } = useAppStore();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +29,7 @@ export default function LoginDialog() {
   async function onLogIn() {
     try {
       await login(username, password);
+      setClientUsername(username);
       onCloseDialog();
       logInAlert.current.base.toast();
     } catch (e) {

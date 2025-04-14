@@ -12,7 +12,7 @@ const styles = {
 }
 
 export default function ChangeNameDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setClientUsername } = useAppStore();
 
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +29,7 @@ export default function ChangeNameDialog() {
   async function onChangeUsername() {
     try {
       await changeUsername(password, newUsername);
+      setClientUsername(newUsername);
     } catch(e) {
       setHelpText(e.message);
       return;

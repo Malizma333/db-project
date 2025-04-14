@@ -23,6 +23,7 @@ export const COLUMN_MASK = Object.freeze({
 });
 
 const initStoreState = {
+  clientUsername: "",
   view: VIEW.MAIN,
   page: 0,
   numRowsPerPage: 10,
@@ -57,6 +58,7 @@ export const useAppStore = create(
       getColumnVisible: (mask) => ((get().visibleColumns & mask) > 0),
       toggleColumn: (mask) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
       setActiveRecipeId: (val) => set({ activeRecipeId: val }),
+      setClientUsername: (username) => set({ clientUsername: username }),
     })
   )
 );

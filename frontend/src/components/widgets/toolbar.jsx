@@ -3,7 +3,7 @@ import { useAppStore } from '../../store';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 
-import { DB_DATA, USER_DATA } from '../../api/api';
+import { DB_DATA } from '../../api/api';
 import { logout, useLoggedIn } from '../../api/user';
 
 const styles = {
@@ -28,6 +28,8 @@ export default function Toolbar() {
     setChangeUserView,
     setCollectionsView,
     setRecipeSummaryView,
+    clientUsername,
+    setClientUsername,
   } = useAppStore();
 
   const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
@@ -54,6 +56,7 @@ export default function Toolbar() {
 
   async function onLogOut() {
     await logout();
+    setClientUsername("");
     logOutAlert.current.base.toast();
   }
 
@@ -84,7 +87,7 @@ export default function Toolbar() {
       </SlInput>
       <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
       <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>
-      {!loggedIn ?
+      {loggedInFetching || !loggedIn ?
         (
           <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>
         ) : (
@@ -92,11 +95,11 @@ export default function Toolbar() {
             <SlAvatar
               style={styles.avatar}
               slot="trigger"
-              initials={USER_DATA.username[0]}
+              initials={clientUsername[0]}
               label="Avatar with username initial"
             ></SlAvatar>
             <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
-              <SlMenuLabel className="userMenuLabel">{USER_DATA.username}</SlMenuLabel>
+              <SlMenuLabel className="userMenuLabel">{clientUsername}</SlMenuLabel>
               <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
                 View Collections
               </SlMenuItem>

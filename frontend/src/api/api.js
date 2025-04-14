@@ -76,8 +76,3 @@ export const DB_DATA = {
   allAuthors: ["Alice", "Bob"],
   columns: ["name", "author", "allergens", "reference", "ingredients"]
 }
-
-export const USER_DATA = {
-  username: "test",
-  password: "test"
-}
