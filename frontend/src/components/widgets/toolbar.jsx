@@ -3,10 +3,9 @@ import { useAppStore } from '../../store';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
 
-import { DB_DATA } from '../../api/api';
 import { logout, useLoggedIn } from '../../api/user';
 import { useParams } from 'react-router';
-import { useCollectionName, useOwnedCollections } from '../../api/recipeCollection';
+import { filterRecipeCollection, useCollectionName, useRecipeCount } from '../../api/recipeCollection';
 
 const styles = {
   root: {
@@ -37,7 +36,10 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
   const params = useParams();
 
   const { data: collectionName } = useCollectionName(params["id"]);
+  const { data: numRecipes } = useRecipeCount(params["id"]);
   const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
+
+  const logOutAlert = useRef(null);
 
   if (status === "error") {
     console.error(error.message);
@@ -50,12 +52,19 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
     LOGOUT: 3
   };
 
-  const logOutAlert = useRef(null);
 
-  function onRandomRecipe() {
-    // TODO use api
-    const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
-    const randRecipe = DB_DATA.collectionData[ind];
+  async function onRandomRecipe() {
+    const ind = Math.floor(Math.random() * numRecipes);
+    const randRecipe = await filterRecipeCollection({
+      collection_id: params["id"],
+      recipe_name: "",
+      include_allergens: [],
+      exclude_allergens: [],
+      include_ingredients: [],
+      exclude_ingredients: [],
+      view_min: ind,
+      view_max: ind + 1
+    })[0];
     setRecipeData.setRecipeName(randRecipe.recipeName);
     setRecipeData.setAuthors(randRecipe.authors);
     setRecipeData.setReference(randRecipe.reference);

@@ -17,8 +17,7 @@ import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
 import { useState } from 'preact/hooks';
 
-import { DB_DATA } from './api/api';
-import { useOwnedCollections, useRecipeCount } from './api/recipeCollection';
+import { useFilterCollection, useOwnedCollections, useRecipeCount } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
 
@@ -43,7 +42,6 @@ const styles = {
 export default function App({ collectionDef }) {
   const { page, numRowsPerPage, setNumRecipesInCollection, setEditMode, init, setInit } = useAppStore();
 
-  let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
   const params = useParams();
 
   const [recipeName, setRecipeName] = useState("");
@@ -57,6 +55,17 @@ export default function App({ collectionDef }) {
   const { data: numRecipesInCollection } = useRecipeCount(params["id"] || -1);
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
+  const { data: tableData } = useFilterCollection({
+    collection_id: params["id"],
+    recipe_name: "",
+    include_allergens: [],
+    exclude_allergens: [],
+    include_ingredients: [],
+    exclude_ingredients: [],
+    authors: [],
+    view_min: page * numRowsPerPage,
+    view_max: (page + 1) * numRowsPerPage
+  });
 
   if (!init) {
     if (collectionDef) {
@@ -78,7 +87,7 @@ export default function App({ collectionDef }) {
       {collectionDef ?
         <>
           <Table
-            pageData={pageData}
+            pageData={tableData}
             setRecipeData={setRecipeData}
           ></Table>
           <PageNav></PageNav>
