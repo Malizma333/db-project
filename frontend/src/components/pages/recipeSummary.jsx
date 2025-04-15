@@ -24,10 +24,10 @@ export default function RecipeSummary() {
       class="dialog-overview"
       open={view === VIEW.RECIPE_SUMMARY}
       onSlHide={(e) => onCloseDialog(e)}
-      label={recipeData.name}
+      label={recipeData.recipeName}
     >
       <strong>Author(s)</strong>
-      <div style={styles.summaryField}>{recipeData.author}</div>
+      <div style={styles.summaryField}>{recipeData.authors.join(",")}</div>
       <strong>Reference</strong>
       <div style={styles.summaryField}>{recipeData.reference}</div>
       <strong>Allergens</strong>

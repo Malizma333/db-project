@@ -37,9 +37,8 @@ const styles = {
   },
 }
 
-function TableRow({ id, name, author, allergens, reference, ingredients }) {
+function TableRow({ setRecipeData, editMode, id, rowData }) {
   const {
-    editMode,
     getColumnVisible,
     setUpdateRecipeView,
     setRecipeSummaryView,
@@ -47,11 +46,21 @@ function TableRow({ id, name, author, allergens, reference, ingredients }) {
   } = useAppStore();
 
   function onViewRecipe() {
+    setRecipeData.setRecipeName(rowData.recipeName);
+    setRecipeData.setAuthors(rowData.authors);
+    setRecipeData.setReference(rowData.reference);
+    setRecipeData.setAllergens(rowData.allergens);
+    setRecipeData.setIngredients(rowData.ingredients);
     setRecipeSummaryView();
     setActiveRecipeId(id);
   }
 
   function onEditRecipe() {
+    setRecipeData.setRecipeName(rowData.recipeName);
+    setRecipeData.setAuthors(rowData.authors);
+    setRecipeData.setReference(rowData.reference);
+    setRecipeData.setAllergens(rowData.allergens);
+    setRecipeData.setIngredients(rowData.ingredients);
     setUpdateRecipeView();
     setActiveRecipeId(id);
   }
@@ -60,19 +69,19 @@ function TableRow({ id, name, author, allergens, reference, ingredients }) {
     <SlCard style={{"--border-radius": "0"}}>
       <div style={styles.row}>
         {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>
-          {name}
+          {rowData.recipeName}
         </div>}
         {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>
-          {author}
+          {rowData.authors.join(",")}
         </div>}
         {getColumnVisible(COLUMN_MASK.ALLERGENS) && <div style={styles.cell}>
-          <TagPicker variant="warning" selected={allergens} viewMode></TagPicker>
+          <TagPicker variant="warning" selected={rowData.allergens} viewMode></TagPicker>
         </div>}
         {getColumnVisible(COLUMN_MASK.REFERENCE) && <div style={styles.cell}>
-          {reference}
+          {rowData.reference}
         </div>}
         {getColumnVisible(COLUMN_MASK.INGREDIENTS) && <div style={styles.cell}>
-          <TagPicker variant="primary" selected={ingredients} viewMode></TagPicker>
+          <TagPicker variant="primary" selected={rowData.ingredients} viewMode></TagPicker>
         </div>}
         <div style={styles.end}>
             <SlTooltip content="View Recipe">
@@ -92,8 +101,17 @@ function TableRow({ id, name, author, allergens, reference, ingredients }) {
   )
 }
 
-export default function Table({ pageData }) {
+export default function Table({ pageData, setRecipeData }) {
   const { editMode, getColumnVisible, setNewRecipeView } = useAppStore();
+
+  function onCreateRecipe() {
+    setRecipeData.setRecipeName("");
+    setRecipeData.setAuthors([]);
+    setRecipeData.setReference("");
+    setRecipeData.setAllergens([]);
+    setRecipeData.setIngredients([]);
+    setNewRecipeView();
+  }
 
   return (
     <div style={styles.root}>
@@ -107,14 +125,14 @@ export default function Table({ pageData }) {
           <div style={{...styles.end, fontSize: "2em"}}>
             {editMode &&
               <SlTooltip content="Create Recipe" placement="left">
-                <SlIconButton name="plus" label="Create Recipe" onClick={() => setNewRecipeView()}></SlIconButton>
+                <SlIconButton name="plus" label="Create Recipe" onClick={() => onCreateRecipe()}></SlIconButton>
               </SlTooltip>
             }
           </div>
         </div>
       </SlCard>
       {pageData.map((row, id) => {
-        return <TableRow editMode={editMode} id={id} {...row}></TableRow>;
+        return <TableRow setRecipeData={setRecipeData} editMode={editMode} id={id} rowData={row}></TableRow>;
       })}
     </div>
   )

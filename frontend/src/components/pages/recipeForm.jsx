@@ -1,10 +1,11 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import { useAppStore } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
 
 import { DB_DATA } from '../../api/api';
+import { addRecipe } from '../../api/recipe';
 
 const styles = {
   inputField: {
@@ -12,21 +13,8 @@ const styles = {
   },
 }
 
-export default function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
-  const { activeRecipeId, view, setMainView } = useAppStore();
-
-  const recipeData = DB_DATA.collectionData[activeRecipeId];
-  const [recipeName, setRecipeName] = useState("");
-  const [author, setAuthor] = useState("");
-  const [reference, setReference] = useState("");
-  const [ingredients, setIngredients] = useState([]);
-  const [allergens, setAllergens] = useState([]);
-
-  setRecipeName(recipeData.name);
-  setAuthor(recipeData.author);
-  setReference(recipeData.reference);
-  setIngredients(recipeData.ingredients);
-  setAllergens(recipeData.allergens);
+export default function RecipeForm({ formTitle, submitLabel, submitMessage, viewState, recipeData, setRecipeData }) {
+  const { view, setMainView } = useAppStore();
 
   const submitAlert = useRef(null);
 
@@ -40,10 +28,16 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
     setMainView();
   }
 
-  function onAddRecipe(e) {
-    console.log({ activeRecipeId, recipeName, author, reference, allergens, ingredients });
-    onCloseDialog(e);
-    submitAlert.current.base.toast();
+  async function onAddRecipe(e) {
+    console.log(recipeData);
+    // TODO: active collection id
+    try {
+      await addRecipe(0, recipeData.recipeName, recipeData.reference, recipeData.authors, recipeData.ingredients, recipeData.allergens);
+      onCloseDialog(e);
+      submitAlert.current.base.toast();
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   return (
@@ -57,35 +51,35 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
       <SlInput
         style={styles.inputField}
         type="text"
-        value={recipeName}
-        onSlChange={(e) => setRecipeName(e.target.value)}
+        value={recipeData.recipeName}
+        onSlChange={(e) => setRecipeData.setRecipeName(e.target.value)}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
-        value={author}
-        onSlChange={(e) => setAuthor(e.target.value)}
-        placeholder="Author"
+        value={recipeData.authors.join(",")}
+        onSlChange={(e) => setRecipeData.setAuthors(e.target.value.split(","))}
+        placeholder="Authors"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
-        value={reference}
-        onSlChange={(e) => setReference(e.target.value)}
+        value={recipeData.reference}
+        onSlChange={(e) => setRecipeData.setReference(e.target.value)}
         placeholder="Reference"
       ></SlInput>
       <TagPicker
         variant="primary"
         available={DB_DATA.allAllergens}
-        selected={allergens}
-        setSelected={setAllergens}
+        selected={recipeData.allergens}
+        setSelected={setRecipeData.setAllergens}
       ></TagPicker>
       <TagPicker
         variant="primary"
         available={DB_DATA.allIngredients}
-        selected={ingredients}
-        setSelected={setIngredients}
+        selected={recipeData.ingredients}
+        setSelected={setRecipeData.setIngredients}
       ></TagPicker>
       <SlButton onClick={(e) => onAddRecipe(e)}>
         {submitLabel}

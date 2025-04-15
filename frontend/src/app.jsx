@@ -15,6 +15,7 @@ import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
+import { useState } from 'preact/hooks';
 
 import { DB_DATA } from './api/api';
 
@@ -31,6 +32,14 @@ export default function App() {
 
   let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
 
+  const [recipeName, setRecipeName] = useState("");
+  const [authors, setAuthors] = useState([]);
+  const [reference, setReference] = useState("");
+  const [ingredients, setIngredients] = useState([]);
+  const [allergens, setAllergens] = useState([]);
+  const newRecipeData = { recipeName, authors, reference, ingredients, allergens };
+  const setRecipeData = { setRecipeName, setAuthors, setReference, setIngredients, setAllergens };
+
   return (
     <div style={styles.root}>
       <SettingsDrawer></SettingsDrawer>
@@ -39,19 +48,26 @@ export default function App() {
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
       <Toolbar></Toolbar>
-      <Table pageData={pageData}></Table>
+      <Table
+        pageData={pageData}
+        setRecipeData={setRecipeData}
+      ></Table>
       <PageNav></PageNav>
       <RecipeForm
         formTitle="New Recipe"
         submitLabel="Add Recipe"
         submitMessage="Added recipe successfully"
         viewState={VIEW.NEW_RECIPE_FORM}
+        recipeData={newRecipeData}
+        setRecipeData={setRecipeData}
       ></RecipeForm>
       <RecipeForm
         formTitle="Update Recipe"
         submitLabel="Update"
         submitMessage="Updated recipe successfully"
         viewState={VIEW.UPDATE_RECIPE_FORM}
+        recipeData={newRecipeData}
+        setRecipeData={setRecipeData}
       ></RecipeForm>
       <RecipeSummary></RecipeSummary>
     </div>
