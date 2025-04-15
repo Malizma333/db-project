@@ -2,6 +2,7 @@ import { SlDrawer, SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlToolti
 import { useAppStore, VIEW } from "../../store";
 
 import { addRecipeCollection, removeRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
+import { useState } from "preact/hooks";
 
 const styles = {
   root: {
@@ -26,6 +27,7 @@ const styles = {
 export default function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
   const { data: collections } = useOwnedCollections();
+  const [searchTerm, setSearchTerm] = useState("");
 
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -52,8 +54,6 @@ export default function CollectionsDrawer() {
     }
   }
 
-  // TODO: Make sure collection searching works with placeholder recipe names
-
   return (
     <SlDrawer
       class="drawer-placement-start"
@@ -69,9 +69,13 @@ export default function CollectionsDrawer() {
             clearable
             type="search"
             placeholder="Find a collection..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           ></SlInput>
-          {collections.map((collection) => {
-            return (
+          {collections
+            .filter((collection) => collection.name.includes(searchTerm))
+            .map((collection) =>
+            (
               <SlCard style={styles.collectionCard}>
                 <div slot="header" style={styles.collectionTitle}>
                   <SlInput
@@ -98,8 +102,8 @@ export default function CollectionsDrawer() {
                 </div>
                 Included recipes: {collection.numRecipes}
               </SlCard>
-            );
-          })}
+            )
+          )}
           <SlTooltip content="Add Collection">
             <SlIconButton
               name="plus"
