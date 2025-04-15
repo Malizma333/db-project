@@ -98,9 +98,17 @@ def do_thing(body):
                 cursor.execute(f"""UPDATE Recipe SET recipe_name == ? 
                 WHERE recipe_name = ? AND owned_by = ?""", params)
                 conn.commit()
-        # TODO
-        elif body["type"] == "filter_recipe_collection":
-            print("not implemented yet")
+        # TODO NOT FINISHED
+        #elif body["type"] == "filter_recipe_collection":
+        #    cursor.execute(f"""SELECT R.recipe_name, A.author_name, R.reference, Cot.allergen_name
+        #    Com.ingredient_name, R.owned_by FROM
+        #    ((SELECT recipe, owned_by FROM Stores S WHERE collection_id = ? AND owned_by = ?)
+        #    JOIN Author A ON S.recipe = A.recipe_name AND S.owned_by = A.owned_by
+        #    JOIN Recipe R ON S.recipe = R.recipe_name AND S.owned_by = R.owned_by
+        #    JOIN Contains Cot ON S.recipe = Cot.recipe_name AND S.owned_by = Cot.owned_by
+        #    JOIN Composes Com ON S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
+        #    WHERE """)
+
 
         elif body["type"] == "rename_recipe_collection":
             username = check_auth(body["auth"])
@@ -175,6 +183,18 @@ def do_thing(body):
                 ingredients.append(t[0])
             ret = {"type": "get_ingredients_in_collection_response", "ingredients": ingredients}
 
+            # NOTE: This query doesn't require authentification (no auth passed)
+        elif body["type"] == "get_authors_in_collection":
+            cursor.execute("""SELECT DISTINCT author_name FROM Author WHERE recipe_name = 
+                                (SELECT recipe FROM STORES WHERE collection_id = ? AND owned_by = (SELECT managed_by 
+                                FROM RecipeCollection WHERE collection_id = ?))""", (body["id"], body["id"]))
+            temp = cursor.fetchall()
+            conn.commit()
+            authors = []
+            for t in temp:
+                authors.append(t[0])
+            ret = {"type": "get_authors_in_collection_response", "authors": authors}
+
         elif body["type"] == "count_recipes_in_collection":
             cursor.execute("""SELECT COUNT(*) FROM Stores 
             WHERE collection_id = ?""", [body["id"]])
@@ -203,6 +223,10 @@ def do_thing(body):
                 cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
                 conn.commit()
 
+        elif body["type"] == "append_allergen":
+            cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen_name"]])
+            conn.commit()
+
         elif body["type"] == "remove_allergen":
             username = check_auth(body["auth"])
             if username == -1:
@@ -222,6 +246,10 @@ def do_thing(body):
                 cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient"]])
                 cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""", params)
                 conn.commit()
+
+        elif body["type"] == "append_ingredient":
+            cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient_name"]])
+            conn.commit()
 
         elif body["type"] == "remove_ingredient":
             username = check_auth(body["auth"])
@@ -310,7 +338,8 @@ if not os.path.isfile("recipe.db"):
     #do_thing(v)
     #v = {"type": "add_recipe", "auth": "s", "collection_id": 2, "recipe_name": "cookies", "reference": "Frankie's website", "authors": ["Breanna"], "ingredients": ["sugar", "spice", "chicken"], "allergens": []}
     #do_thing(v)
-    #r = {"type": "count_recipes_in_collection", "id": 1}
+    r = {"type": "append_allergen", "allergen_name": "coconuts"}
+    do_thing(r)
     #print(do_thing(r))
     #testing code
     # the following needs to be added back once account queries are implemented
