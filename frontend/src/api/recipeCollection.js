@@ -14,7 +14,7 @@ async function filterRecipeCollection({
   view_max
 }) {
   const response = await makeRequest({
-    type: "filter recipe collection",
+    type: "filter_recipe_collection",
     collection_id,
     recipe_name,
     include_allergens,
@@ -64,7 +64,7 @@ export function useFilterCollection(props) {
  */
 export async function renameRecipeCollection(id, new_name) {
   const response = await makeRequest({
-    type: "rename recipe collection",
+    type: "rename_recipe_collection",
     auth: session_auth.auth,
     id,
     new_name,
@@ -84,7 +84,7 @@ export async function renameRecipeCollection(id, new_name) {
  */
 export async function addRecipeCollection(name) {
   const response = await makeRequest({
-    type: "add recipe collection",
+    type: "add_recipe_collection",
     auth: session_auth.auth,
     name,
   });
@@ -104,7 +104,7 @@ export async function addRecipeCollection(name) {
  */
 export async function removeRecipeCollection(id) {
   const response = await makeRequest({
-    type: "remove recipe collection",
+    type: "remove_recipe_collection",
     auth: session_auth.auth,
     id,
   });
@@ -122,7 +122,7 @@ export async function removeRecipeCollection(id) {
  */
 async function getOwnedRecipeCollections() {
   const response = await makeRequest({
-    type: "get owned recipe collections",
+    type: "get_owned_recipe_collections",
     auth: session_auth.auth,
   });
 
@@ -149,7 +149,7 @@ export function useOwnedCollections() {
  */
 async function getAllergensFromCollection(id) {
   const response = await makeRequest({
-    type: "get allergens in collection",
+    type: "get_allergens_in_collection",
     auth: session_auth.auth,
     id,
   });
@@ -177,7 +177,7 @@ export function useCollectionAllergens(collection_id) {
  */
 async function getIngredientsFromCollection(id) {
   const response = await makeRequest({
-    type: "get ingredients in collection",
+    type: "get_ingredients_in_collection",
     auth: session_auth.auth,
     id,
   });
@@ -199,13 +199,41 @@ export function useCollectionIngredients(collection_id) {
 }
 
 /**
+ * Get list of authors in collection
+ * @param {number} collection_id Target collection
+ * @returns {Promise<string[]>} List of authors
+ */
+async function getAuthorsFromCollection(id) {
+  const response = await makeRequest({
+    type: "get_authors_in_collection",
+    auth: session_auth.auth,
+    id,
+  });
+
+  const data = await response.json();
+
+  if (response.status !== 200) {
+    throw new Error(getErrorMessage(data));
+  }
+
+  return data.authors;
+}
+
+export function useCollectionAuthors(collection_id) {
+  return useQuery({
+    queryKey: ['collectionAuthors'],
+    queryFn: () => getAuthorsFromCollection(collection_id),
+  })
+}
+
+/**
  * Count recipes in collection
  * @param {number} collection_id Target collection
  * @returns {Promise<number>} Count of recipes
  */
 async function getRecipeCount(id) {
   const response = await makeRequest({
-    type: "count recipes in collection",
+    type: "count_recipes_in_collection",
     auth: session_auth.auth,
     id,
   });
@@ -223,5 +251,33 @@ export function useRecipeCount(collection_id) {
   return useQuery({
     queryKey: ['recipeCount'],
     queryFn: () => getRecipeCount(collection_id),
+  })
+}
+
+/**
+ * Get name of collection
+ * @param {number} collection_id Target collection
+ * @returns {Promise<string>} Name of collection
+ */
+async function getRecipeCollectionName(id) {
+  const response = await makeRequest({
+    type: "get_collection_name",
+    auth: session_auth.auth,
+    id,
+  });
+
+  const data = await response.json();
+
+  if (response.status !== 200) {
+    throw new Error(getErrorMessage(data));
+  }
+
+  return data.name;
+}
+
+export function useCollectionName(collection_id) {
+  return useQuery({
+    queryKey: ['collectionName'],
+    queryFn: () => getRecipeCollectionName(collection_id),
   })
 }

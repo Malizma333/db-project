@@ -5,6 +5,8 @@ import { useRef } from 'preact/hooks';
 
 import { DB_DATA } from '../../api/api';
 import { logout, useLoggedIn } from '../../api/user';
+import { useParams } from 'react-router';
+import { useCollectionName, useOwnedCollections } from '../../api/recipeCollection';
 
 const styles = {
   root: {
@@ -32,6 +34,9 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
     setClientUsername,
   } = useAppStore();
 
+  const params = useParams();
+
+  const { data: collectionName } = useCollectionName(params["id"]);
   const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
 
   if (status === "error") {
@@ -48,7 +53,7 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
   const logOutAlert = useRef(null);
 
   function onRandomRecipe() {
-    // TODO api
+    // TODO use api
     const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
     const randRecipe = DB_DATA.collectionData[ind];
     setRecipeData.setRecipeName(randRecipe.recipeName);
@@ -119,7 +124,7 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
       }
       {missingCollection && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>}
       {missingCollection && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
-      {missingCollection && <SlInput clearable type="search" placeholder={`Search ${DB_DATA.collectionArray[0].name}...`} style={{flex: "1"}}>
+      {missingCollection && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>}
     </div>

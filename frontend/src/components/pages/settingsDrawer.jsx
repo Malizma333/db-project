@@ -2,8 +2,8 @@ import { SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/rea
 import TagPicker from '../widgets/tagPicker';
 import { useState } from 'preact/hooks';
 import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
-
-import { DB_DATA } from '../../api/api';
+import { useParams } from 'react-router';
+import { useCollectionAllergens, useCollectionAuthors, useCollectionIngredients } from '../../api/recipeCollection';
 
 const styles = {
   settingContainer: {
@@ -51,6 +51,13 @@ export default function SettingsDrawer() {
     view, numRowsPerPage,
     getColumnVisible, toggleColumn, setMainView, setRowsPerPage, gotoFirstPage
   } = useAppStore();
+
+  const params = useParams();
+
+  const { data: allAuthors } = useCollectionAuthors(params["id"]);
+  const { data: allAllergens } = useCollectionAllergens(params["id"]);
+  const { data: allIngredients } = useCollectionIngredients(params["id"]);
+
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;
 
@@ -122,9 +129,9 @@ export default function SettingsDrawer() {
           >Ingredients</SlCheckbox>
         </div>
       </div>
-      <FilterPicker columnName={"Author"} columnOptions={DB_DATA.allAuthors}></FilterPicker>
-      <FilterPicker columnName={"Allergens"} columnOptions={DB_DATA.allAllergens}></FilterPicker>
-      <FilterPicker columnName={"Ingredients"} columnOptions={DB_DATA.allIngredients}></FilterPicker>
+      <FilterPicker columnName={"Author"} columnOptions={allAuthors}></FilterPicker>
+      <FilterPicker columnName={"Allergens"} columnOptions={allAllergens}></FilterPicker>
+      <FilterPicker columnName={"Ingredients"} columnOptions={allIngredients}></FilterPicker>
     </SlDrawer>
   )
 }

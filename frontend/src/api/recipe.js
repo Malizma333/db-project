@@ -12,7 +12,7 @@ import { session_auth } from "./user";
  */
 export async function addRecipe(collection_id, recipe_name, reference, authors, ingredients, allergens) {
   const response = await makeRequest({
-    type: "add recipe",
+    type: "add_recipe",
     auth: session_auth.auth,
     collection_id,
     recipe_name,
@@ -35,7 +35,7 @@ export async function addRecipe(collection_id, recipe_name, reference, authors, 
  */
 export async function removeRecipe(recipe_name) {
   const response = await makeRequest({
-    type: "remove recipe",
+    type: "remove_recipe",
     auth: session_auth.auth,
     recipe_name,
   });
@@ -54,7 +54,7 @@ export async function removeRecipe(recipe_name) {
  */
 export async function renameRecipe(recipe_name, new_recipe_name) {
   const response = await makeRequest({
-    type: "rename recipe",
+    type: "rename_recipe",
     auth: session_auth.auth,
     recipe_name,
     new_recipe_name,
@@ -74,7 +74,7 @@ export async function renameRecipe(recipe_name, new_recipe_name) {
  */
 export async function changeReference(recipe_name, reference) {
   const response = await makeRequest({
-    type: "change reference",
+    type: "change_reference",
     auth: session_auth.auth,
     recipe_name,
     reference,
@@ -94,7 +94,7 @@ export async function changeReference(recipe_name, reference) {
  */
 export async function addAllergen(recipe_name, allergen) {
   const response = await makeRequest({
-    type: "add allergen",
+    type: "add_allergen",
     auth: session_auth.auth,
     recipe_name,
     allergen,
@@ -114,7 +114,7 @@ export async function addAllergen(recipe_name, allergen) {
  */
 export async function removeAllergen(recipe_name, allergen) {
   const response = await makeRequest({
-    type: "remove allergen",
+    type: "remove_allergen",
     auth: session_auth.auth,
     recipe_name,
     allergen,
@@ -134,7 +134,7 @@ export async function removeAllergen(recipe_name, allergen) {
  */
 export async function addIngredient(recipe_name, ingredient) {
   const response = await makeRequest({
-    type: "add ingredient",
+    type: "add_ingredient",
     auth: session_auth.auth,
     recipe_name,
     ingredient,
@@ -154,7 +154,7 @@ export async function addIngredient(recipe_name, ingredient) {
  */
 export async function removeIngredient(recipe_name, ingredient) {
   const response = await makeRequest({
-    type: "remove ingredient",
+    type: "remove_ingredient",
     auth: session_auth.auth,
     recipe_name,
     ingredient,
@@ -174,7 +174,7 @@ export async function removeIngredient(recipe_name, ingredient) {
  */
 export async function addAuthor(recipe_name, author) {
   const response = await makeRequest({
-    type: "add author",
+    type: "add_author",
     auth: session_auth.auth,
     recipe_name,
     author,
@@ -194,7 +194,7 @@ export async function addAuthor(recipe_name, author) {
  */
 export async function removeAuthor(recipe_name, author) {
   const response = await makeRequest({
-    type: "remove author",
+    type: "remove_author",
     auth: session_auth.auth,
     recipe_name,
     author,

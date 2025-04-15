@@ -51,7 +51,7 @@ async function loggedIn() {
   }
 
   const response = await makeRequest({
-    type: "is logged in",
+    type: "is_logged_in",
     auth: session_auth.auth,
   });
 
@@ -76,7 +76,7 @@ export function useLoggedIn() {
  */
 export async function changeUsername(password, new_username) {
   const response = await makeRequest({
-    type: "change username",
+    type: "change_username",
     auth: session_auth.auth,
     password,
     new_username,
@@ -96,7 +96,7 @@ export async function changeUsername(password, new_username) {
  */
 export async function changePassword(password, new_password) {
   const response = await makeRequest({
-    type: "change password",
+    type: "change_password",
     auth: session_auth.auth,
     password,
     new_password,

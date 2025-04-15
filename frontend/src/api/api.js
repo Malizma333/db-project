@@ -57,23 +57,8 @@ export async function makeRequest(jsonBody) {
 // TODO remove below
 
 export const DB_DATA = {
-  collectionArray: [
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"},
-    {name: "First Collection", numRecipes: 2, id: "test_string"}
-  ],
   collectionData: [
     {recipeName: "Ravioli", authors: ["Alice"], allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
     {recipeName: "Spaghetti", authors: ["Bob"], allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
   ],
-  allAllergens: ["Gluten", "Nuts", "Shellfish"],
-  allIngredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"],
-  allAuthors: ["Alice", "Bob"],
-  columns: ["name", "author", "allergens", "reference", "ingredients"]
 }

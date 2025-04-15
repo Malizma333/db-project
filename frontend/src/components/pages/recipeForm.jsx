@@ -5,8 +5,8 @@ import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
 import { useParams } from 'react-router';
 
-import { DB_DATA } from '../../api/api';
 import { addRecipe, removeRecipe } from '../../api/recipe';
+import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
 
 const styles = {
   inputField: {
@@ -19,6 +19,9 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
 
   const submitAlert = useRef(null);
   const params = useParams();
+
+  const { data: allAllergens } = useCollectionAllergens(params["id"]);
+  const { data: allIngredients } = useCollectionIngredients(params["id"]);
 
   function onCloseDialog(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -74,13 +77,13 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
       ></SlInput>
       <TagPicker
         variant="primary"
-        available={DB_DATA.allAllergens}
+        available={allAllergens}
         selected={recipeData.allergens}
         setSelected={setRecipeData.setAllergens}
       ></TagPicker>
       <TagPicker
         variant="primary"
-        available={DB_DATA.allIngredients}
+        available={allIngredients}
         selected={recipeData.ingredients}
         setSelected={setRecipeData.setIngredients}
       ></TagPicker>
