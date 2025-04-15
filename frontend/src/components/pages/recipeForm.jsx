@@ -3,6 +3,7 @@ import { useRef } from 'preact/hooks';
 import { useAppStore } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
+import { useSearchParams } from 'react-router';
 
 import { DB_DATA } from '../../api/api';
 import { addRecipe } from '../../api/recipe';
@@ -17,6 +18,7 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
   const { view, setMainView } = useAppStore();
 
   const submitAlert = useRef(null);
+  const [searchParams, _] = useSearchParams();
 
   function onCloseDialog(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -29,10 +31,9 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
   }
 
   async function onAddRecipe(e) {
-    console.log(recipeData);
     // TODO: active collection id
     try {
-      await addRecipe(0, recipeData.recipeName, recipeData.reference, recipeData.authors, recipeData.ingredients, recipeData.allergens);
+      await addRecipe(searchParams.get("id"), recipeData.recipeName, recipeData.reference, recipeData.authors, recipeData.ingredients, recipeData.allergens);
       onCloseDialog(e);
       submitAlert.current.base.toast();
     } catch(e) {

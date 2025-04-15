@@ -25,8 +25,6 @@ export async function login(username, password) {
     auth: data.auth,
     lifetime: data.lifetime,
   }
-
-  console.log(session_auth);
 }
 
 /**
@@ -45,8 +43,6 @@ export async function logout() {
   }
 
   session_auth = null;
-
-  console.log(session_auth);
 }
 
 async function loggedIn() {
