@@ -47,7 +47,7 @@ export default function App() {
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar></Toolbar>
+      <Toolbar setRecipeData={setRecipeData}></Toolbar>
       <Table
         pageData={pageData}
         setRecipeData={setRecipeData}
@@ -69,7 +69,7 @@ export default function App() {
         recipeData={newRecipeData}
         setRecipeData={setRecipeData}
       ></RecipeForm>
-      <RecipeSummary></RecipeSummary>
+      <RecipeSummary recipeData={newRecipeData}></RecipeSummary>
     </div>
   );
 }

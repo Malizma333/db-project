@@ -45,7 +45,6 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
     getColumnVisible,
     setUpdateRecipeView,
     setRecipeSummaryView,
-    setActiveRecipeId,
   } = useAppStore();
 
   const queryClient = useQueryClient();
@@ -57,7 +56,6 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
     setRecipeData.setAllergens(rowData.allergens);
     setRecipeData.setIngredients(rowData.ingredients);
     setRecipeSummaryView();
-    setActiveRecipeId(id);
   }
 
   function onEditRecipe() {
@@ -67,7 +65,6 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
     setRecipeData.setAllergens(rowData.allergens);
     setRecipeData.setIngredients(rowData.ingredients);
     setUpdateRecipeView();
-    setActiveRecipeId(id);
   }
 
   async function onDeleteRecipe() {

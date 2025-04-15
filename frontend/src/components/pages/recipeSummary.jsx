@@ -10,10 +10,8 @@ const styles = {
   },
 }
 
-export default function RecipeSummary() {
-  const { activeRecipeId, view, setMainView } = useAppStore();
-
-  const recipeData = DB_DATA.collectionData[activeRecipeId];
+export default function RecipeSummary({ recipeData }) {
+  const { view, setMainView } = useAppStore();
 
   function onCloseDialog() {
     setMainView();

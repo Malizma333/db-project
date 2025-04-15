@@ -20,7 +20,7 @@ const styles = {
   },
 }
 
-export default function Toolbar() {
+export default function Toolbar({ setRecipeData }) {
   const {
     setSettingsView,
     setLoginView,
@@ -48,9 +48,14 @@ export default function Toolbar() {
   const logOutAlert = useRef(null);
 
   function onRandomRecipe() {
-    // TODO
+    // TODO api
     const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
-    console.log(DB_DATA.collectionData[ind]);
+    const randRecipe = DB_DATA.collectionData[ind];
+    setRecipeData.setRecipeName(randRecipe.recipeName);
+    setRecipeData.setAuthors(randRecipe.authors);
+    setRecipeData.setReference(randRecipe.reference);
+    setRecipeData.setAllergens(randRecipe.allergens);
+    setRecipeData.setIngredients(randRecipe.ingredients);
     setRecipeSummaryView();
   }
 
