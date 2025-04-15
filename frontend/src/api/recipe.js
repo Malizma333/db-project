@@ -1,4 +1,5 @@
 import { makeRequest, getErrorMessage } from "./api";
+import { session_auth } from "./user";
 
 /**
  * Adds new recipe

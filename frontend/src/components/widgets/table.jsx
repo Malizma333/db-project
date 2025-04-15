@@ -2,6 +2,9 @@ import { SlCard, SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/r
 import TagPicker from './tagPicker';
 import { COLUMN_MASK, useAppStore } from '../../store';
 
+import { removeRecipe } from '../../api/recipe';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 const styles = {
   root: {
     display: "flex",
@@ -45,6 +48,8 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
     setActiveRecipeId,
   } = useAppStore();
 
+  const queryClient = useQueryClient();
+
   function onViewRecipe() {
     setRecipeData.setRecipeName(rowData.recipeName);
     setRecipeData.setAuthors(rowData.authors);
@@ -63,6 +68,11 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
     setRecipeData.setIngredients(rowData.ingredients);
     setUpdateRecipeView();
     setActiveRecipeId(id);
+  }
+
+  async function onDeleteRecipe() {
+    await removeRecipe();
+    await queryClient.invalidateQueries("filterCollection");
   }
 
   return (
@@ -92,7 +102,7 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
               <SlIconButton name="pencil" label="Edit Recipe" onClick={() => onEditRecipe()}></SlIconButton>
             </SlTooltip>
             <SlTooltip content="Delete Recipe">
-              <SlIconButton name="trash" label="Delete Recipe"></SlIconButton>
+              <SlIconButton name="trash" label="Delete Recipe" onClick={() => onDeleteRecipe()}></SlIconButton>
             </SlTooltip>
           </>}
         </div>

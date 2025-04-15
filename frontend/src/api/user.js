@@ -1,7 +1,7 @@
 import { makeRequest, getErrorMessage } from "./api";
 import { useQuery } from "@tanstack/react-query";
 
-let session_auth = null;
+export let session_auth = null;
 
 /**
  * Log in with username and password to create auth

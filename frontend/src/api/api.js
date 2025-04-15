@@ -28,6 +28,7 @@ export function getErrorMessage(responseData) {
       break;
     case "bad_fetch":
       message += responseData.message;
+      break;
     default:
       break;
   }
