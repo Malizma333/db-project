@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './api/api.js'
 
+// TODO: Create wrapper to verify :id param is valid collection id
 render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>

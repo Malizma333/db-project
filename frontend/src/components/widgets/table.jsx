@@ -3,7 +3,7 @@ import TagPicker from './tagPicker';
 import { COLUMN_MASK, useAppStore } from '../../store';
 
 import { removeRecipe } from '../../api/recipe';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   root: {

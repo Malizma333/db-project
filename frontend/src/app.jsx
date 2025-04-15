@@ -18,6 +18,8 @@ import RecipeSummary from './components/pages/recipeSummary';
 import { useState } from 'preact/hooks';
 
 import { DB_DATA } from './api/api';
+import { useOwnedCollections, useRecipeCount } from './api/recipeCollection';
+import { useLoggedIn } from './api/user';
 
 const styles = {
   root: {
@@ -38,7 +40,7 @@ const styles = {
 }
 
 export default function App({ collectionDef }) {
-  const { page, numRowsPerPage } = useAppStore();
+  const { page, numRowsPerPage, setNumRecipesInCollection } = useAppStore();
 
   let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
 
@@ -49,6 +51,14 @@ export default function App({ collectionDef }) {
   const [allergens, setAllergens] = useState([]);
   const newRecipeData = { recipeName, authors, reference, ingredients, allergens };
   const setRecipeData = { setRecipeName, setAuthors, setReference, setIngredients, setAllergens };
+  const { data: numRecipesInCollection } = useRecipeCount(params["id"]);
+  const { data: loggedIn } = useLoggedIn();
+  const { data: ownedCollections } = useOwnedCollections();
+
+  if (collectionDef) {
+    setNumRecipesInCollection(numRecipesInCollection);
+    setEditMode(loggedIn && ownedCollections.includes(params["id"]));
+  }
 
   return (
     <div style={styles.root}>

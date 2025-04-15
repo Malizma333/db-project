@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { createComputed } from "zustand-computed";
-import { DB_DATA } from "./api/api";
 
 export const VIEW = Object.freeze({
   SEARCH_SETTINGS: 0,
@@ -27,13 +26,13 @@ const initStoreState = {
   view: VIEW.MAIN,
   page: 0,
   numRowsPerPage: 10,
-  numRecipesInCollection: DB_DATA.collectionData.length,
+  numRecipesInCollection: 0,
   visibleColumns: COLUMN_MASK.NAME | COLUMN_MASK.AUTHOR | COLUMN_MASK.REFERENCE,
+  editMode: false // TODO: Logged in && current collection belongs to current user
 }
 
 const computed = createComputed((state) => ({
   numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage),
-  editMode: true // TODO: Logged in && current collection belongs to current user
 }));
 
 export const useAppStore = create(
@@ -57,6 +56,8 @@ export const useAppStore = create(
       getColumnVisible: (mask) => ((get().visibleColumns & mask) > 0),
       toggleColumn: (mask) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
       setClientUsername: (username) => set({ clientUsername: username }),
+      setNumRecipesInCollection: (val) => set({ numRecipesInCollection: val }),
+      setEditMode: (val) => set({ editMode: val }),
     })
   )
 );
