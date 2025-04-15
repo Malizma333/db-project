@@ -19,7 +19,7 @@ const styles = {
   }
 }
 
-function FilterPicker({ columnName, columnOptions }) {
+function FilterPicker({ columnName, columnOptions = [] }) {
   const [included, setIncluded] = useState([]);
   const [excluded, setExcluded] = useState([]);
 

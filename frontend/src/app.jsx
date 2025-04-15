@@ -20,6 +20,7 @@ import { useState } from 'preact/hooks';
 import { DB_DATA } from './api/api';
 import { useOwnedCollections, useRecipeCount } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
+import { useParams } from 'react-router';
 
 const styles = {
   root: {
@@ -40,9 +41,10 @@ const styles = {
 }
 
 export default function App({ collectionDef }) {
-  const { page, numRowsPerPage, setNumRecipesInCollection } = useAppStore();
+  const { page, numRowsPerPage, setNumRecipesInCollection, setEditMode, init, setInit } = useAppStore();
 
   let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
+  const params = useParams();
 
   const [recipeName, setRecipeName] = useState("");
   const [authors, setAuthors] = useState([]);
@@ -51,13 +53,18 @@ export default function App({ collectionDef }) {
   const [allergens, setAllergens] = useState([]);
   const newRecipeData = { recipeName, authors, reference, ingredients, allergens };
   const setRecipeData = { setRecipeName, setAuthors, setReference, setIngredients, setAllergens };
-  const { data: numRecipesInCollection } = useRecipeCount(params["id"]);
+
+  const { data: numRecipesInCollection } = useRecipeCount(params["id"] || -1);
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
 
-  if (collectionDef) {
-    setNumRecipesInCollection(numRecipesInCollection);
-    setEditMode(loggedIn && ownedCollections.includes(params["id"]));
+  if (!init) {
+    if (collectionDef) {
+      setNumRecipesInCollection(numRecipesInCollection);
+      setEditMode(loggedIn && ownedCollections && ownedCollections.includes(params["id"]));
+    }
+
+    setInit();
   }
 
   return (

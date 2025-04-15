@@ -72,7 +72,7 @@ export default function CollectionsDrawer() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           ></SlInput>
-          {collections
+          {collections && collections
             .filter((collection) => collection.name.includes(searchTerm))
             .map((collection) =>
             (

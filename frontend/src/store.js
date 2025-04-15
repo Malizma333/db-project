@@ -22,6 +22,7 @@ export const COLUMN_MASK = Object.freeze({
 });
 
 const initStoreState = {
+  init: false,
   clientUsername: "",
   view: VIEW.MAIN,
   page: 0,
@@ -58,6 +59,7 @@ export const useAppStore = create(
       setClientUsername: (username) => set({ clientUsername: username }),
       setNumRecipesInCollection: (val) => set({ numRecipesInCollection: val }),
       setEditMode: (val) => set({ editMode: val }),
+      setInit: () => set({ init: true }),
     })
   )
 );
