@@ -9,8 +9,8 @@ render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App></App>}>
-        </Route>
+        <Route path="/" element={<App collectionDef={false}></App>}></Route>
+        <Route path="/:id" element={<App collectionDef={true}></App>}></Route>
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>,

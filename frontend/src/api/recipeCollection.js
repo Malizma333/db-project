@@ -80,7 +80,7 @@ export async function renameRecipeCollection(id, new_name) {
 /**
  * Adds recipe collection
  * @param {string} name
- * @returns {number} Added collection id
+ * @returns {Promise<number>} Added collection id
  */
 export async function addRecipeCollection(name) {
   const response = await makeRequest({
@@ -100,7 +100,7 @@ export async function addRecipeCollection(name) {
 
 /**
  * Removes recipe collection
- * @param {number} id
+ * @param {Promise<number>} id
  */
 export async function removeRecipeCollection(id) {
   const response = await makeRequest({
@@ -116,6 +116,10 @@ export async function removeRecipeCollection(id) {
   }
 }
 
+/**
+ * Get list of owned recipe collections
+ * @returns {Promise<number[]>} List of recipe collection ids
+ */
 async function getOwnedRecipeCollections() {
   const response = await makeRequest({
     type: "get owned recipe collections",
@@ -131,10 +135,6 @@ async function getOwnedRecipeCollections() {
   return data.ids;
 }
 
-/**
- * Get list of owned recipe collections
- * @returns {number[]} List of recipe collection ids
- */
 export function useOwnedCollections() {
   return useQuery({
     queryKey: ['ownedCollections'],
@@ -142,6 +142,11 @@ export function useOwnedCollections() {
   })
 }
 
+/**
+ * Get list of allergens in collection
+ * @param {number} collection_id Target collection
+ * @returns {Promise<string[]>} List of allergens
+ */
 async function getAllergensFromCollection(id) {
   const response = await makeRequest({
     type: "get allergens in collection",
@@ -158,11 +163,6 @@ async function getAllergensFromCollection(id) {
   return data.allergens;
 }
 
-/**
- * Get list of allergens in collection
- * @param {number} collection_id Target collection
- * @returns {string[]} List of allergens
- */
 export function useCollectionAllergens(collection_id) {
   return useQuery({
     queryKey: ['collectionAllergens'],
@@ -170,6 +170,11 @@ export function useCollectionAllergens(collection_id) {
   })
 }
 
+/**
+ * Get list of ingredients in collection
+ * @param {number} collection_id Target collection
+ * @returns {Promise<string[]>} List of ingredients
+ */
 async function getIngredientsFromCollection(id) {
   const response = await makeRequest({
     type: "get ingredients in collection",
@@ -186,11 +191,6 @@ async function getIngredientsFromCollection(id) {
   return data.ingredients;
 }
 
-/**
- * Get list of ingredients in collection
- * @param {number} collection_id Target collection
- * @returns {string[]} List of ingredients
- */
 export function useCollectionIngredients(collection_id) {
   return useQuery({
     queryKey: ['collectionIngredients'],
@@ -198,6 +198,11 @@ export function useCollectionIngredients(collection_id) {
   })
 }
 
+/**
+ * Count recipes in collection
+ * @param {number} collection_id Target collection
+ * @returns {Promise<number>} Count of recipes
+ */
 async function getRecipeCount(id) {
   const response = await makeRequest({
     type: "count recipes in collection",
@@ -214,11 +219,6 @@ async function getRecipeCount(id) {
   return data.count;
 }
 
-/**
- * Count recipes in collection
- * @param {number} collection_id Target collection
- * @returns {number} Count of recipes
- */
 export function useRecipeCount(collection_id) {
   return useQuery({
     queryKey: ['recipeCount'],

@@ -25,9 +25,19 @@ const styles = {
     flexDirection: "column",
     height: "95vh",
   },
+  missingCollection: {
+    alignItems: "center",
+    color: "gray",
+    display: "flex",
+    flexDirection: "column",
+    flex: "11",
+    fontSize: "72px",
+    justifyContent: "center",
+    userSelect: "none",
+  }
 }
 
-export default function App() {
+export default function App({ collectionDef }) {
   const { page, numRowsPerPage } = useAppStore();
 
   let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
@@ -42,34 +52,38 @@ export default function App() {
 
   return (
     <div style={styles.root}>
-      <SettingsDrawer></SettingsDrawer>
+      {collectionDef && <SettingsDrawer></SettingsDrawer>}
       <CollectionsDrawer></CollectionsDrawer>
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar setRecipeData={setRecipeData}></Toolbar>
-      <Table
-        pageData={pageData}
-        setRecipeData={setRecipeData}
-      ></Table>
-      <PageNav></PageNav>
-      <RecipeForm
-        formTitle="New Recipe"
-        submitLabel="Add Recipe"
-        submitMessage="Added recipe successfully"
-        viewState={VIEW.NEW_RECIPE_FORM}
-        recipeData={newRecipeData}
-        setRecipeData={setRecipeData}
-      ></RecipeForm>
-      <RecipeForm
-        formTitle="Update Recipe"
-        submitLabel="Update"
-        submitMessage="Updated recipe successfully"
-        viewState={VIEW.UPDATE_RECIPE_FORM}
-        recipeData={newRecipeData}
-        setRecipeData={setRecipeData}
-      ></RecipeForm>
-      <RecipeSummary recipeData={newRecipeData}></RecipeSummary>
+      <Toolbar missingCollection={collectionDef} setRecipeData={setRecipeData}></Toolbar>
+      {collectionDef ?
+        <>
+          <Table
+            pageData={pageData}
+            setRecipeData={setRecipeData}
+          ></Table>
+          <PageNav></PageNav>
+          <RecipeForm
+            formTitle="New Recipe"
+            submitLabel="Add Recipe"
+            submitMessage="Added recipe successfully"
+            viewState={VIEW.NEW_RECIPE_FORM}
+            recipeData={newRecipeData}
+            setRecipeData={setRecipeData}
+          ></RecipeForm>
+          <RecipeForm
+            formTitle="Update Recipe"
+            submitLabel="Update"
+            submitMessage="Updated recipe successfully"
+            viewState={VIEW.UPDATE_RECIPE_FORM}
+            recipeData={newRecipeData}
+            setRecipeData={setRecipeData}
+          ></RecipeForm>
+          <RecipeSummary recipeData={newRecipeData}></RecipeSummary>
+        </> : <div style={styles.missingCollection}>No collection selected!</div>
+      }
     </div>
   );
 }

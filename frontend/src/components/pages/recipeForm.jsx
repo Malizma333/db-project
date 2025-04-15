@@ -1,12 +1,12 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef } from 'preact/hooks';
-import { useAppStore } from '../../store';
+import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DB_DATA } from '../../api/api';
-import { addRecipe } from '../../api/recipe';
+import { addRecipe, removeRecipe } from '../../api/recipe';
 
 const styles = {
   inputField: {
@@ -18,7 +18,7 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
   const { view, setMainView } = useAppStore();
 
   const submitAlert = useRef(null);
-  const [searchParams, _] = useSearchParams();
+  const params = useParams();
 
   function onCloseDialog(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -31,9 +31,11 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
   }
 
   async function onAddRecipe(e) {
-    // TODO: active collection id
     try {
-      await addRecipe(searchParams.get("id"), recipeData.recipeName, recipeData.reference, recipeData.authors, recipeData.ingredients, recipeData.allergens);
+      if (viewState === VIEW.UPDATE_RECIPE_FORM) {
+        await removeRecipe(recipeData.recipeName);
+      }
+      await addRecipe(params["id"], recipeData.recipeName, recipeData.reference, recipeData.authors, recipeData.ingredients, recipeData.allergens);
       onCloseDialog(e);
       submitAlert.current.base.toast();
     } catch(e) {

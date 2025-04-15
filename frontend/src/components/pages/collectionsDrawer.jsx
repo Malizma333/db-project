@@ -1,7 +1,7 @@
 import { SlDrawer, SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
 
-import { DB_DATA } from "../../api/api";
+import { addRecipeCollection, removeRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
 
 const styles = {
   root: {
@@ -25,6 +25,7 @@ const styles = {
 
 export default function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
+  const { data: collections } = useOwnedCollections();
 
   function onHide(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -32,6 +33,22 @@ export default function CollectionsDrawer() {
       setMainView();
     } else {
       e.preventDefault()
+    }
+  }
+
+  async function onCreateCollection() {
+    try {
+      await addRecipeCollection("New Collection");
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  async function onDeleteCollection(id) {
+    try {
+      await removeRecipeCollection(id);
+    } catch(e) {
+      console.error(e);
     }
   }
 
@@ -45,43 +62,54 @@ export default function CollectionsDrawer() {
       placement="start"
       label="Collections"
     >
-      <div style={styles.root}>
-        <SlInput
-          style={styles.collectionCard}
-          clearable
-          type="search"
-          placeholder="Find a collection..."
-        ></SlInput>
-        {DB_DATA.collectionArray.map((collection) => {
-          return (
-            <SlCard style={styles.collectionCard}>
-              <div slot="header" style={styles.collectionTitle}>
-                <SlInput
-                  className="collectionsName"
-                  filled
-                  value={collection.name}
-                  placeholder={`Collection ${collection.id}`}
-                ></SlInput>
-                <SlCopyButton
-                  value={window.location.origin + "/?id=" + collection.id}
-                  copyLabel="Share Collection"
-                  successLabel="Copied"
-                  errorLabel="Failed to copy"
-                >
-                  <SlIcon name="share" slot="copy-icon"></SlIcon>
-                </SlCopyButton>
-                <SlTooltip content="Delete Collection">
-                  <SlIconButton name="trash" label="Delete Collection"></SlIconButton>
-                </SlTooltip>
-              </div>
-              Included recipes: {collection.numRecipes}
-            </SlCard>
-          );
-        })}
-        <SlTooltip content="Add Collection">
-          <SlIconButton name="plus" label="Add Collection" style={{fontSize: "2em"}}></SlIconButton>
-        </SlTooltip>
-      </div>
+      {collections && (
+        <div style={styles.root}>
+          <SlInput
+            style={styles.collectionCard}
+            clearable
+            type="search"
+            placeholder="Find a collection..."
+          ></SlInput>
+          {collections.map((collection) => {
+            return (
+              <SlCard style={styles.collectionCard}>
+                <div slot="header" style={styles.collectionTitle}>
+                  <SlInput
+                    className="collectionsName"
+                    filled
+                    value={collection.name}
+                    placeholder={`Collection ${collection.id}`}
+                  ></SlInput>
+                  <SlCopyButton
+                    value={window.location.origin + "/" + collection.id}
+                    copyLabel="Share Collection"
+                    successLabel="Copied"
+                    errorLabel="Failed to copy"
+                  >
+                    <SlIcon name="share" slot="copy-icon"></SlIcon>
+                  </SlCopyButton>
+                  <SlTooltip content="Delete Collection">
+                    <SlIconButton
+                      name="trash"
+                      label="Delete Collection"
+                      onClick={() => onDeleteCollection(collection.id)}
+                    ></SlIconButton>
+                  </SlTooltip>
+                </div>
+                Included recipes: {collection.numRecipes}
+              </SlCard>
+            );
+          })}
+          <SlTooltip content="Add Collection">
+            <SlIconButton
+              name="plus"
+              label="Add Collection"
+              style={{fontSize: "2em"}}
+              onClick={() => onCreateCollection()}
+            ></SlIconButton>
+          </SlTooltip>
+        </div>
+      )}
     </SlDrawer>
   )
 }

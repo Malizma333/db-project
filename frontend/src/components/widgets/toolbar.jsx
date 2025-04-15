@@ -9,7 +9,7 @@ import { logout, useLoggedIn } from '../../api/user';
 const styles = {
   root: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     flex: "1",
   },
@@ -20,7 +20,7 @@ const styles = {
   },
 }
 
-export default function Toolbar({ setRecipeData }) {
+export default function Toolbar({ setRecipeData, missingCollection }) {
   const {
     setSettingsView,
     setLoginView,
@@ -87,11 +87,6 @@ export default function Toolbar({ setRecipeData }) {
   return (
     <div style={styles.root}>
       <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
-      <SlInput clearable type="search" placeholder={`Search ${DB_DATA.collectionArray[0].name}...`} style={{flex: "1"}}>
-        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
-      </SlInput>
-      <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
-      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>
       {loggedInFetching || !loggedIn ?
         (
           <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>
@@ -122,6 +117,11 @@ export default function Toolbar({ setRecipeData }) {
           </SlDropdown>
         )
       }
+      {missingCollection && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>}
+      {missingCollection && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
+      {missingCollection && <SlInput clearable type="search" placeholder={`Search ${DB_DATA.collectionArray[0].name}...`} style={{flex: "1"}}>
+        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
+      </SlInput>}
     </div>
   )
 }

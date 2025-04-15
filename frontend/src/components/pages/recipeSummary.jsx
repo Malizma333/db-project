@@ -2,8 +2,6 @@ import { SlDialog } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore, VIEW } from '../../store';
 import TagPicker from '../widgets/tagPicker';
 
-import { DB_DATA } from '../../api/api';
-
 const styles = {
   summaryField: {
     marginBottom: "1em",
