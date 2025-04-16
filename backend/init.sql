@@ -7,9 +7,9 @@ CREATE TABLE RecipeCollection (
 );
 
 CREATE TABLE Account (
-  username          VARCHAR(20) PRIMARY KEY,
-  password_hash     VARCHAR(20),
-  password_salt     VARCHAR(20)
+  username          VARCHAR(100) PRIMARY KEY,
+  password_hash     VARCHAR(50),
+  password_salt     VARCHAR(50)
 );
 
 CREATE TABLE Stores (

@@ -47,7 +47,19 @@ def do_thing(body):
         cursor = conn.cursor()
         cursor.execute("PRAGMA foreign_keys = ON;")
         if body["type"] == "login":
-            print("login doesn't work")
+            cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?", (body["username"],))
+            results = cursor.fetchall()
+            if len(results) != 1:
+                print(f"ruh roh: {results}")
+                exit()
+            r = results[0]
+            hash_bytes = base64.b64decode(r[0].encode("utf-8"))
+            salt_bytes = base64.b64decode(r[1].encode("utf-8"))
+            trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", body["password"].encode("utf-8"), salt_bytes, 100_000)
+            if hash_bytes == trial_hash_bytes:
+                ret = {"type": "login_response", "auth": "it worked!", "lifetime": "forever man"}
+            else:
+                ret = {"type": "login_response", "auth": "stinky", "lifetime": "never"}
         elif body["type"] == "logout":
             print("logout doesn't work")
         elif body["type"] == "is_logged_in":
@@ -386,6 +398,15 @@ if not os.path.isfile("recipe.db"):
     conn.commit()
     print("meow >:3")
     conn.close()
+
+# v = {"type": "login", "username": "robert!!", "password": "my password" }
+# print(do_thing(v))
+# v = {"type": "login", "username": "robert!!", "password": "my passwor" }
+# print(do_thing(v))
+# v = {"type": "login", "username": "robert!", "password": "my password" }
+# print(do_thing(v))
+# v = {"type": "login", "username": "robert", "password": "my passwor" }
+# print(do_thing(v))
 
 ser = server.ThreadingHTTPServer(("", 8008), RequestHandler)
 
