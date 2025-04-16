@@ -15,7 +15,6 @@ import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
-import { useState } from 'preact/hooks';
 
 import { useFilterCollection, useOwnedCollections, useRecipeCount } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
