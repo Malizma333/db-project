@@ -1,13 +1,16 @@
 import { SlInput, SlIconButton, SlIcon, SlDropdown, SlMenu, SlMenuItem, SlMenuLabel, SlAvatar } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
-import { DB_DATA, USER_DATA } from '../../api';
 import { SlNotification } from './notification';
 import { useRef } from 'preact/hooks';
+
+import { logout, useLoggedIn } from '../../api/user';
+import { useParams } from 'react-router';
+import { filterRecipeCollection, useCollectionName, useRecipeCount } from '../../api/recipeCollection';
 
 const styles = {
   root: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     flex: "1",
   },
@@ -18,17 +21,30 @@ const styles = {
   },
 }
 
-export default function Toolbar() {
+export default function Toolbar({ missingCollection }) {
   const {
-    loggedIn,
     setSettingsView,
     setLoginView,
     setChangePassView,
     setChangeUserView,
     setCollectionsView,
     setRecipeSummaryView,
-    logOut
+    clientUsername,
+    setClientUsername,
+    setSelectedRecipe,
   } = useAppStore();
+
+  const params = useParams();
+
+  const { data: collectionName } = useCollectionName(params["id"]);
+  const { data: numRecipes } = useRecipeCount(params["id"]);
+  const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
+
+  const logOutAlert = useRef(null);
+
+  if (status === "error") {
+    console.error(error.message);
+  }
 
   const ACTION = {
     VIEW_COLLECTIONS: 0,
@@ -37,16 +53,26 @@ export default function Toolbar() {
     LOGOUT: 3
   };
 
-  const logOutAlert = useRef(null);
 
-  function onRandomRecipe() {
-    const ind = Math.floor(Math.random() * DB_DATA.collectionData.length);
-    console.log(DB_DATA.collectionData[ind]);
+  async function onRandomRecipe() {
+    const ind = Math.floor(Math.random() * numRecipes);
+    const randRecipe = await filterRecipeCollection({
+      collection_id: params["id"],
+      recipe_name: "",
+      include_allergens: [],
+      exclude_allergens: [],
+      include_ingredients: [],
+      exclude_ingredients: [],
+      view_min: ind,
+      view_max: ind + 1
+    })[0];
+    setSelectedRecipe(randRecipe);
     setRecipeSummaryView();
   }
 
-  function onLogOut() {
-    logOut();
+  async function onLogOut() {
+    await logout();
+    setClientUsername("");
     logOutAlert.current.base.toast();
   }
 
@@ -72,38 +98,41 @@ export default function Toolbar() {
   return (
     <div style={styles.root}>
       <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
-      <SlInput clearable type="search" placeholder={`Search ${DB_DATA.collectionArray[0].name}...`} style={{flex: "1"}}>
-        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
-      </SlInput>
-      <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
-      <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>
-      {!loggedIn ?
-        <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar> :
-        <SlDropdown>
-          <SlAvatar
-            style={styles.avatar}
-            slot="trigger"
-            initials={USER_DATA.username[0]}
-            label="Avatar with username initial"
-          ></SlAvatar>
-          <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
-            <SlMenuLabel className="userMenuLabel">{USER_DATA.username}</SlMenuLabel>
-            <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
-              View Collections
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.CHANGE_USERNAME}>
-              Change Username
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.CHANGE_PASSWORD}>
-              Change Password
-            </SlMenuItem>
-            <SlMenuItem value={ACTION.LOGOUT}>
-              Log Out
-              <SlIcon name="box-arrow-right" slot="suffix"></SlIcon>
-            </SlMenuItem>
-          </SlMenu>
-        </SlDropdown>
+      {loggedInFetching || !loggedIn ?
+        (
+          <SlAvatar style={styles.avatar} label="Empty avatar" onClick={() => setLoginView()}></SlAvatar>
+        ) : (
+          <SlDropdown>
+            <SlAvatar
+              style={styles.avatar}
+              slot="trigger"
+              initials={clientUsername[0]}
+              label="Avatar with username initial"
+            ></SlAvatar>
+            <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
+              <SlMenuLabel className="userMenuLabel">{clientUsername}</SlMenuLabel>
+              <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
+                View Collections
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.CHANGE_USERNAME}>
+                Change Username
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.CHANGE_PASSWORD}>
+                Change Password
+              </SlMenuItem>
+              <SlMenuItem value={ACTION.LOGOUT}>
+                Log Out
+                <SlIcon name="box-arrow-right" slot="suffix"></SlIcon>
+              </SlMenuItem>
+            </SlMenu>
+          </SlDropdown>
+        )
       }
+      {missingCollection && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>}
+      {missingCollection && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
+      {missingCollection && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
+        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
+      </SlInput>}
     </div>
   )
 }

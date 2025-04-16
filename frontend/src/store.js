@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { createComputed } from "zustand-computed";
-import { DB_DATA } from "./api";
 
 export const VIEW = Object.freeze({
   SEARCH_SETTINGS: 0,
@@ -23,18 +22,23 @@ export const COLUMN_MASK = Object.freeze({
 });
 
 const initStoreState = {
+  init: false,
+  clientUsername: "",
   view: VIEW.MAIN,
-  loggedIn: false,
   page: 0,
   numRowsPerPage: 10,
-  numRecipesInCollection: DB_DATA.collectionData.length,
+  numRecipesInCollection: 0,
   visibleColumns: COLUMN_MASK.NAME | COLUMN_MASK.AUTHOR | COLUMN_MASK.REFERENCE,
-  activeRecipeId: 0,
+  editMode: false,
+  selectedRecipeName: "",
+  selectedRecipeReference: "",
+  selectedRecipeAuthors: [],
+  selectedRecipeIngredients: [],
+  selectedRecipeAllergens: [],
 }
 
 const computed = createComputed((state) => ({
   numPages: Math.ceil(state.numRecipesInCollection / state.numRowsPerPage),
-  editMode: state.loggedIn && true // TODO: Determine if current collection belongs to current user
 }));
 
 export const useAppStore = create(
@@ -50,8 +54,6 @@ export const useAppStore = create(
       setNewRecipeView: () => set({ view: VIEW.NEW_RECIPE_FORM }),
       setUpdateRecipeView: () => set({ view: VIEW.UPDATE_RECIPE_FORM }),
       setRecipeSummaryView: () => set({ view: VIEW.RECIPE_SUMMARY }),
-      logIn: () => set({ loggedIn: true }),
-      logOut: () => set({ loggedIn: false }),
       gotoFirstPage: () => set({ page: 0 }),
       gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
       gotoNextPage: () => set((state) => ({ page: Math.min(get().numPages - 1, state.page + 1) })),
@@ -59,7 +61,17 @@ export const useAppStore = create(
       setRowsPerPage: (val) => set({ numRowsPerPage: val }),
       getColumnVisible: (mask) => ((get().visibleColumns & mask) > 0),
       toggleColumn: (mask) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
-      setActiveRecipeId: (val) => set({ activeRecipeId: val }),
+      setClientUsername: (username) => set({ clientUsername: username }),
+      setNumRecipesInCollection: (val) => set({ numRecipesInCollection: val }),
+      setEditMode: (val) => set({ editMode: val }),
+      setInit: () => set({ init: true }),
+      setSelectedRecipe: (recipeData) => set({
+        selectedRecipeName: recipeData.recipeName,
+        selectedRecipeReference: recipeData.reference,
+        selectedRecipeAllergens: recipeData.allergens,
+        selectedRecipeIngredients: recipeData.ingredients,
+        selectedRecipeAuthors: recipeData.authors,
+      }),
     })
   )
 );

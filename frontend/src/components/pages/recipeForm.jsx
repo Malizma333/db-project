@@ -1,9 +1,12 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
-import { useAppStore } from '../../store';
+import { useRef } from 'preact/hooks';
+import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
-import { DB_DATA } from '../../api';
+import { useParams } from 'react-router';
+
+import { addRecipe, removeRecipe } from '../../api/recipe';
+import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
 
 const styles = {
   inputField: {
@@ -12,22 +15,30 @@ const styles = {
 }
 
 export default function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
-  const { activeRecipeId, view, setMainView } = useAppStore();
+  const {
+    view,
+    setMainView,
+    setSelectedRecipe,
+    selectedRecipeName,
+    selectedRecipeReference,
+    selectedRecipeAllergens,
+    selectedRecipeIngredients,
+    selectedRecipeAuthors,
+  } = useAppStore();
 
-  const recipeData = DB_DATA.collectionData[activeRecipeId];
-  const [recipeName, setRecipeName] = useState("");
-  const [author, setAuthor] = useState("");
-  const [reference, setReference] = useState("");
-  const [ingredients, setIngredients] = useState([]);
-  const [allergens, setAllergens] = useState([]);
-
-  setRecipeName(recipeData.name);
-  setAuthor(recipeData.author);
-  setReference(recipeData.reference);
-  setIngredients(recipeData.ingredients);
-  setAllergens(recipeData.allergens);
+  const selectedRecipe = {
+    recipeName: selectedRecipeName,
+    reference: selectedRecipeReference,
+    allergens: selectedRecipeAllergens,
+    ingredients: selectedRecipeIngredients,
+    authors: selectedRecipeAuthors,
+  };
 
   const submitAlert = useRef(null);
+  const params = useParams();
+
+  const { data: allAllergens } = useCollectionAllergens(params["id"]);
+  const { data: allIngredients } = useCollectionIngredients(params["id"]);
 
   function onCloseDialog(e) {
     // Prevent event bubbling caused by inner menu elements
@@ -39,10 +50,24 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
     setMainView();
   }
 
-  function onAddRecipe(e) {
-    console.log({ activeRecipeId, recipeName, author, reference, allergens, ingredients });
-    onCloseDialog(e);
-    submitAlert.current.base.toast();
+  async function onAddRecipe(e) {
+    try {
+      if (viewState === VIEW.UPDATE_RECIPE_FORM) {
+        await removeRecipe(selectedRecipeName);
+      }
+      await addRecipe(
+        params["id"],
+        selectedRecipe.recipeName,
+        selectedRecipe.reference,
+        selectedRecipe.authors,
+        selectedRecipe.ingredients,
+        selectedRecipe.allergens
+      );
+      onCloseDialog(e);
+      submitAlert.current.base.toast();
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   return (
@@ -56,35 +81,35 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
       <SlInput
         style={styles.inputField}
         type="text"
-        value={recipeName}
-        onSlChange={(e) => setRecipeName(e.target.value)}
+        value={selectedRecipeName}
+        onSlChange={(e) => setRecipeName({ ...selectedRecipe, recipeName: e.target.value })}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
-        value={author}
-        onSlChange={(e) => setAuthor(e.target.value)}
-        placeholder="Author"
+        value={selectedRecipeAuthors.join(",")}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, authors: e.target.value.split(",") })}
+        placeholder="Authors"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
-        value={reference}
-        onSlChange={(e) => setReference(e.target.value)}
+        value={selectedRecipeReference}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, reference: e.target.value })}
         placeholder="Reference"
       ></SlInput>
       <TagPicker
         variant="primary"
-        available={DB_DATA.allAllergens}
-        selected={allergens}
-        setSelected={setAllergens}
+        available={allAllergens}
+        selected={selectedRecipeAllergens}
+        setSelected={(allergens) => setSelectedRecipe({ ...selectedRecipe, allergens })}
       ></TagPicker>
       <TagPicker
         variant="primary"
-        available={DB_DATA.allIngredients}
-        selected={ingredients}
-        setSelected={setIngredients}
+        available={allIngredients}
+        selected={selectedRecipeIngredients}
+        setSelected={(ingredients) => setSelectedRecipe({ ...selectedRecipe, ingredients })}
       ></TagPicker>
       <SlButton onClick={(e) => onAddRecipe(e)}>
         {submitLabel}

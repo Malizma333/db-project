@@ -1,8 +1,9 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
 import { useRef, useState } from 'preact/hooks';
-import { tempChangeUser, correctPassword, uniqueUsername, validUsername } from '../../api';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
+
+import { changeUsername } from '../../api/user';
 
 const styles = {
   inputField: {
@@ -11,7 +12,7 @@ const styles = {
 }
 
 export default function ChangeNameDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setClientUsername } = useAppStore();
 
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,23 +26,15 @@ export default function ChangeNameDialog() {
     setHelpText("");
   }
 
-  function onChangeUsername() {
-    if (!correctPassword(password)) {
-      setHelpText("Invalid password");
+  async function onChangeUsername() {
+    try {
+      await changeUsername(password, newUsername);
+      setClientUsername(newUsername);
+    } catch(e) {
+      setHelpText(e.message);
       return;
     }
 
-    if (!validUsername(newUsername)) {
-      setHelpText("New username must be 8 - 20 characters");
-      return;
-    }
-
-    if (!uniqueUsername(newUsername)) {
-      setHelpText("Username already taken");
-      return;
-    }
-
-    tempChangeUser(newUsername);
     onCloseDialog();
     changeNameAlert.current.base.toast();
   }

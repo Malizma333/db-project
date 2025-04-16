@@ -9,7 +9,6 @@ import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
-import { DB_DATA } from './api';
 import { useAppStore, VIEW } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
@@ -17,42 +16,86 @@ import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
 
+import { useFilterCollection, useOwnedCollections, useRecipeCount } from './api/recipeCollection';
+import { useLoggedIn } from './api/user';
+import { useParams } from 'react-router';
+
 const styles = {
   root: {
     display: "flex",
     flexDirection: "column",
     height: "95vh",
   },
+  missingCollection: {
+    alignItems: "center",
+    color: "gray",
+    display: "flex",
+    flexDirection: "column",
+    flex: "11",
+    fontSize: "72px",
+    justifyContent: "center",
+    userSelect: "none",
+  }
 }
 
-export default function App() {
-  const { page, numRowsPerPage } = useAppStore();
+export default function App({ collectionDef }) {
+  const { page, numRowsPerPage, setNumRecipesInCollection, setEditMode, init, setInit } = useAppStore();
 
-  let pageData = DB_DATA.collectionData.slice(page * numRowsPerPage, (page + 1) * numRowsPerPage);
+  const params = useParams();
+
+  const { data: numRecipesInCollection } = useRecipeCount(params["id"] || -1);
+  const { data: loggedIn } = useLoggedIn();
+  const { data: ownedCollections } = useOwnedCollections();
+  const { data: tableData } = useFilterCollection({
+    collection_id: params["id"],
+    recipe_name: "",
+    include_allergens: [],
+    exclude_allergens: [],
+    include_ingredients: [],
+    exclude_ingredients: [],
+    authors: [],
+    view_min: page * numRowsPerPage,
+    view_max: (page + 1) * numRowsPerPage
+  });
+
+  if (!init) {
+    if (collectionDef) {
+      setNumRecipesInCollection(numRecipesInCollection);
+      setEditMode(loggedIn && ownedCollections && ownedCollections.includes(params["id"]));
+    }
+
+    setInit();
+  }
 
   return (
     <div style={styles.root}>
-      <SettingsDrawer></SettingsDrawer>
+      {collectionDef && <SettingsDrawer></SettingsDrawer>}
       <CollectionsDrawer></CollectionsDrawer>
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar></Toolbar>
-      <Table pageData={pageData}></Table>
-      <PageNav></PageNav>
-      <RecipeForm
-        formTitle="New Recipe"
-        submitLabel="Add Recipe"
-        submitMessage="Added recipe successfully"
-        viewState={VIEW.NEW_RECIPE_FORM}
-      ></RecipeForm>
-      <RecipeForm
-        formTitle="Update Recipe"
-        submitLabel="Update"
-        submitMessage="Updated recipe successfully"
-        viewState={VIEW.UPDATE_RECIPE_FORM}
-      ></RecipeForm>
-      <RecipeSummary></RecipeSummary>
+      <Toolbar missingCollection={collectionDef}></Toolbar>
+      {collectionDef ?
+        <>
+          <Table
+            pageData={tableData}
+          ></Table>
+          <PageNav></PageNav>
+          <RecipeForm
+            formTitle="New Recipe"
+            submitLabel="Add Recipe"
+            submitMessage="Added recipe successfully"
+            viewState={VIEW.NEW_RECIPE_FORM}
+          ></RecipeForm>
+          <RecipeForm
+            formTitle="Update Recipe"
+            submitLabel="Update"
+            submitMessage="Updated recipe successfully"
+            viewState={VIEW.UPDATE_RECIPE_FORM}
+          ></RecipeForm>
+          <RecipeSummary></RecipeSummary>
+        </> : <div style={styles.missingCollection}>No collection selected!</div>
+      }
     </div>
   );
 }
