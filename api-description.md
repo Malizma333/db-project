@@ -169,7 +169,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "exclude_ingredients": [<string>, ...],
   "authors": [<string>, ...],
   "view_min": <int>,
-  "view_max": <int>
+  "view_max": <int>,
 }
 ```
 
@@ -186,9 +186,9 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
       "reference": <string>,
       "allergens": [<string>, ...],
       "ingredients": [<string>, ...],
-      "owner": <string>
+      "owner": <string>,
     }, ...
-  ]
+  ],
 }
 ```
 
@@ -301,6 +301,47 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "ingredients": [<string>, ...]
 }
 ```
+# get authors in collection
+
+## client -> server
+
+```
+{
+  "type": "get authors in collection",
+  "id": <int>
+}
+```
+
+## server -> client
+
+```
+200
+{
+  "type": "get authors in collection response",
+  "authours": [<string>, ...]
+}
+```
+
+# get collection name
+
+## client -> server
+
+```
+{
+  "type": "get collection name",
+  "id": <int>
+}
+```
+
+## server -> client
+
+```
+200
+{
+  "type": "get collection name response",
+  "collection_name": <string>
+}
+```
 
 # count recipes in collection
 
@@ -349,6 +390,17 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 }
 ```
 
+# append allergen
+
+## client -> server
+
+```
+{
+  "type": "append allergen",
+  "allergen_name": <string>
+}
+```
+
 # remove allergen
 
 ## client -> server
@@ -372,6 +424,17 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "auth": <string>,
   "recipe_name": <string>,
   "ingredient": <string>
+}
+```
+
+# append ingredient
+
+## client -> server
+
+```
+{
+  "type": "append ingredient",
+  "ingredient_name": <string>
 }
 ```
 

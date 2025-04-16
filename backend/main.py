@@ -17,7 +17,7 @@ EXTENSIONS = {
 }
 
 SERVABLE = dict()
-for root,dirs,files in os.walk(FILE_ROOT):
+for root, dirs, files in os.walk(FILE_ROOT):
     for f_name in files:
         full_name = os.path.join(root, f_name)
         extension = f_name.split(".")[-1]
@@ -30,9 +30,11 @@ TOKEN_CHARS = string.ascii_letters + string.digits
 
 db_lock = threading.Lock()
 
+
 # return username, if it fails return -1
 def check_auth(token):
     return "username"
+
 
 # This is where most db calls get handled. takes in parsed json. outputs object
 # ready to be run through `dumps`
@@ -68,14 +70,14 @@ def do_thing(body):
                 for ing in body["ingredients"]:
                     cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
                     cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""",
-                                 (body["recipe_name"], username, ing))
+                                   (body["recipe_name"], username, ing))
                 for alg in body["allergens"]:
                     cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
                     cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""",
-                                 (body["recipe_name"], username, alg))
+                                   (body["recipe_name"], username, alg))
                 for aut in body["authors"]:
                     cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""",
-                                 (body["recipe_name"], username, aut))
+                                   (body["recipe_name"], username, aut))
 
                 conn.commit()
 
@@ -85,7 +87,7 @@ def do_thing(body):
                 ret = {"type": "bad_auth_token"}
             else:
                 cursor.execute("DELETE FROM Recipe WHERE recipe_name = ? "
-                             "AND owned_by = ?", (body["recipe_name"], username))
+                               "AND owned_by = ?", (body["recipe_name"], username))
                 conn.commit()
 
         # NOTE: Collection_id does not need to be passed in since recipe name is a primary key already (I think)
@@ -98,16 +100,32 @@ def do_thing(body):
                 cursor.execute(f"""UPDATE Recipe SET recipe_name == ? 
                 WHERE recipe_name = ? AND owned_by = ?""", params)
                 conn.commit()
+
         # TODO NOT FINISHED
-        #elif body["type"] == "filter_recipe_collection":
-        #    cursor.execute(f"""SELECT R.recipe_name, A.author_name, R.reference, Cot.allergen_name
-        #    Com.ingredient_name, R.owned_by FROM
-        #    ((SELECT recipe, owned_by FROM Stores S WHERE collection_id = ? AND owned_by = ?)
-        #    JOIN Author A ON S.recipe = A.recipe_name AND S.owned_by = A.owned_by
-        #    JOIN Recipe R ON S.recipe = R.recipe_name AND S.owned_by = R.owned_by
-        #    JOIN Contains Cot ON S.recipe = Cot.recipe_name AND S.owned_by = Cot.owned_by
-        #    JOIN Composes Com ON S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
-        #    WHERE """)
+        elif body["type"] == "filter_recipe_collection":
+            ings = tuple(body["exclude_ingredients"])
+            algs = tuple(body["exclude_allergens"])
+            params = algs + ings + tuple([body["collection_id"]])
+            print(params)
+            cursor.execute(f"""SELECT * FROM STORES AS S 
+            WHERE NOT EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["exclude_allergens"]))})
+            AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
+            AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["exclude_ingredients"]))})
+            AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
+            AND S.collection_id = ?""", (params))
+            # JOIN Contains AS Cot ON S.recipe = Cot.recipe_name AND S.owned_by = Cot.owned_by
+            # JOIN Composes AS Com ON S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by
+            # (Cot.allergen_name IN ({','.join(['?']*len(body["exclude_allergens"]))})
+            # OR Com.ingredient_name IN ({','.join(['?']*len(body["exclude_ingredients"]))}));, [body["collection_id"], algs, ings])
+
+            temp = cursor.fetchall()
+            conn.commit()
+            stuff = []
+            for t in temp:
+                stuff.append(t)
+            ret = {"type": "get_allergen_in_collection_response", "recipe&owned": stuff}
+
+
 
 
         elif body["type"] == "rename_recipe_collection":
@@ -195,6 +213,13 @@ def do_thing(body):
                 authors.append(t[0])
             ret = {"type": "get_authors_in_collection_response", "authors": authors}
 
+        elif body["type"] == "get_collection_name":
+            cursor.execute(f"""SELECT collection_name FROM RecipeCollection WHERE collection_id = ?)""", [body["id"]])
+            temp = cursor.fetchall()
+            conn.commit()
+            name = temp[0][0]
+            ret = {"type": "get_collection_name_response", "collection_name": name}
+
         elif body["type"] == "count_recipes_in_collection":
             cursor.execute("""SELECT COUNT(*) FROM Stores 
             WHERE collection_id = ?""", [body["id"]])
@@ -234,7 +259,7 @@ def do_thing(body):
             else:
                 params = (body["recipe_name"], username, body["allergen"],)
                 cursor.execute(f"""DELETE FROM Contains WHERE recipe_name = ? AND owned_by = ? 
-                AND allergen_name = ?""",params)
+                AND allergen_name = ?""", params)
                 conn.commit()
 
         elif body["type"] == "add_ingredient":
@@ -280,9 +305,9 @@ def do_thing(body):
                                                 AND author_name = ?""", params)
                 conn.commit()
 
-
         conn.close()
     return ret
+
 
 class RequestHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -323,25 +348,32 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         self.wfile.write(SERVABLE["/404.html"][0])
         return 404
 
+
 if not os.path.isfile("recipe.db"):
     conn = sqlite3.connect("recipe.db")
     cur = conn.cursor()
     sqlfile = open('init.sql').read().split('\n\n')
     for table in sqlfile:
         cur.execute(table)
-    #testing code
+    # testing code
     #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipies"}
     #print(do_thing(v))
     #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Dog Food Recipes"}
     #print(do_thing(v))
-    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "tunamelt", "reference": "kibbie's website", "authors": ["me", "my mom"], "ingredients": ["pecans", "butter", "kibble"], "allergens": ["peanuts", "shellfish"]}
+    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "tunamelt",
+    #     "reference": "kibbie's website", "authors": ["me", "my mom"], "ingredients": ["pecans", "butter", "kibble"],
+    #     "allergens": ["peanuts", "shellfish"]}
     #do_thing(v)
-    #v = {"type": "add_recipe", "auth": "s", "collection_id": 2, "recipe_name": "cookies", "reference": "Frankie's website", "authors": ["Breanna"], "ingredients": ["sugar", "spice", "chicken"], "allergens": []}
+    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "cookies",
+    #     "reference": "Frankie's website", "authors": ["Breanna"], "ingredients": ["sugar", "spice", "chicken"],
+    #     "allergens": []}
     #do_thing(v)
-    r = {"type": "append_allergen", "allergen_name": "coconuts"}
-    do_thing(r)
-    #print(do_thing(r))
-    #testing code
+    #v = {"type": "filter_recipe_collection", "collection_id": 1, "recipe_name": "s", "include_allergens": [],
+    #     "exclude_allergens": ["peanuts"], "include_ingredients": [], "exclude_ingredients": ["sugar"], "authors": [],
+    #     "view_min": 0, "view_max": 1,
+    #     }
+    #print(do_thing(v))
+    # testing code
     # the following needs to be added back once account queries are implemented
     # can't test otherwise due to foreign key constraints
     # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
@@ -353,6 +385,6 @@ if not os.path.isfile("recipe.db"):
     print("meow >:3")
     conn.close()
 
-ser = server.ThreadingHTTPServer(("",8008), RequestHandler)
+ser = server.ThreadingHTTPServer(("", 8008), RequestHandler)
 
 ser.serve_forever()
