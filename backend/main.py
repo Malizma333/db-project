@@ -6,6 +6,7 @@ import os
 import sqlite3
 import string
 import threading
+import traceback
 
 FILE_ROOT = os.path.join("..", "frontend", "dist")
 
@@ -228,7 +229,7 @@ def do_thing(body):
             ret = {"type": "get_authors_in_collection_response", "authors": authors}
 
         elif body["type"] == "get_collection_name":
-            cursor.execute(f"""SELECT collection_name FROM RecipeCollection WHERE collection_id = ?)""", [body["id"]])
+            cursor.execute(f"""SELECT collection_name FROM RecipeCollection WHERE collection_id = ?""", [body["id"]])
             temp = cursor.fetchall()
             conn.commit()
             name = temp[0][0]
@@ -349,12 +350,27 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         length = int(self.headers["content-length"])
         body = self.rfile.read(length)
         if p.startswith("/api"):
-            ret = do_thing(json.loads(body.decode()))
-            self.send_response(200)
+            ret = {"type": "internal_server_error", "message": "Eek!"}
+            ret_type = 500
+            try:
+                ret = do_thing(json.loads(body.decode()))
+                ret_type = 200
+            except json.decoder.JSONDecodeError as E:
+                ret = {"type": "parse_error"}
+                ret_type = 400
+            except KeyError as E:
+                ret = {"type": "key_error", "key": E.args[0]}
+                ret_type = 400
+            except Exception as E:
+                msg = traceback.format_exc()
+                ret = {"type": "internal_server_error", "message": msg}
+                ret_type = 500
+                print(msg)
+            self.send_response(ret_type)
             self.send_header("content-type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(ret).encode())
-            return 200
+            return ret_type
 
         self.send_response(404)
         self.send_header("content-type", SERVABLE["/404.html"][1])

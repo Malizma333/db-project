@@ -6,7 +6,6 @@ import hashlib
 import secrets
 import sqlite3
 
-# Whoopsie! forgot to git pull, thought that there was no db code on the repo...
 conn = sqlite3.connect('recipe.db')
 cursor = conn.cursor()
 cursor.execute("PRAGMA foreign_keys = ON;")
