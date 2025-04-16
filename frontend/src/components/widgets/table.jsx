@@ -100,8 +100,8 @@ function TableRow({ editMode, rowData }) {
   )
 }
 
-export default function Table({ pageData }) {
-  const { editMode, getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
+export default function Table({ pageData, editMode }) {
+  const { getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
 
   function onCreateRecipe() {
     setSelectedRecipe({
