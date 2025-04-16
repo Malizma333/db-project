@@ -1,4 +1,4 @@
-import { makeRequest, getErrorMessage } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
 import { session_auth } from "./user";
 
 /**
@@ -20,9 +20,9 @@ export async function addRecipe(collection_id, recipe_name, reference, authors, 
     authors,
     ingredients,
     allergens,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -38,9 +38,9 @@ export async function removeRecipe(recipe_name) {
     type: "remove_recipe",
     auth: session_auth.auth,
     recipe_name,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -58,9 +58,9 @@ export async function renameRecipe(recipe_name, new_recipe_name) {
     auth: session_auth.auth,
     recipe_name,
     new_recipe_name,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -78,9 +78,9 @@ export async function changeReference(recipe_name, reference) {
     auth: session_auth.auth,
     recipe_name,
     reference,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -98,9 +98,9 @@ export async function addAllergen(recipe_name, allergen) {
     auth: session_auth.auth,
     recipe_name,
     allergen,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -118,9 +118,9 @@ export async function removeAllergen(recipe_name, allergen) {
     auth: session_auth.auth,
     recipe_name,
     allergen,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -138,9 +138,9 @@ export async function addIngredient(recipe_name, ingredient) {
     auth: session_auth.auth,
     recipe_name,
     ingredient,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -158,9 +158,9 @@ export async function removeIngredient(recipe_name, ingredient) {
     auth: session_auth.auth,
     recipe_name,
     ingredient,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -178,9 +178,9 @@ export async function addAuthor(recipe_name, author) {
     auth: session_auth.auth,
     recipe_name,
     author,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -198,9 +198,9 @@ export async function removeAuthor(recipe_name, author) {
     auth: session_auth.auth,
     recipe_name,
     author,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));

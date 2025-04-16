@@ -1,5 +1,7 @@
 import { SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
+import { useRecipeCount } from '../../api/recipeCollection';
+import { useParams } from 'react-router';
 
 const styles = {
   root: {
@@ -13,9 +15,15 @@ const styles = {
 
 // For some reason, the disabled property causes a second re-render that lit complains about in the console
 export default function PageNav() {
-  const { page, numPages, gotoFirstPage, gotoPrevPage, gotoNextPage, gotoLastPage } = useAppStore();
+  const { page, numRowsPerPage, gotoFirstPage, gotoPrevPage, gotoNextPage, gotoLastPage } = useAppStore();
 
-  return (
+  const params = useParams();
+
+  const { data: numRecipesInCollection } = useRecipeCount(params["id"]);
+
+  const numPages = Math.ceil((numRecipesInCollection || 0) / numRowsPerPage);
+
+  return numPages == 0 ? <div style={styles.root}></div> : (
     <div style={styles.root}>
       <SlTooltip content="First Page">
         <SlIconButton
@@ -38,7 +46,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-right"
-          onClick={gotoNextPage}
+          onClick={() => gotoNextPage(numPages)}
           label="Next Page"
         ></SlIconButton>
       </SlTooltip>
@@ -46,7 +54,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-double-right"
-          onClick={gotoLastPage}
+          onClick={() => gotoLastPage(numPages)}
           label="Last Page"
         ></SlIconButton>
       </SlTooltip>

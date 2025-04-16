@@ -1,18 +1,21 @@
-// eslint.config.js
 import { defineConfig } from "eslint/config";
-import js from "@eslint/js";
+import ts from "typescript-eslint";
 import globals from "globals";
 
 export default defineConfig([
   {
-    ignores: ["dist"]
+    ignores: ["dist", "*.config.*"]
   },
   {
     languageOptions: {
       globals: {
         ...globals.browser
-      }
+      },
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     }
   },
-  js.configs.recommended
+  ts.configs.recommendedTypeChecked,
 ]);

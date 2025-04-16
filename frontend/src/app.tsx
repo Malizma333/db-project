@@ -16,7 +16,7 @@ import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
 
-import { useFilterCollection, useOwnedCollections, useRecipeCount } from './api/recipeCollection';
+import { useFilterCollection, useOwnedCollections } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
 
@@ -39,11 +39,10 @@ const styles = {
 }
 
 export default function App({ collectionDef }) {
-  const { page, numRowsPerPage, setNumRecipesInCollection, setEditMode, init, setInit } = useAppStore();
+  const { page, numRowsPerPage } = useAppStore();
 
   const params = useParams();
 
-  const { data: numRecipesInCollection } = useRecipeCount(params["id"] || -1);
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
   const { data: tableData } = useFilterCollection({
@@ -58,14 +57,7 @@ export default function App({ collectionDef }) {
     view_max: (page + 1) * numRowsPerPage
   });
 
-  if (!init) {
-    if (collectionDef) {
-      setNumRecipesInCollection(numRecipesInCollection);
-      setEditMode(loggedIn && ownedCollections && ownedCollections.includes(params["id"]));
-    }
-
-    setInit();
-  }
+  const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(params["id"]));
 
   return (
     <div style={styles.root}>
@@ -78,7 +70,8 @@ export default function App({ collectionDef }) {
       {collectionDef ?
         <>
           <Table
-            pageData={tableData}
+            pageData={tableData || []}
+            editMode={editMode}
           ></Table>
           <PageNav></PageNav>
           <RecipeForm

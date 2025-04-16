@@ -1,4 +1,4 @@
-import { makeRequest, getErrorMessage } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
 import { useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 
@@ -24,9 +24,9 @@ export async function filterRecipeCollection({
     authors,
     view_min,
     view_max
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -68,9 +68,9 @@ export async function renameRecipeCollection(id, new_name) {
     auth: session_auth.auth,
     id,
     new_name,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -87,9 +87,9 @@ export async function addRecipeCollection(name) {
     type: "add_recipe_collection",
     auth: session_auth.auth,
     name,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -107,9 +107,9 @@ export async function removeRecipeCollection(id) {
     type: "remove_recipe_collection",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -124,9 +124,9 @@ async function getOwnedRecipeCollections() {
   const response = await makeRequest({
     type: "get_owned_recipe_collections",
     auth: session_auth.auth,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -152,9 +152,9 @@ async function getAllergensFromCollection(id) {
     type: "get_allergens_in_collection",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -180,9 +180,9 @@ async function getIngredientsFromCollection(id) {
     type: "get_ingredients_in_collection",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -208,9 +208,9 @@ async function getAuthorsFromCollection(id) {
     type: "get_authors_in_collection",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -236,9 +236,9 @@ async function getRecipeCount(id) {
     type: "count_recipes_in_collection",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -264,9 +264,9 @@ async function getRecipeCollectionName(id) {
     type: "get_collection_name",
     auth: session_auth.auth,
     id,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));

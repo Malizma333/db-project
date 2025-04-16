@@ -1,4 +1,4 @@
-import { makeRequest, getErrorMessage } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
 import { useQuery } from "@tanstack/react-query";
 
 export let session_auth = null;
@@ -13,9 +13,9 @@ export async function login(username, password) {
     type: "login",
     username,
     password,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -34,9 +34,9 @@ export async function logout() {
   const response = await makeRequest({
     type: "logout",
     auth: session_auth.auth,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -80,9 +80,9 @@ export async function changeUsername(password, new_username) {
     auth: session_auth.auth,
     password,
     new_username,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -100,9 +100,9 @@ export async function changePassword(password, new_password) {
     auth: session_auth.auth,
     password,
     new_password,
-  });
+  }),
 
-  const data = await response.json();
+   data = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
