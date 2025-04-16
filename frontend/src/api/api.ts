@@ -56,8 +56,8 @@ export async function makeRequest(jsonBody) {
 
 // TODO remove below
 
-// export const DB_DATA = {
-//   collectionData: [
+// Export const DB_DATA = {
+//   CollectionData: [
 //     {recipeName: "Ravioli", authors: ["Alice"], allergens: ["Gluten", "Cheese"], reference: "http://www.example.com/", ingredients: ["Bread", "Cheese"] },
 //     {recipeName: "Spaghetti", authors: ["Bob"], allergens: ["Gluten", "Shellfish"], reference: "Some Book", ingredients: ["Bread", "Cheese", "Ham", "Turkey", "Butter", "Pasta Sauce"] },
 //   ],
