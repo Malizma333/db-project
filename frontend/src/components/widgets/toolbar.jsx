@@ -21,7 +21,7 @@ const styles = {
   },
 }
 
-export default function Toolbar({ setRecipeData, missingCollection }) {
+export default function Toolbar({ missingCollection }) {
   const {
     setSettingsView,
     setLoginView,
@@ -31,6 +31,7 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
     setRecipeSummaryView,
     clientUsername,
     setClientUsername,
+    setSelectedRecipe,
   } = useAppStore();
 
   const params = useParams();
@@ -65,11 +66,7 @@ export default function Toolbar({ setRecipeData, missingCollection }) {
       view_min: ind,
       view_max: ind + 1
     })[0];
-    setRecipeData.setRecipeName(randRecipe.recipeName);
-    setRecipeData.setAuthors(randRecipe.authors);
-    setRecipeData.setReference(randRecipe.reference);
-    setRecipeData.setAllergens(randRecipe.allergens);
-    setRecipeData.setIngredients(randRecipe.ingredients);
+    setSelectedRecipe(randRecipe);
     setRecipeSummaryView();
   }
 

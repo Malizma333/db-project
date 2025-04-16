@@ -29,7 +29,12 @@ const initStoreState = {
   numRowsPerPage: 10,
   numRecipesInCollection: 0,
   visibleColumns: COLUMN_MASK.NAME | COLUMN_MASK.AUTHOR | COLUMN_MASK.REFERENCE,
-  editMode: false // TODO: Logged in && current collection belongs to current user
+  editMode: false,
+  selectedRecipeName: "",
+  selectedRecipeReference: "",
+  selectedRecipeAuthors: [],
+  selectedRecipeIngredients: [],
+  selectedRecipeAllergens: [],
 }
 
 const computed = createComputed((state) => ({
@@ -60,6 +65,13 @@ export const useAppStore = create(
       setNumRecipesInCollection: (val) => set({ numRecipesInCollection: val }),
       setEditMode: (val) => set({ editMode: val }),
       setInit: () => set({ init: true }),
+      setSelectedRecipe: (recipeData) => set({
+        selectedRecipeName: recipeData.recipeName,
+        selectedRecipeReference: recipeData.reference,
+        selectedRecipeAllergens: recipeData.allergens,
+        selectedRecipeIngredients: recipeData.ingredients,
+        selectedRecipeAuthors: recipeData.authors,
+      }),
     })
   )
 );

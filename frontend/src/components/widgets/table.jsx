@@ -40,7 +40,7 @@ const styles = {
   },
 }
 
-function TableRow({ setRecipeData, editMode, id, rowData }) {
+function TableRow({ editMode, rowData }) {
   const {
     getColumnVisible,
     setUpdateRecipeView,
@@ -50,20 +50,12 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
   const queryClient = useQueryClient();
 
   function onViewRecipe() {
-    setRecipeData.setRecipeName(rowData.recipeName);
-    setRecipeData.setAuthors(rowData.authors);
-    setRecipeData.setReference(rowData.reference);
-    setRecipeData.setAllergens(rowData.allergens);
-    setRecipeData.setIngredients(rowData.ingredients);
+    setSelectedRecipe(rowData);
     setRecipeSummaryView();
   }
 
   function onEditRecipe() {
-    setRecipeData.setRecipeName(rowData.recipeName);
-    setRecipeData.setAuthors(rowData.authors);
-    setRecipeData.setReference(rowData.reference);
-    setRecipeData.setAllergens(rowData.allergens);
-    setRecipeData.setIngredients(rowData.ingredients);
+    setSelectedRecipe(rowData);
     setUpdateRecipeView();
   }
 
@@ -108,15 +100,17 @@ function TableRow({ setRecipeData, editMode, id, rowData }) {
   )
 }
 
-export default function Table({ pageData, setRecipeData }) {
-  const { editMode, getColumnVisible, setNewRecipeView } = useAppStore();
+export default function Table({ pageData }) {
+  const { editMode, getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
 
   function onCreateRecipe() {
-    setRecipeData.setRecipeName("");
-    setRecipeData.setAuthors([]);
-    setRecipeData.setReference("");
-    setRecipeData.setAllergens([]);
-    setRecipeData.setIngredients([]);
+    setSelectedRecipe({
+      recipeName: "",
+      reference: "",
+      authors: [],
+      allergens: [],
+      ingredients: [],
+    });
     setNewRecipeView();
   }
 
@@ -138,8 +132,8 @@ export default function Table({ pageData, setRecipeData }) {
           </div>
         </div>
       </SlCard>
-      {pageData.map((row, id) => {
-        return <TableRow setRecipeData={setRecipeData} editMode={editMode} id={id} rowData={row}></TableRow>;
+      {pageData.map((row) => {
+        return <TableRow editMode={editMode} rowData={row}></TableRow>;
       })}
     </div>
   )

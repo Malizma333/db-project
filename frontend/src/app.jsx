@@ -44,14 +44,6 @@ export default function App({ collectionDef }) {
 
   const params = useParams();
 
-  const [recipeName, setRecipeName] = useState("");
-  const [authors, setAuthors] = useState([]);
-  const [reference, setReference] = useState("");
-  const [ingredients, setIngredients] = useState([]);
-  const [allergens, setAllergens] = useState([]);
-  const newRecipeData = { recipeName, authors, reference, ingredients, allergens };
-  const setRecipeData = { setRecipeName, setAuthors, setReference, setIngredients, setAllergens };
-
   const { data: numRecipesInCollection } = useRecipeCount(params["id"] || -1);
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
@@ -83,12 +75,11 @@ export default function App({ collectionDef }) {
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar missingCollection={collectionDef} setRecipeData={setRecipeData}></Toolbar>
+      <Toolbar missingCollection={collectionDef}></Toolbar>
       {collectionDef ?
         <>
           <Table
             pageData={tableData}
-            setRecipeData={setRecipeData}
           ></Table>
           <PageNav></PageNav>
           <RecipeForm
@@ -96,18 +87,14 @@ export default function App({ collectionDef }) {
             submitLabel="Add Recipe"
             submitMessage="Added recipe successfully"
             viewState={VIEW.NEW_RECIPE_FORM}
-            recipeData={newRecipeData}
-            setRecipeData={setRecipeData}
           ></RecipeForm>
           <RecipeForm
             formTitle="Update Recipe"
             submitLabel="Update"
             submitMessage="Updated recipe successfully"
             viewState={VIEW.UPDATE_RECIPE_FORM}
-            recipeData={newRecipeData}
-            setRecipeData={setRecipeData}
           ></RecipeForm>
-          <RecipeSummary recipeData={newRecipeData}></RecipeSummary>
+          <RecipeSummary></RecipeSummary>
         </> : <div style={styles.missingCollection}>No collection selected!</div>
       }
     </div>
