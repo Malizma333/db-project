@@ -1,4 +1,4 @@
-import { SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/react';
+import { SlButton, SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/react';
 import TagPicker from '../widgets/tagPicker';
 import { useState } from 'preact/hooks';
 import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
@@ -6,6 +6,7 @@ import { useParams } from 'react-router';
 
 import { useCollectionAllergens, useCollectionAuthors, useCollectionIngredients } from '../../api/recipeCollection';
 import { SlHideEvent } from '@shoelace-style/shoelace';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   settingContainer: {
@@ -57,6 +58,7 @@ export default function SettingsDrawer() {
     getColumnVisible, toggleColumn, setMainView, setRowsPerPage, gotoFirstPage
   } = useAppStore();
 
+  const queryClient = useQueryClient();
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1")
 
@@ -67,13 +69,14 @@ export default function SettingsDrawer() {
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;
 
-  function onSetRowsPerPage(value: number) {
+  async function onSetRowsPerPage(value: number) {
     if (isNaN(value)) {
       return;
     }
 
     setRowsPerPage(Math.min(maxRowsPerPage, Math.max(minRowsPerPage, value)));
     gotoFirstPage();
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   }
 
   function onHide(e: SlHideEvent) {
@@ -84,6 +87,10 @@ export default function SettingsDrawer() {
     }
 
     setMainView();
+  }
+
+  async function onApplySearch() {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   }
 
   return (
@@ -102,7 +109,7 @@ export default function SettingsDrawer() {
             value={numRowsPerPage.toString()}
             min={minRowsPerPage}
             max={maxRowsPerPage}
-            onSlBlur={(e) => onSetRowsPerPage(parseInt((e.target as any).value))}></SlInput>
+            onSlBlur={(e) => {void onSetRowsPerPage(parseInt((e.target as any).value))}}></SlInput>
         </div>
       </div>
       <div style={styles.settingContainer}>
@@ -138,6 +145,9 @@ export default function SettingsDrawer() {
       <FilterPicker columnName={"Author"} columnOptions={allAuthors}></FilterPicker>
       <FilterPicker columnName={"Allergens"} columnOptions={allAllergens}></FilterPicker>
       <FilterPicker columnName={"Ingredients"} columnOptions={allIngredients}></FilterPicker>
+      <SlButton onClick={() => {void onApplySearch()}}>
+        Apply
+      </SlButton>
     </SlDrawer>
   )
 }

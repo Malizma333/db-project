@@ -4,10 +4,10 @@ import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 import TagPicker from '../widgets/tagPicker';
 import { useParams } from 'react-router';
-
 import { addRecipe, removeRecipe } from '../../api/recipe';
 import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
 import { SlHideEvent } from '@shoelace-style/shoelace';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   inputField: {
@@ -37,6 +37,8 @@ export default function RecipeForm(
     ingredients: selectedRecipeIngredients,
     authors: selectedRecipeAuthors,
   };
+
+  const queryClient = useQueryClient();
 
   const submitAlert = useRef(null);
   const params = useParams();
@@ -68,6 +70,7 @@ export default function RecipeForm(
         selectedRecipe.ingredients,
         selectedRecipe.allergens
       );
+      await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
       onCloseDialog(e);
       if (submitAlert.current !== null) {
         // @ts-expect-error Not sure what to type this ref as

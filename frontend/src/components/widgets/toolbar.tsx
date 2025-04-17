@@ -36,7 +36,6 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
@@ -55,7 +54,6 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     CHANGE_PASSWORD = "2",
     LOGOUT = "3"
   };
-
 
   async function onRandomRecipe() {
     const numRecipes = await getRecipeCount(collectionId);
@@ -83,6 +81,10 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
       // @ts-expect-error Not sure what to type this ref as
       logOutAlert.current.base.toast();
     }
+  }
+
+  async function onApplySearch() {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   }
 
   async function onMenuAction(item: ACTION) {
@@ -139,10 +141,28 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         )
       }
       {!collectionDef ? null : <>
-        <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => {void onRandomRecipe()}}></SlIconButton>
-        <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
-        <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
-          <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
+        <SlIconButton
+          name="shuffle"
+          label="Generate Random Recipe"
+          onClick={() => {void onRandomRecipe()}}
+        ></SlIconButton>
+        <SlIconButton
+          name="sliders"
+          label="Search Settings"
+          onClick={() => setSettingsView()}
+        ></SlIconButton>
+        <SlInput
+          clearable
+          type="search"
+          placeholder={`Search ${collectionName}...`}
+          style={{flex: "1"}}
+        >
+          <SlIconButton
+            name="search"
+            label="Run Search"
+            slot="suffix"
+            onClick={() => {void onApplySearch()}}
+          ></SlIconButton>
         </SlInput>
       </>}
     </div>

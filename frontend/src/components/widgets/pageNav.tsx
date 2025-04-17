@@ -2,6 +2,7 @@ import { SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/react';
 import { useAppStore } from '../../store';
 import { useRecipeCount } from '../../api/recipeCollection';
 import { useParams } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   root: {
@@ -17,6 +18,7 @@ const styles = {
 export default function PageNav() {
   const { page, numRowsPerPage, gotoFirstPage, gotoPrevPage, gotoNextPage, gotoLastPage } = useAppStore();
 
+  const queryClient = useQueryClient();
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
@@ -24,13 +26,33 @@ export default function PageNav() {
 
   const numPages = Math.ceil((numRecipesInCollection || 0) / numRowsPerPage);
 
+  const onNavigateFirstPage = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    gotoFirstPage();
+  }
+
+  const onNavigatePrevPage = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    gotoPrevPage();
+  }
+
+  const onNavigateNextPage = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    gotoNextPage(numPages);
+  }
+
+  const onNavigateLastPage = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    gotoLastPage(numPages);
+  }
+
   return numPages == 0 ? <div style={styles.root}></div> : (
     <div style={styles.root}>
       <SlTooltip content="First Page">
         <SlIconButton
           disabled={page === 0}
           name="chevron-double-left"
-          onClick={gotoFirstPage}
+          onClick={() => {void onNavigateFirstPage()}}
           label="First Page"
         ></SlIconButton>
       </SlTooltip>
@@ -38,7 +60,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === 0}
           name="chevron-left"
-          onClick={gotoPrevPage}
+          onClick={() => {void onNavigatePrevPage()}}
           label="Previous Page"
         ></SlIconButton>
       </SlTooltip>
@@ -47,7 +69,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-right"
-          onClick={() => gotoNextPage(numPages)}
+          onClick={() => {void onNavigateNextPage(numPages)}}
           label="Next Page"
         ></SlIconButton>
       </SlTooltip>
@@ -55,7 +77,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-double-right"
-          onClick={() => gotoLastPage(numPages)}
+          onClick={() => {void onNavigateLastPage(numPages)}}
           label="Last Page"
         ></SlIconButton>
       </SlTooltip>
