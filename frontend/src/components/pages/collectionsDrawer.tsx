@@ -3,6 +3,7 @@ import { useAppStore, VIEW } from "../../store";
 
 import { addRecipeCollection, removeRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
 import { useState } from "preact/hooks";
+import { SlHideEvent } from "@shoelace-style/shoelace";
 
 const styles = {
   root: {
@@ -29,7 +30,7 @@ export default function CollectionsDrawer() {
   const { data: collections } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
 
-  function onHide(e) {
+  function onHide(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements
     if (e.eventPhase === Event.AT_TARGET) {
       setMainView();
@@ -46,7 +47,7 @@ export default function CollectionsDrawer() {
     }
   }
 
-  async function onDeleteCollection(id) {
+  async function onDeleteCollection(id: number) {
     try {
       await removeRecipeCollection(id);
     } catch(e) {
@@ -70,7 +71,7 @@ export default function CollectionsDrawer() {
             type="search"
             placeholder="Find a collection..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm((e.target as any).value)}
           ></SlInput>
           {collections && collections
             .filter((collection) => collection.name.includes(searchTerm))

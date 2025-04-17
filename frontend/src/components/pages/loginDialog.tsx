@@ -1,9 +1,10 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
+import { MutableRef, useRef, useState } from 'preact/hooks';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
 import { login } from '../../api/user';
+import ShoelaceElement from '@shoelace-style/shoelace/dist/internal/shoelace-element';
 
 const styles = {
   inputField: {
@@ -17,7 +18,7 @@ export default function LoginDialog() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const logInAlert = useRef(null);
+  const logInAlert: MutableRef<ShoelaceElement | null> = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -31,9 +32,12 @@ export default function LoginDialog() {
       await login(username, password);
       setClientUsername(username);
       onCloseDialog();
-      logInAlert.current.base.toast();
+      // @ts-expect-error
+      logInAlert.current && logInAlert.current.base.toast();
     } catch (e) {
-      setHelpText(e.message);
+      if (e instanceof Error) {
+        setHelpText(e.message);
+      }
     }
   }
 
@@ -44,12 +48,13 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
+      {/* @ts-expect-error */}
       <SlNotification message="Logged in successfully" variant="success" ref={logInAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={username}
-        onSlChange={(e) => setUsername(e.target.value)}
+        onSlChange={(e) => setUsername((e.target as any).value)}
         placeholder="Username"
       ></SlInput>
       <SlInput
@@ -58,7 +63,7 @@ export default function LoginDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword(e.target.value)}
+        onSlChange={(e) => setPassword((e.target as any).value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>

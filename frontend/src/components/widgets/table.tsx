@@ -2,7 +2,7 @@ import { SlCard, SlTooltip, SlIconButton } from '@shoelace-style/shoelace/dist/r
 import TagPicker from './tagPicker';
 import { COLUMN_MASK, useAppStore } from '../../store';
 
-import { removeRecipe } from '../../api/recipe';
+import { Recipe, removeRecipe } from '../../api/recipe';
 import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
@@ -40,11 +40,15 @@ const styles = {
   },
 }
 
-function TableRow({ editMode, rowData }) {
+function TableRow(
+  { editMode, rowData } :
+  { editMode: boolean, rowData: Recipe }
+) {
   const {
     getColumnVisible,
     setUpdateRecipeView,
     setRecipeSummaryView,
+    setSelectedRecipe
   } = useAppStore();
 
   const queryClient = useQueryClient();
@@ -60,8 +64,8 @@ function TableRow({ editMode, rowData }) {
   }
 
   async function onDeleteRecipe() {
-    await removeRecipe();
-    await queryClient.invalidateQueries("filterCollection");
+    await removeRecipe(rowData.recipeName);
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   }
 
   return (
@@ -100,7 +104,10 @@ function TableRow({ editMode, rowData }) {
   )
 }
 
-export default function Table({ pageData, editMode }) {
+export default function Table(
+  { pageData, editMode } :
+  { pageData: Recipe[], editMode: boolean }
+) {
   const { getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
 
   function onCreateRecipe() {

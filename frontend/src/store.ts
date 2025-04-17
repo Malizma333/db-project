@@ -32,6 +32,24 @@ interface InitStateType {
   selectedRecipeAllergens: string[],
   selectedRecipeIngredients: string[],
   selectedRecipeAuthors: string[]
+  setMainView: () => void,
+  setSettingsView: () => void,
+  setLoginView: () => void,
+  setChangeUserView: () => void,
+  setChangePassView: () => void,
+  setCollectionsView: () => void,
+  setNewRecipeView: () => void,
+  setUpdateRecipeView: () => void,
+  setRecipeSummaryView: () => void,
+  gotoFirstPage: () => void,
+  gotoPrevPage: () => void,
+  gotoNextPage: (numPages: number) => void,
+  gotoLastPage: (numPages: number) => void,
+  setRowsPerPage: (numRowsPerPage: number) => void,
+  getColumnVisible: (mask: COLUMN_MASK) => boolean,
+  toggleColumn: (mask: COLUMN_MASK) => void,
+  setClientUsername: (clientUsername: string) => void,
+  setSelectedRecipe: (recipeData: Recipe) => void,
 }
 
 const initStoreState = {

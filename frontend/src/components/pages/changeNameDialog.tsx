@@ -1,9 +1,10 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
+import { MutableRef, useRef, useState } from 'preact/hooks';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
 import { changeUsername } from '../../api/user';
+import ShoelaceElement from '@shoelace-style/shoelace/dist/internal/shoelace-element';
 
 const styles = {
   inputField: {
@@ -17,7 +18,7 @@ export default function ChangeNameDialog() {
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const changeNameAlert = useRef(null);
+  const changeNameAlert: MutableRef<ShoelaceElement | null> = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -31,28 +32,32 @@ export default function ChangeNameDialog() {
       await changeUsername(password, newUsername);
       setClientUsername(newUsername);
     } catch(e) {
-      setHelpText(e.message);
+      if (e instanceof Error) {
+        setHelpText(e.message);
+      }
       return;
     }
 
     onCloseDialog();
-    changeNameAlert.current.base.toast();
+    // @ts-expect-error
+    changeNameAlert.current && changeNameAlert.current.base.toast();
   }
 
   return (
     <SlDialog
-      class="dialog-overview"
+      className="dialog-overview"
       open={view === VIEW.CHANGE_USERNAME}
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
+      {/* @ts-expect-error */}
       <SlNotification message="Changed username successfully" variant="success" ref={changeNameAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         helpText="Must be 8 - 20 characters"
         type="text"
         value={newUsername}
-        onSlChange={(e) => setNewUsername(e.target.value)}
+        onSlChange={(e) => setNewUsername((e.target as any).value)}
         placeholder="New Username"
       ></SlInput>
       <SlInput
@@ -61,7 +66,7 @@ export default function ChangeNameDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword(e.target.value)}
+        onSlChange={(e) => setPassword((e.target as any).value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>

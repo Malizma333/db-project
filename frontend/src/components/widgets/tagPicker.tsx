@@ -1,4 +1,6 @@
 import { SlTag, SlIconButton, SlDropdown, SlMenu, SlMenuItem } from '@shoelace-style/shoelace/dist/react';
+import { StateUpdater } from 'preact/hooks';
+import { Dispatch } from 'react';
 
 const styles = {
   root: {
@@ -12,13 +14,16 @@ const styles = {
   }
 }
 
-export default function TagPicker({ variant, selected, available=[], setSelected=undefined, viewMode=false }) {
-  function onRemoveTag(i) {
-    setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
+export default function TagPicker(
+  { variant, selected, available=[], setSelected=undefined, viewMode=false } :
+  { variant: "success" | "warning" | "danger" | "primary", selected: string[], available?: string[], setSelected?: (s: string[]) => void, viewMode?: boolean }
+) {
+  function onRemoveTag(i: number) {
+    setSelected && setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
   }
 
-  function onAddTag(name) {
-    setSelected(selected.concat([name]))
+  function onAddTag(name: string) {
+    setSelected && setSelected(selected.concat([name]))
   }
 
   return (

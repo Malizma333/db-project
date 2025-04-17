@@ -69,7 +69,7 @@ export default function App() {
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar missingCollection={collectionDef}></Toolbar>
+      <Toolbar collectionDef={collectionDef}></Toolbar>
       {collectionDef ?
         <>
           <Table

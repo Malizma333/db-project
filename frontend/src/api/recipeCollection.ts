@@ -191,6 +191,7 @@ export function useCollectionAuthors(collection_id: number) {
   })
 }
 
+// TODO: This should also work with a filter applied
 async function getRecipeCount(id: number): Promise<number> {
   const response = await makeRequest({
     type: "count_recipes_in_collection",
