@@ -16,6 +16,7 @@ EXTENSIONS = {
     "html": "text/html",
     "ico": "image/x-icon",
     "png": "image/png",
+    "txt": "text/plain",
     "js": "text/javascript",
     "css": "text/css",
     "json": "application/json",
@@ -360,10 +361,11 @@ class RequestHandler(server.BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(ret).encode())
             return ret_type
 
+        print(f"invalid post request: {p}")
         self.send_response(404)
-        self.send_header("content-type", SERVABLE["/404.html"][1])
+        self.send_header("content-type", EXTENSIONS["txt"])
         self.end_headers()
-        self.wfile.write(SERVABLE["/404.html"][0])
+        self.wfile.write(b"invalid post request")
         return 404
 
 
