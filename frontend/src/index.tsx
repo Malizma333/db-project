@@ -11,7 +11,7 @@ render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App></App>}></Route>
-        <Route path="/:id" element={<App></App>}></Route>
+        <Route path="/collection/:id" element={<App></App>}></Route>
         <Route
           path="*"
           element={<Navigate to="/" replace />}

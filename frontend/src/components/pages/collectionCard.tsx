@@ -41,7 +41,7 @@ export default function CollectionCard(
           placeholder={`Collection ${collectionId}`}
         ></SlInput>
         <SlCopyButton
-          value={window.location.origin + "/" + collectionId}
+          value={window.location.origin + "/collection/" + collectionId}
           copyLabel="Share Collection"
           successLabel="Copied"
           errorLabel="Failed to copy"
