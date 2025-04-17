@@ -59,7 +59,7 @@ export function getErrorMessage(responseData: Record<string, string>) {
 
 export async function makeRequest(jsonBody: Record<string, unknown>): Promise<Response> {
   try {
-    return await fetch('api', {
+    return await fetch('/api', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jsonBody),
