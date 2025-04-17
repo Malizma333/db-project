@@ -14,8 +14,8 @@ export function getErrorMessage(responseData: Record<string, string>) {
     auth_token_error: "[ERROR] Bad authentication token!",
     bad_fetch_error: "[ERROR] Bad fetch: ",
     resource_error: "[ERROR] Invalid resource: ",
-    username_error: "[ERROR] Bad username!",
-    password_error: "[ERROR] Bad password!",
+    username_error: "Invalid username or password!",
+    password_error: "Invalid username or password!",
     internal_server_error: "[ERROR] Robert or Bre screwed up: "
   };
 
@@ -53,9 +53,6 @@ export function getErrorMessage(responseData: Record<string, string>) {
     default:
       break;
   }
-
-  console.log(responseData);
-  console.error(message);
 
   return message;
 }

@@ -1,4 +1,5 @@
 import { SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { removeRecipeCollection, useCollectionName, useRecipeCount } from "src/api/recipeCollection";
 
 const styles = {
@@ -19,26 +20,34 @@ export default function CollectionCard(
   { collectionId, searchTerm } :
   { collectionId: number, searchTerm: string }
 ) {
+  console.log("Search", searchTerm);
+  console.log(collectionId);
+
+  const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
+  console.log(collectionName, recipeCount);
+
   async function onDeleteCollection(id: number) {
     try {
+      console.log("C");
       await removeRecipeCollection(id);
+      console.log("D");
+      await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch(e) {
       console.error(e);
     }
   }
 
-  return !searchTerm.includes(collectionName || "") ? null : (
+  return (collectionName === undefined || !collectionName.includes(searchTerm)) ? null : (
     <SlCard style={styles.collectionCard}>
       <div slot="header" style={styles.collectionTitle}>
         <SlInput
           className="collectionsName"
           filled
           value={collectionName}
-          placeholder={`Collection ${collectionId}`}
         ></SlInput>
         <SlCopyButton
           value={window.location.origin + "/collection/" + collectionId}

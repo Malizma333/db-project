@@ -5,7 +5,8 @@ import { useRef } from 'preact/hooks';
 
 import { logout, useLoggedIn } from '../../api/user';
 import { useParams } from 'react-router';
-import { filterRecipeCollection, useCollectionName, useRecipeCount } from '../../api/recipeCollection';
+import { filterRecipeCollection, getRecipeCount, useCollectionName } from '../../api/recipeCollection';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   root: {
@@ -23,22 +24,23 @@ const styles = {
 
 export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   const {
+    clientUsername,
     setSettingsView,
     setLoginView,
     setChangePassView,
     setChangeUserView,
     setCollectionsView,
     setRecipeSummaryView,
-    clientUsername,
     setClientUsername,
     setSelectedRecipe,
   } = useAppStore();
+
+  const queryClient = useQueryClient();
 
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
   const { data: collectionName } = useCollectionName(collectionId);
-  const { data: numRecipes } = useRecipeCount(collectionId);
   const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
 
   const logOutAlert = useRef(null);
@@ -56,6 +58,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
 
 
   async function onRandomRecipe() {
+    const numRecipes = await getRecipeCount(collectionId);
     const ind = Math.floor(Math.random() * (numRecipes || 0));
     const randRecipe = await filterRecipeCollection({
       collection_id: collectionId,
@@ -75,6 +78,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   async function onLogOut() {
     await logout();
     setClientUsername("");
+    await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
     if (logOutAlert.current !== null) {
       // @ts-expect-error Not sure what to type this ref as
       logOutAlert.current.base.toast();
@@ -134,11 +138,13 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
           </SlDropdown>
         )
       }
-      {collectionDef && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => {void onRandomRecipe()}}></SlIconButton>}
-      {collectionDef && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
-      {collectionDef && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
-        <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
-      </SlInput>}
+      {!collectionDef ? null : <>
+        <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => {void onRandomRecipe()}}></SlIconButton>
+        <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>
+        <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
+          <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
+        </SlInput>
+      </>}
     </div>
   )
 }

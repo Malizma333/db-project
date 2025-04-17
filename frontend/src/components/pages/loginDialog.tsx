@@ -4,6 +4,7 @@ import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
 import { login } from '../../api/user';
+import { useQueryClient } from '@tanstack/react-query';
 
 const styles = {
   inputField: {
@@ -13,6 +14,8 @@ const styles = {
 
 export default function LoginDialog() {
   const { view, setMainView, setClientUsername } = useAppStore();
+
+  const queryClient = useQueryClient();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +32,7 @@ export default function LoginDialog() {
   async function onLogIn() {
     try {
       await login(username, password);
+      await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       setClientUsername(username);
       onCloseDialog();
       if (logInAlert.current !== null) {

@@ -1,5 +1,5 @@
 import { getErrorMessage, makeRequest } from "./api";
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
 
@@ -118,7 +118,7 @@ async function getOwnedRecipeCollections(): Promise<number[]> {
 export function useOwnedCollections() {
   return useQuery({
     queryKey: ['ownedCollections'],
-    queryFn: () => getOwnedRecipeCollections(),
+    queryFn: session_auth.auth !== "" ? () => getOwnedRecipeCollections() : skipToken,
   })
 }
 
@@ -140,7 +140,7 @@ async function getAllergensFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionAllergens(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionAllergens'],
+    queryKey: ['collectionAllergens', collection_id],
     queryFn: () => getAllergensFromCollection(collection_id),
   })
 }
@@ -163,7 +163,7 @@ async function getIngredientsFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionIngredients(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionIngredients'],
+    queryKey: ['collectionIngredients', collection_id],
     queryFn: () => getIngredientsFromCollection(collection_id),
   })
 }
@@ -186,13 +186,13 @@ async function getAuthorsFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionAuthors(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionAuthors'],
+    queryKey: ['collectionAuthors', collection_id],
     queryFn: () => getAuthorsFromCollection(collection_id),
   })
 }
 
 // TODO: This should also work with a filter applied
-async function getRecipeCount(id: number): Promise<number> {
+export async function getRecipeCount(id: number): Promise<number> {
   const response = await makeRequest({
     type: "count_recipes_in_collection",
     auth: session_auth.auth,
@@ -210,8 +210,8 @@ async function getRecipeCount(id: number): Promise<number> {
 
 export function useRecipeCount(collection_id: number) {
   return useQuery({
-    queryKey: ['recipeCount'],
-    queryFn: () => getRecipeCount(collection_id),
+    queryKey: ['recipeCount', collection_id],
+    queryFn: collection_id !== -1 ? () => getRecipeCount(collection_id) : skipToken,
   })
 }
 
@@ -233,7 +233,7 @@ async function getRecipeCollectionName(id: number): Promise<string> {
 
 export function useCollectionName(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionName'],
-    queryFn: () => getRecipeCollectionName(collection_id),
+    queryKey: ['collectionName', collection_id],
+    queryFn: collection_id !== -1 ? () => getRecipeCollectionName(collection_id) : skipToken,
   })
 }

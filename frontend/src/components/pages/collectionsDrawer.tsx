@@ -5,6 +5,7 @@ import { addRecipeCollection, useOwnedCollections } from "../../api/recipeCollec
 import { useState } from "preact/hooks";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import CollectionCard from "./collectionCard";
+import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   root: {
@@ -21,6 +22,8 @@ const styles = {
 };
 
 export default function CollectionsDrawer() {
+  const queryClient = useQueryClient();
+
   const { view, setMainView } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,7 +39,11 @@ export default function CollectionsDrawer() {
 
   async function onCreateCollection() {
     try {
+      console.log("A");
       await addRecipeCollection("New Collection");
+      console.log("B");
+      await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
+      await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
     } catch(e) {
       console.error(e);
     }
