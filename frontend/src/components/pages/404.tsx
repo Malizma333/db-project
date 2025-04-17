@@ -13,7 +13,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "72px",
     justifyContent: "center",
     userSelect: "none",
-  }
+  },
   art: {
     alignItems: "center",
     color: "gray",
@@ -23,8 +23,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "50px",
     justifyContent: "center",
     userSelect: "none",
-    font-family: "monospace",
-    white-space: "pre-wrap",
+    fontFamily: "monospace",
+    whiteSpace: "pre-wrap",
   }
 }
 

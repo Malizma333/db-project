@@ -39,9 +39,7 @@ export default function CollectionsDrawer() {
 
   async function onCreateCollection() {
     try {
-      console.log("A");
       await addRecipeCollection("New Collection");
-      console.log("B");
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
       await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
     } catch(e) {

@@ -20,21 +20,19 @@ export default function CollectionCard(
   { collectionId, searchTerm } :
   { collectionId: number, searchTerm: string }
 ) {
-  console.log("Search", searchTerm);
-  console.log(collectionId);
-
   const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
-  console.log(collectionName, recipeCount);
+  console.log("Search", searchTerm);
+  console.log("Collection id", collectionId);
+  console.log("Collection name", collectionName);
+  console.log("Collection recipes", recipeCount);
 
   async function onDeleteCollection(id: number) {
     try {
-      console.log("C");
       await removeRecipeCollection(id);
-      console.log("D");
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch(e) {
       console.error(e);
