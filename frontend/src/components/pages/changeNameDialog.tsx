@@ -31,28 +31,34 @@ export default function ChangeNameDialog() {
       await changeUsername(password, newUsername);
       setClientUsername(newUsername);
     } catch(e) {
-      setHelpText(e.message);
+      if (e instanceof Error) {
+        setHelpText(e.message);
+      }
       return;
     }
 
     onCloseDialog();
-    changeNameAlert.current.base.toast();
+    if (changeNameAlert.current !== null) {
+      // @ts-expect-error Not sure what to type this ref as
+      changeNameAlert.current.base.toast();
+    }
   }
 
   return (
     <SlDialog
-      class="dialog-overview"
+      className="dialog-overview"
       open={view === VIEW.CHANGE_USERNAME}
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message="Changed username successfully" variant="success" ref={changeNameAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         helpText="Must be 8 - 20 characters"
         type="text"
         value={newUsername}
-        onSlChange={(e) => setNewUsername(e.target.value)}
+        onSlChange={(e) => setNewUsername((e.target as any).value)}
         placeholder="New Username"
       ></SlInput>
       <SlInput
@@ -61,11 +67,11 @@ export default function ChangeNameDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword(e.target.value)}
+        onSlChange={(e) => setPassword((e.target as any).value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => onChangeUsername()}>
+      <SlButton onClick={() => {void onChangeUsername()}}>
         Confirm
       </SlButton>
     </SlDialog>

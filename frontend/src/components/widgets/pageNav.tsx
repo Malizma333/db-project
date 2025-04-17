@@ -18,8 +18,9 @@ export default function PageNav() {
   const { page, numRowsPerPage, gotoFirstPage, gotoPrevPage, gotoNextPage, gotoLastPage } = useAppStore();
 
   const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: numRecipesInCollection } = useRecipeCount(params["id"]);
+  const { data: numRecipesInCollection } = useRecipeCount(collectionId);
 
   const numPages = Math.ceil((numRecipesInCollection || 0) / numRowsPerPage);
 

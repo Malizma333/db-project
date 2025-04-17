@@ -12,13 +12,20 @@ const styles = {
   }
 }
 
-export default function TagPicker({ variant, selected, available=[], setSelected=undefined, viewMode=false }) {
-  function onRemoveTag(i) {
-    setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
+export default function TagPicker(
+  { variant, selected, available=[], setSelected=undefined, viewMode=false } :
+  { variant: "success" | "warning" | "danger" | "primary", selected: string[], available?: string[], setSelected?: (s: string[]) => void, viewMode?: boolean }
+) {
+  function onRemoveTag(i: number) {
+    if (setSelected !== undefined) {
+      setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
+    }
   }
 
-  function onAddTag(name) {
-    setSelected(selected.concat([name]))
+  function onAddTag(name: string) {
+    if (setSelected !== undefined) {
+      setSelected(selected.concat([name]))
+    }
   }
 
   return (
@@ -34,7 +41,7 @@ export default function TagPicker({ variant, selected, available=[], setSelected
         <SlDropdown>
           <SlIconButton slot="trigger" name="plus"></SlIconButton>
           <SlMenu style={styles.menu} onSlSelect={(e) => onAddTag(e.detail.item.value)}>
-            {available.filter((tag) => !selected.includes(tag)).map((tag, _) => {
+            {available.filter((tag) => !selected.includes(tag)).map((tag) => {
               return (
                 <SlMenuItem value={tag}>
                   {tag}

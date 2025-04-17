@@ -5,6 +5,7 @@ import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
 import { useParams } from 'react-router';
 
 import { useCollectionAllergens, useCollectionAuthors, useCollectionIngredients } from '../../api/recipeCollection';
+import { SlHideEvent } from '@shoelace-style/shoelace';
 
 const styles = {
   settingContainer: {
@@ -19,9 +20,12 @@ const styles = {
   }
 }
 
-function FilterPicker({ columnName, columnOptions = [] }) {
-  const [included, setIncluded] = useState([]);
-  const [excluded, setExcluded] = useState([]);
+function FilterPicker(
+  { columnName, columnOptions = [] }:
+  { columnName: string, columnOptions?: string[] }
+) {
+  const [included, setIncluded] = useState<string[]>([]);
+  const [excluded, setExcluded] = useState<string[]>([]);
 
   return (
     <div style={styles.settingContainer}>
@@ -54,15 +58,16 @@ export default function SettingsDrawer() {
   } = useAppStore();
 
   const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1")
 
-  const { data: allAuthors } = useCollectionAuthors(params["id"]);
-  const { data: allAllergens } = useCollectionAllergens(params["id"]);
-  const { data: allIngredients } = useCollectionIngredients(params["id"]);
+  const { data: allAuthors } = useCollectionAuthors(collectionId);
+  const { data: allAllergens } = useCollectionAllergens(collectionId);
+  const { data: allIngredients } = useCollectionIngredients(collectionId);
 
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;
 
-  function onSetRowsPerPage(value) {
+  function onSetRowsPerPage(value: number) {
     if (isNaN(value)) {
       return;
     }
@@ -71,7 +76,7 @@ export default function SettingsDrawer() {
     gotoFirstPage();
   }
 
-  function onHide(e) {
+  function onHide(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
@@ -94,10 +99,10 @@ export default function SettingsDrawer() {
           Recipes Per Page
           <SlInput
             type="number"
-            value={numRowsPerPage}
+            value={numRowsPerPage.toString()}
             min={minRowsPerPage}
             max={maxRowsPerPage}
-            onSlBlur={(e) => onSetRowsPerPage(parseInt(e.target.value))}></SlInput>
+            onSlBlur={(e) => onSetRowsPerPage(parseInt((e.target as any).value))}></SlInput>
         </div>
       </div>
       <div style={styles.settingContainer}>

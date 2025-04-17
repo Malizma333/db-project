@@ -7,6 +7,7 @@ import { useParams } from 'react-router';
 
 import { addRecipe, removeRecipe } from '../../api/recipe';
 import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
+import { SlHideEvent } from '@shoelace-style/shoelace';
 
 const styles = {
   inputField: {
@@ -14,7 +15,10 @@ const styles = {
   },
 }
 
-export default function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
+export default function RecipeForm(
+  { formTitle, submitLabel, submitMessage, viewState } :
+  { formTitle: string, submitLabel: string, submitMessage: string, viewState: VIEW }
+) {
   const {
     view,
     setMainView,
@@ -36,11 +40,12 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
 
   const submitAlert = useRef(null);
   const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: allAllergens } = useCollectionAllergens(params["id"]);
-  const { data: allIngredients } = useCollectionIngredients(params["id"]);
+  const { data: allAllergens } = useCollectionAllergens(collectionId);
+  const { data: allIngredients } = useCollectionIngredients(collectionId);
 
-  function onCloseDialog(e) {
+  function onCloseDialog(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
@@ -50,13 +55,13 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
     setMainView();
   }
 
-  async function onAddRecipe(e) {
+  async function onAddRecipe(e: any) {
     try {
       if (viewState === VIEW.UPDATE_RECIPE_FORM) {
         await removeRecipe(selectedRecipeName);
       }
       await addRecipe(
-        params["id"],
+        collectionId,
         selectedRecipe.recipeName,
         selectedRecipe.reference,
         selectedRecipe.authors,
@@ -64,7 +69,10 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
         selectedRecipe.allergens
       );
       onCloseDialog(e);
-      submitAlert.current.base.toast();
+      if (submitAlert.current !== null) {
+        // @ts-expect-error Not sure what to type this ref as
+        submitAlert.current.base.toast();
+      }
     } catch(e) {
       console.error(e);
     }
@@ -77,26 +85,27 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
       onSlHide={(e) => onCloseDialog(e)}
       label={formTitle}
     >
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message={submitMessage} variant="success" ref={submitAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeName}
-        onSlChange={(e) => setRecipeName({ ...selectedRecipe, recipeName: e.target.value })}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, recipeName: (e.target as any).value })}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeAuthors.join(",")}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, authors: e.target.value.split(",") })}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, authors: (e.target as any).value.split(",") })}
         placeholder="Authors"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeReference}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, reference: e.target.value })}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, reference: (e.target as any).value })}
         placeholder="Reference"
       ></SlInput>
       <TagPicker
@@ -111,7 +120,7 @@ export default function RecipeForm({ formTitle, submitLabel, submitMessage, view
         selected={selectedRecipeIngredients}
         setSelected={(ingredients) => setSelectedRecipe({ ...selectedRecipe, ingredients })}
       ></TagPicker>
-      <SlButton onClick={(e) => onAddRecipe(e)}>
+      <SlButton onClick={(e) => {void onAddRecipe(e)}}>
         {submitLabel}
       </SlButton>
     </SlDialog>

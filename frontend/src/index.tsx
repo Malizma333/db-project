@@ -1,6 +1,6 @@
-import { render } from 'preact'
+import { ContainerNode, render } from 'preact'
 import './index.css'
-import App from './app.jsx'
+import App from './app'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './api/api.js'
@@ -10,8 +10,8 @@ render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App collectionDef={false}></App>}></Route>
-        <Route path="/:id" element={<App collectionDef={true}></App>}></Route>
+        <Route path="/" element={<App></App>}></Route>
+        <Route path="/collection/:id" element={<App></App>}></Route>
         <Route
           path="*"
           element={<Navigate to="/" replace />}
@@ -19,5 +19,5 @@ render(
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>,
-  document.getElementById('app')
+  document.getElementById('app') as ContainerNode
 );

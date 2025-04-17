@@ -21,7 +21,7 @@ const styles = {
   },
 }
 
-export default function Toolbar({ missingCollection }) {
+export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   const {
     setSettingsView,
     setLoginView,
@@ -35,9 +35,10 @@ export default function Toolbar({ missingCollection }) {
   } = useAppStore();
 
   const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: collectionName } = useCollectionName(params["id"]);
-  const { data: numRecipes } = useRecipeCount(params["id"]);
+  const { data: collectionName } = useCollectionName(collectionId);
+  const { data: numRecipes } = useRecipeCount(collectionId);
   const { status, data: loggedIn, error, isFetching: loggedInFetching } = useLoggedIn();
 
   const logOutAlert = useRef(null);
@@ -46,37 +47,41 @@ export default function Toolbar({ missingCollection }) {
     console.error(error.message);
   }
 
-  const ACTION = {
-    VIEW_COLLECTIONS: 0,
-    CHANGE_USERNAME: 1,
-    CHANGE_PASSWORD: 2,
-    LOGOUT: 3
+  enum ACTION {
+    VIEW_COLLECTIONS = "0",
+    CHANGE_USERNAME = "1",
+    CHANGE_PASSWORD = "2",
+    LOGOUT = "3"
   };
 
 
   async function onRandomRecipe() {
-    const ind = Math.floor(Math.random() * numRecipes);
+    const ind = Math.floor(Math.random() * (numRecipes || 0));
     const randRecipe = await filterRecipeCollection({
-      collection_id: params["id"],
+      collection_id: collectionId,
       recipe_name: "",
+      authors: [],
       include_allergens: [],
       exclude_allergens: [],
       include_ingredients: [],
       exclude_ingredients: [],
       view_min: ind,
       view_max: ind + 1
-    })[0];
-    setSelectedRecipe(randRecipe);
+    });
+    setSelectedRecipe(randRecipe[0]);
     setRecipeSummaryView();
   }
 
   async function onLogOut() {
     await logout();
     setClientUsername("");
-    logOutAlert.current.base.toast();
+    if (logOutAlert.current !== null) {
+      // @ts-expect-error Not sure what to type this ref as
+      logOutAlert.current.base.toast();
+    }
   }
 
-  function onMenuAction(item) {
+  async function onMenuAction(item: ACTION) {
     switch(item) {
       case ACTION.VIEW_COLLECTIONS:
         setCollectionsView();
@@ -88,7 +93,7 @@ export default function Toolbar({ missingCollection }) {
         setChangePassView();
         break;
       case ACTION.LOGOUT:
-        onLogOut();
+        await onLogOut();
         break;
       default:
         break;
@@ -97,6 +102,7 @@ export default function Toolbar({ missingCollection }) {
 
   return (
     <div style={styles.root}>
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
       {loggedInFetching || !loggedIn ?
         (
@@ -109,7 +115,7 @@ export default function Toolbar({ missingCollection }) {
               initials={clientUsername[0]}
               label="Avatar with username initial"
             ></SlAvatar>
-            <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value)}>
+            <SlMenu onSlSelect={(e) => {void onMenuAction(e.detail.item.value as ACTION)}}>
               <SlMenuLabel className="userMenuLabel">{clientUsername}</SlMenuLabel>
               <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
                 View Collections
@@ -128,9 +134,9 @@ export default function Toolbar({ missingCollection }) {
           </SlDropdown>
         )
       }
-      {missingCollection && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>}
-      {missingCollection && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
-      {missingCollection && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
+      {collectionDef && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => {void onRandomRecipe()}}></SlIconButton>}
+      {collectionDef && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
+      {collectionDef && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
       </SlInput>}
     </div>

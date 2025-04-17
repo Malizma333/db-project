@@ -31,9 +31,14 @@ export default function LoginDialog() {
       await login(username, password);
       setClientUsername(username);
       onCloseDialog();
-      logInAlert.current.base.toast();
+      if (logInAlert.current !== null) {
+        // @ts-expect-error Not sure what to type this ref as
+        logInAlert.current.base.toast();
+      }
     } catch (e) {
-      setHelpText(e.message);
+      if (e instanceof Error) {
+        setHelpText(e.message);
+      }
     }
   }
 
@@ -44,12 +49,13 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message="Logged in successfully" variant="success" ref={logInAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={username}
-        onSlChange={(e) => setUsername(e.target.value)}
+        onSlChange={(e) => setUsername((e.target as any).value)}
         placeholder="Username"
       ></SlInput>
       <SlInput
@@ -58,11 +64,11 @@ export default function LoginDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword(e.target.value)}
+        onSlChange={(e) => setPassword((e.target as any).value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => onLogIn()}>
+      <SlButton onClick={() => {void onLogIn()}}>
         Log In
       </SlButton>
     </SlDialog>

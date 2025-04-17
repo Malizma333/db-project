@@ -20,7 +20,7 @@ import { useFilterCollection, useOwnedCollections } from './api/recipeCollection
 import { useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   root: {
     display: "flex",
     flexDirection: "column",
@@ -38,15 +38,18 @@ const styles = {
   }
 }
 
-export default function App({ collectionDef }) {
+export default function App() {
   const { page, numRowsPerPage } = useAppStore();
 
   const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
+
+  const collectionDef = collectionId !== -1;
 
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
   const { data: tableData } = useFilterCollection({
-    collection_id: params["id"],
+    collection_id: collectionId,
     recipe_name: "",
     include_allergens: [],
     exclude_allergens: [],
@@ -57,7 +60,7 @@ export default function App({ collectionDef }) {
     view_max: (page + 1) * numRowsPerPage
   });
 
-  const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(params["id"]));
+  const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(collectionId));
 
   return (
     <div style={styles.root}>
@@ -66,7 +69,7 @@ export default function App({ collectionDef }) {
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar missingCollection={collectionDef}></Toolbar>
+      <Toolbar collectionDef={collectionDef}></Toolbar>
       {collectionDef ?
         <>
           <Table

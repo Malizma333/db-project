@@ -38,11 +38,16 @@ export default function ChangePassDialog() {
     try {
       await changePassword(oldPassword, newPassword);
     } catch (e) {
-      setHelpText(e.message);
+      if (e instanceof Error) {
+        setHelpText(e.message);
+      }
     }
 
     onCloseDialog();
-    changePassAlert.current.base.toast();
+    if (changePassAlert.current !== null) {
+      // @ts-expect-error Not sure what to type this ref as
+      changePassAlert.current.base.toast();
+    }
   }
 
   return (
@@ -52,13 +57,14 @@ export default function ChangePassDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Password"
     >
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message="Password changed successfully" variant="success" ref={changePassAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
         type="password"
         helpText="Must be 8 - 20 characters"
         value={oldPassword}
-        onSlChange={(e) => setOldPassword(e.target.value)}
+        onSlChange={(e) => setOldPassword((e.target as any).value)}
         placeholder="Old Password"
         passwordToggle
       ></SlInput>
@@ -66,7 +72,7 @@ export default function ChangePassDialog() {
         style={styles.inputField}
         type="password"
         value={newPassword}
-        onSlChange={(e) => setNewPassword(e.target.value)}
+        onSlChange={(e) => setNewPassword((e.target as any).value)}
         placeholder="New Password"
         passwordToggle
       ></SlInput>
@@ -76,11 +82,11 @@ export default function ChangePassDialog() {
         helpText={helpText}
         type="password"
         value={rePassword}
-        onSlChange={(e) => setRePassword(e.target.value)}
+        onSlChange={(e) => setRePassword((e.target as any).value)}
         placeholder="Retype New Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => onSetPassword()}>
+      <SlButton onClick={() => {void onSetPassword()}}>
         Confirm
       </SlButton>
     </SlDialog>
