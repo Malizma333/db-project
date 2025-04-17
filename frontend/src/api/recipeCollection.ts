@@ -37,9 +37,9 @@ export async function filterRecipeCollection({
     authors,
     view_min,
     view_max
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -61,9 +61,9 @@ export async function renameRecipeCollection(id: number, new_name: string) {
     auth: session_auth.auth,
     id,
     new_name,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -75,9 +75,9 @@ export async function addRecipeCollection(name: string): Promise<number> {
     type: "add_recipe_collection",
     auth: session_auth.auth,
     name,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -91,9 +91,9 @@ export async function removeRecipeCollection(id: number) {
     type: "remove_recipe_collection",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -104,9 +104,9 @@ async function getOwnedRecipeCollections(): Promise<number[]> {
   const response = await makeRequest({
     type: "get_owned_recipe_collections",
     auth: session_auth.auth,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -127,9 +127,9 @@ async function getAllergensFromCollection(id: number): Promise<string[]> {
     type: "get_allergens_in_collection",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -150,9 +150,9 @@ async function getIngredientsFromCollection(id: number): Promise<string[]> {
     type: "get_ingredients_in_collection",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -173,9 +173,9 @@ async function getAuthorsFromCollection(id: number): Promise<string[]> {
     type: "get_authors_in_collection",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -197,9 +197,9 @@ async function getRecipeCount(id: number): Promise<number> {
     type: "count_recipes_in_collection",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -220,9 +220,9 @@ async function getRecipeCollectionName(id: number): Promise<string> {
     type: "get_collection_name",
     auth: session_auth.auth,
     id,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));

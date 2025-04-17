@@ -16,9 +16,9 @@ export async function login(username: string, password: string) {
     type: "login",
     username,
     password,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -34,9 +34,9 @@ export async function logout() {
   const response = await makeRequest({
     type: "logout",
     auth: session_auth.auth,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, any> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -74,9 +74,9 @@ export async function changeUsername(password: string, new_username: string) {
     auth: session_auth.auth,
     password,
     new_username,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -89,9 +89,9 @@ export async function changePassword(password: string, new_password: string) {
     auth: session_auth.auth,
     password,
     new_password,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));

@@ -27,7 +27,7 @@ export default function RecipeSummary() {
     <SlDialog
       class="dialog-overview"
       open={view === VIEW.RECIPE_SUMMARY}
-      onSlHide={(_) => onCloseDialog()}
+      onSlHide={() => onCloseDialog()}
       label={selectedRecipeName}
     >
       <strong>Author(s)</strong>

@@ -69,8 +69,10 @@ export default function RecipeForm(
         selectedRecipe.allergens
       );
       onCloseDialog(e);
-      // @ts-expect-error
-      submitAlert.current && submitAlert.current.base.toast();
+      if (submitAlert.current !== null) {
+        // @ts-expect-error Not sure what to type this ref as
+        submitAlert.current.base.toast();
+      }
     } catch(e) {
       console.error(e);
     }
@@ -83,7 +85,7 @@ export default function RecipeForm(
       onSlHide={(e) => onCloseDialog(e)}
       label={formTitle}
     >
-      {/* @ts-expect-error */}
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message={submitMessage} variant="success" ref={submitAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
@@ -118,7 +120,7 @@ export default function RecipeForm(
         selected={selectedRecipeIngredients}
         setSelected={(ingredients) => setSelectedRecipe({ ...selectedRecipe, ingredients })}
       ></TagPicker>
-      <SlButton onClick={(e) => onAddRecipe(e)}>
+      <SlButton onClick={(e) => {void onAddRecipe(e)}}>
         {submitLabel}
       </SlButton>
     </SlDialog>

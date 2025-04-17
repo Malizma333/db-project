@@ -1,10 +1,9 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { MutableRef, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
 import { changeUsername } from '../../api/user';
-import ShoelaceElement from '@shoelace-style/shoelace/dist/internal/shoelace-element';
 
 const styles = {
   inputField: {
@@ -18,7 +17,7 @@ export default function ChangeNameDialog() {
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const changeNameAlert: MutableRef<ShoelaceElement | null> = useRef(null);
+  const changeNameAlert = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -39,8 +38,10 @@ export default function ChangeNameDialog() {
     }
 
     onCloseDialog();
-    // @ts-expect-error
-    changeNameAlert.current && changeNameAlert.current.base.toast();
+    if (changeNameAlert.current !== null) {
+      // @ts-expect-error Not sure what to type this ref as
+      changeNameAlert.current.base.toast();
+    }
   }
 
   return (
@@ -50,7 +51,7 @@ export default function ChangeNameDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
-      {/* @ts-expect-error */}
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message="Changed username successfully" variant="success" ref={changeNameAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
@@ -70,7 +71,7 @@ export default function ChangeNameDialog() {
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => onChangeUsername()}>
+      <SlButton onClick={() => {void onChangeUsername()}}>
         Confirm
       </SlButton>
     </SlDialog>

@@ -95,7 +95,7 @@ function TableRow(
               <SlIconButton name="pencil" label="Edit Recipe" onClick={() => onEditRecipe()}></SlIconButton>
             </SlTooltip>
             <SlTooltip content="Delete Recipe">
-              <SlIconButton name="trash" label="Delete Recipe" onClick={() => onDeleteRecipe()}></SlIconButton>
+              <SlIconButton name="trash" label="Delete Recipe" onClick={() => {void onDeleteRecipe()}}></SlIconButton>
             </SlTooltip>
           </>}
         </div>

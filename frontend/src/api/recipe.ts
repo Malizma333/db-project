@@ -26,9 +26,9 @@ export async function addRecipe(
     authors,
     ingredients,
     allergens,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
@@ -40,9 +40,9 @@ export async function removeRecipe(recipe_name: string) {
     type: "remove_recipe",
     auth: session_auth.auth,
     recipe_name,
-  }),
+  });
 
-   data = await response.json();
+  const data: Record<string, string> = await response.json();
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));

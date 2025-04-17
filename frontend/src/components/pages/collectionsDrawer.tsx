@@ -1,9 +1,10 @@
-import { SlDrawer, SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
+import { SlDrawer, SlInput, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
 
-import { addRecipeCollection, removeRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
+import { addRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
 import { useState } from "preact/hooks";
 import { SlHideEvent } from "@shoelace-style/shoelace";
+import CollectionCard from "./collectionCard";
 
 const styles = {
   root: {
@@ -11,12 +12,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-  },
-  collectionTitle: {
-    alignItems: "center",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
   },
   collectionCard: {
     marginBottom: "1em",
@@ -27,7 +22,7 @@ const styles = {
 
 export default function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
-  const { data: collections } = useOwnedCollections();
+  const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
 
   function onHide(e: SlHideEvent) {
@@ -47,14 +42,6 @@ export default function CollectionsDrawer() {
     }
   }
 
-  async function onDeleteCollection(id: number) {
-    try {
-      await removeRecipeCollection(id);
-    } catch(e) {
-      console.error(e);
-    }
-  }
-
   return (
     <SlDrawer
       class="drawer-placement-start"
@@ -63,7 +50,7 @@ export default function CollectionsDrawer() {
       placement="start"
       label="Collections"
     >
-      {collections && (
+      {collectionIds !== undefined && (
         <div style={styles.root}>
           <SlInput
             style={styles.collectionCard}
@@ -73,44 +60,19 @@ export default function CollectionsDrawer() {
             value={searchTerm}
             onChange={(e) => setSearchTerm((e.target as any).value)}
           ></SlInput>
-          {collections && collections
-            .filter((collection) => collection.name.includes(searchTerm))
-            .map((collection) =>
-            (
-              <SlCard style={styles.collectionCard}>
-                <div slot="header" style={styles.collectionTitle}>
-                  <SlInput
-                    className="collectionsName"
-                    filled
-                    value={collection.name}
-                    placeholder={`Collection ${collection.id}`}
-                  ></SlInput>
-                  <SlCopyButton
-                    value={window.location.origin + "/" + collection.id}
-                    copyLabel="Share Collection"
-                    successLabel="Copied"
-                    errorLabel="Failed to copy"
-                  >
-                    <SlIcon name="share" slot="copy-icon"></SlIcon>
-                  </SlCopyButton>
-                  <SlTooltip content="Delete Collection">
-                    <SlIconButton
-                      name="trash"
-                      label="Delete Collection"
-                      onClick={() => onDeleteCollection(collection.id)}
-                    ></SlIconButton>
-                  </SlTooltip>
-                </div>
-                Included recipes: {collection.numRecipes}
-              </SlCard>
-            )
+          {collectionIds.map(
+            (collectionId) =>
+              <CollectionCard
+                collectionId={collectionId}
+                searchTerm={searchTerm}
+              ></CollectionCard>
           )}
           <SlTooltip content="Add Collection">
             <SlIconButton
               name="plus"
               label="Add Collection"
               style={{fontSize: "2em"}}
-              onClick={() => onCreateCollection()}
+              onClick={() => {void onCreateCollection()}}
             ></SlIconButton>
           </SlTooltip>
         </div>

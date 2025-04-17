@@ -1,10 +1,9 @@
 import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { MutableRef, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
 
 import { login } from '../../api/user';
-import ShoelaceElement from '@shoelace-style/shoelace/dist/internal/shoelace-element';
 
 const styles = {
   inputField: {
@@ -18,7 +17,7 @@ export default function LoginDialog() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const logInAlert: MutableRef<ShoelaceElement | null> = useRef(null);
+  const logInAlert = useRef(null);
 
   function onCloseDialog() {
     setMainView();
@@ -32,8 +31,10 @@ export default function LoginDialog() {
       await login(username, password);
       setClientUsername(username);
       onCloseDialog();
-      // @ts-expect-error
-      logInAlert.current && logInAlert.current.base.toast();
+      if (logInAlert.current !== null) {
+        // @ts-expect-error Not sure what to type this ref as
+        logInAlert.current.base.toast();
+      }
     } catch (e) {
       if (e instanceof Error) {
         setHelpText(e.message);
@@ -48,7 +49,7 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
-      {/* @ts-expect-error */}
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification message="Logged in successfully" variant="success" ref={logInAlert}></SlNotification>
       <SlInput
         style={styles.inputField}
@@ -67,7 +68,7 @@ export default function LoginDialog() {
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => onLogIn()}>
+      <SlButton onClick={() => {void onLogIn()}}>
         Log In
       </SlButton>
     </SlDialog>

@@ -75,11 +75,13 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   async function onLogOut() {
     await logout();
     setClientUsername("");
-    // @ts-expect-error
-    logOutAlert.current && logOutAlert.current.base.toast();
+    if (logOutAlert.current !== null) {
+      // @ts-expect-error Not sure what to type this ref as
+      logOutAlert.current.base.toast();
+    }
   }
 
-  function onMenuAction(item: ACTION) {
+  async function onMenuAction(item: ACTION) {
     switch(item) {
       case ACTION.VIEW_COLLECTIONS:
         setCollectionsView();
@@ -91,7 +93,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         setChangePassView();
         break;
       case ACTION.LOGOUT:
-        onLogOut();
+        await onLogOut();
         break;
       default:
         break;
@@ -100,7 +102,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
 
   return (
     <div style={styles.root}>
-      {/* @ts-expect-error */}
+      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification variant="success" message="Logged out successfully" ref={logOutAlert}></SlNotification>
       {loggedInFetching || !loggedIn ?
         (
@@ -113,7 +115,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
               initials={clientUsername[0]}
               label="Avatar with username initial"
             ></SlAvatar>
-            <SlMenu onSlSelect={(e) => onMenuAction(e.detail.item.value as ACTION)}>
+            <SlMenu onSlSelect={(e) => {void onMenuAction(e.detail.item.value as ACTION)}}>
               <SlMenuLabel className="userMenuLabel">{clientUsername}</SlMenuLabel>
               <SlMenuItem value={ACTION.VIEW_COLLECTIONS}>
                 View Collections
@@ -132,7 +134,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
           </SlDropdown>
         )
       }
-      {collectionDef && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => onRandomRecipe()}></SlIconButton>}
+      {collectionDef && <SlIconButton name="shuffle" label="Generate Random Recipe" onClick={() => {void onRandomRecipe()}}></SlIconButton>}
       {collectionDef && <SlIconButton name="sliders" label="Search Settings" onClick={() => setSettingsView()}></SlIconButton>}
       {collectionDef && <SlInput clearable type="search" placeholder={`Search ${collectionName}...`} style={{flex: "1"}}>
         <SlIconButton name="search" label="Run Search" slot="suffix"></SlIconButton>
