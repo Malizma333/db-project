@@ -49,7 +49,8 @@ class InputError(Exception):
         self.msg = msg
 
 
-# return username, if it fails return -1
+# TODO: every 100 requests clean old tokens?
+# return username, if it fails it raises an error
 def check_auth(token):
     if token in tokens:
         if time.time() < tokens[token][1]:
