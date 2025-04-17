@@ -59,11 +59,12 @@ export function getErrorMessage(responseData: Record<string, string>) {
 
 export async function makeRequest(jsonBody: Record<string, unknown>): Promise<Response> {
   try {
-    return await fetch('/api', {
+    const data = await fetch('/api', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jsonBody),
     });
+    return data;
   } catch (e) {
     return new Response(JSON.stringify({
         type: "bad_fetch_error",

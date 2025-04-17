@@ -57,7 +57,7 @@ export default function RecipeForm(
     setMainView();
   }
 
-  async function onAddRecipe(e: any) {
+  async function onAddRecipe(hideEvent: SlHideEvent) {
     try {
       if (viewState === VIEW.UPDATE_RECIPE_FORM) {
         await removeRecipe(selectedRecipeName);
@@ -71,7 +71,7 @@ export default function RecipeForm(
         selectedRecipe.allergens
       );
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
-      onCloseDialog(e);
+      onCloseDialog(hideEvent);
       if (submitAlert.current !== null) {
         // @ts-expect-error Not sure what to type this ref as
         submitAlert.current.base.toast();
