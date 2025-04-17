@@ -196,8 +196,8 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "include_ingredients": [<string>, ...],
   "exclude_ingredients": [<string>, ...],
   "authors": [<string>, ...],
-  "view min": <int>,
-  "view max": <int>
+  "view_min": <int>,
+  "view_max": <int>
 }
 ```
 
