@@ -131,6 +131,7 @@ def do_thing(body):
 
         # NOTE: This is assuming all inputs that function as an "include ___" will pass ALL already in database
         # in the case that the user does not want to specifically include an attribute (except recipe name)
+        # NOTE: View min and max go from 0 to n-1 in index
         elif body["type"] == "filter_recipe_collection":
             rec_name = "%" + body["recipe_name"] + "%"
             params = tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"]) + tuple(
@@ -162,6 +163,7 @@ def do_thing(body):
             temp = cursor.fetchall()
             conn.commit()
             recipies = []
+            result = []
             current_dict = {}
             names_in_rec_list = []
             for t in temp:
@@ -183,8 +185,19 @@ def do_thing(body):
                         current_dict["allergens"].append(t[3])
                     if t[4] not in current_dict["ingredients"]:
                         current_dict["ingredients"].append(t[4])
-            recipies.append(current_dict)
-            ret = {"type": "filter_recipe_collection_response", "recipies": recipies, "table_size": len(recipies)}
+            if len(current_dict) != 0:
+                recipies.append(current_dict)
+
+            if body["view_min"] > len(recipies)-1:
+                body["view_min"] = len(recipies) - 1
+            if body["view_max"] > len(recipies):
+                body["view_max"] = len(recipies)
+            if len(recipies) > 0:
+                for i in range(body["view_min"], body["view_max"]):
+                    print(i)
+                    result.append(recipies[i])
+
+            ret = {"type": "filter_recipe_collection_response", "recipies": result, "table_size": len(result)}
 
         elif body["type"] == "rename_recipe_collection":
             username = check_auth(body["auth"])
