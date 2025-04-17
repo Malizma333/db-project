@@ -36,7 +36,7 @@ export default function FourOFourPage() {
       </div>
       <div style={styles.art}>
 These should line up  v
-    some more s       ^
+<br/>    some more s       ^
       </div>
     </div>
   );
