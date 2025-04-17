@@ -7,30 +7,58 @@ For requests which error, one of the following is returned.
 ```
 400
 {
-  "type": "parse_failed",
+  "type": "parse_error",
+}
+```
+
+This error is for a key which should have been in the Client -> Server request,
+but was not found.
+
+```
+400
+{
+  "type": "key_error",
+  "key": <string>,
+}
+```
+
+This error is for database keys (like collection.id) that don't exist, maybe
+some other things later.
+
+```
+400
+{
+  "type": "resource_error",
+  "message": <string>,
 }
 ```
 
 ```
 400
 {
-  "type": "missing_keys",
-  "keys": [<key>, ...]
+  "type": "username_error",
 }
 ```
 
 ```
 400
 {
-  "type": "bad_values",
-  "values": [<value>, ...]
+  "type": "password_error",
 }
 ```
 
 ```
 400
 {
-  "type": "bad_auth_token",
+  "type": "auth_token_error",
+}
+```
+
+```
+500
+{
+  "type": "internal_server_error",
+  "message": <string>,
 }
 ```
 
@@ -51,7 +79,7 @@ For requests which error, one of the following is returned.
 ```
 200
 {
-  "type": "login response",
+  "type": "login_response",
   "auth": <string>,
   "lifetime": <int (seconds)>
 }
@@ -74,7 +102,7 @@ For requests which error, one of the following is returned.
 
 ```
 {
-  "type": "is logged in",
+  "type": "is_logged_in",
   "auth": <string>
 }
 ```
@@ -88,7 +116,7 @@ auth token.
 
 ```
 {
-  "type": "change username",
+  "type": "change_username",
   "auth": <string>,
   "password": <string>,
   "new_username": <string>
@@ -103,7 +131,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "change password",
+  "type": "change_password",
   "auth": <string>,
   "password": <string>,
   "new_password": <string>
@@ -118,7 +146,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "add recipe",
+  "type": "add_recipe",
   "auth": <string>,
   "collection_id": <int>,
   "recipe_name": <string>,
@@ -135,7 +163,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "remove recipe",
+  "type": "remove_recipe",
   "auth": <string>,
   "recipe_name": <string>
 }
@@ -147,7 +175,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "rename recipe",
+  "type": "rename_recipe",
   "auth": <string>,
   "recipe_name": <string>,
   "new_recipe_name": <string>,
@@ -160,7 +188,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "filter recipe collection",
+  "type": "filter_recipe_collection",
   "collection_id": <int>,
   "recipe_name": <string>,
   "include_allergens": [<string>, ...],
@@ -178,7 +206,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "filter recipe collection response",
+  "type": "filter_recipe_collection_response",
   "recipes": [
     {
       "name": <string>,
@@ -198,7 +226,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "rename recipe collection",
+  "type": "rename_recipe_collection",
   "auth": <string>,
   "id": <int>,
   "new_name": <string>
@@ -211,7 +239,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "add recipe collection",
+  "type": "add_recipe_collection",
   "auth": <string>,
   "name": <string>
 }
@@ -222,7 +250,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "add recipe collection response"
+  "type": "add_recipe_collection_response"
   "id": <int>
 }
 ```
@@ -233,7 +261,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "remove recipe collection",
+  "type": "remove_recipe_collection",
   "auth": <string>,
   "id": <int>
 }
@@ -245,7 +273,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "get owned recipe collections",
+  "type": "get_owned_recipe_collections",
   "auth": <string>
 }
 ```
@@ -255,7 +283,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "get owned recipe collections response",
+  "type": "get_owned_recipe_collections_response",
   "ids": [<int>, ...]
 }
 ```
@@ -266,7 +294,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "get allergens in collection",
+  "type": "get_allergens_in_collection",
   "id": <int>
 }
 ```
@@ -276,7 +304,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "get allergens in collection response",
+  "type": "get_allergens_in_collection_response",
   "allergens": [<string>, ...]
 }
 ```
@@ -287,7 +315,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "get ingredients in collection",
+  "type": "get_ingredients_in_collection",
   "id": <int>
 }
 ```
@@ -297,7 +325,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "get ingredients in collection response",
+  "type": "get_ingredients_in_collection_response",
   "ingredients": [<string>, ...]
 }
 ```
@@ -307,7 +335,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "get authors in collection",
+  "type": "get_authors_in_collection",
   "id": <int>
 }
 ```
@@ -317,7 +345,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "get authors in collection response",
+  "type": "get_authors_in_collection_response",
   "authours": [<string>, ...]
 }
 ```
@@ -328,7 +356,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "get collection name",
+  "type": "get_collection_name",
   "id": <int>
 }
 ```
@@ -338,7 +366,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "get collection name response",
+  "type": "get_collection_name_response",
   "collection_name": <string>
 }
 ```
@@ -349,7 +377,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "count recipes in collection",
+  "type": "count_recipes_in_collection",
   "id": <int>
 }
 ```
@@ -359,7 +387,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 ```
 200
 {
-  "type": "count recipes in collection response",
+  "type": "count_recipes_in_collection_response",
   "count": <int>
 }
 ```
@@ -370,7 +398,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "change reference",
+  "type": "change_reference",
   "auth": <string>,
   "recipe_name": <string>,
   "reference": <string>
@@ -383,7 +411,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "add allergen",
+  "type": "add_allergen",
   "auth": <string>,
   "recipe_name": <string>,
   "allergen": <string>
@@ -396,7 +424,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "append allergen",
+  "type": "append_allergen",
   "allergen_name": <string>
 }
 ```
@@ -407,7 +435,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "remove allergen",
+  "type": "remove_allergen",
   "auth": <string>,
   "recipe_name": <string>,
   "allergen": <string>
@@ -420,7 +448,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "add ingredient",
+  "type": "add_ingredient",
   "auth": <string>,
   "recipe_name": <string>,
   "ingredient": <string>
@@ -433,7 +461,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "append ingredient",
+  "type": "append_ingredient",
   "ingredient_name": <string>
 }
 ```
@@ -444,7 +472,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "remove ingredient",
+  "type": "remove_ingredient",
   "auth": <string>,
   "recipe_name": <string>,
   "ingredient": <string>
@@ -457,7 +485,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "add author",
+  "type": "add_author",
   "auth": <string>,
   "recipe_name": <string>,
   "author": <string>
@@ -470,7 +498,7 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
 
 ```
 {
-  "type": "remove author",
+  "type": "remove_author",
   "auth": <string>,
   "recipe_name": <string>,
   "author": <string>

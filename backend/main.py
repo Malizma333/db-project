@@ -84,7 +84,7 @@ def do_thing(body):
         elif body["type"] == "logout":
             print("logout doesn't work")
         elif body["type"] == "is_logged_in":
-            print("is logged in doesn't work")
+            check_auth(body["auth"])
         elif body["type"] == "change_username":
             print("change username doesn't work")
         elif body["type"] == "change_password":
