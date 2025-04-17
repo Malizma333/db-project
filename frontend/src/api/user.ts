@@ -1,14 +1,17 @@
 import { getErrorMessage, makeRequest } from "./api";
 import { useQuery } from "@tanstack/react-query";
 
-export let session_auth = null;
+interface AuthInfo {
+  auth: string,
+  lifetime: number
+};
 
-/**
- * Log in with username and password to create auth
- * @param {string} username
- * @param {string} password
- */
-export async function login(username, password) {
+export let session_auth: AuthInfo = {
+  auth: "",
+  lifetime: -1
+};
+
+export async function login(username: string, password: string) {
   const response = await makeRequest({
     type: "login",
     username,
@@ -27,9 +30,6 @@ export async function login(username, password) {
   }
 }
 
-/**
- * Logs out and forgets auth
- */
 export async function logout() {
   const response = await makeRequest({
     type: "logout",
@@ -42,7 +42,10 @@ export async function logout() {
     throw new Error(getErrorMessage(data));
   }
 
-  session_auth = null;
+  session_auth = {
+    auth: "",
+    lifetime: -1
+  };
 }
 
 async function loggedIn() {
@@ -58,10 +61,6 @@ async function loggedIn() {
   return response.status === 200;
 }
 
-/**
- * Checks if logged in
- * @returns {import("@tanstack/react-query").UseQueryResult<boolean>} Logged in
- */
 export function useLoggedIn() {
   return useQuery({
     queryKey: ['loggedIn'],
@@ -69,12 +68,7 @@ export function useLoggedIn() {
   })
 }
 
-/**
- * Changes username
- * @param {string} password
- * @param {string} new_username
- */
-export async function changeUsername(password, new_username) {
+export async function changeUsername(password: string, new_username: string) {
   const response = await makeRequest({
     type: "change_username",
     auth: session_auth.auth,
@@ -89,12 +83,7 @@ export async function changeUsername(password, new_username) {
   }
 }
 
-/**
- * Changes password
- * @param {string} password
- * @param {string} new_password
- */
-export async function changePassword(password, new_password) {
+export async function changePassword(password: string, new_password: string) {
   const response = await makeRequest({
     type: "change_password",
     auth: session_auth.auth,

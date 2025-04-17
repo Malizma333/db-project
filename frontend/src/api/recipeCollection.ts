@@ -1,6 +1,19 @@
 import { getErrorMessage, makeRequest } from "./api";
 import { useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
+import { Recipe } from "./recipe";
+
+interface FilterParams {
+  collection_id: number,
+  recipe_name: string,
+  include_allergens: string[],
+  exclude_allergens: string[],
+  include_ingredients: string[],
+  exclude_ingredients: string[],
+  authors: string[],
+  view_min: number,
+  view_max: number
+}
 
 export async function filterRecipeCollection({
   collection_id,
@@ -12,7 +25,7 @@ export async function filterRecipeCollection({
   authors,
   view_min,
   view_max
-}) {
+}: FilterParams): Promise<Recipe[]> {
   const response = await makeRequest({
     type: "filter_recipe_collection",
     collection_id,
@@ -35,34 +48,14 @@ export async function filterRecipeCollection({
   return data.recipes;
 }
 
-/**
- * Filters the recipe collection
- * @param {{
- *   collection_id: number,
- *   recipe_name: string,
- *   include_allergens: string[],
- *   exclude_allergens: string[],
- *   include_ingredients: string[],
- *   exclude_ingredients: string[],
- *   authors: string[],
- *   view_min: number,
- *   view_max: number
- * }} props
- * @returns {Record<string, any>[]} Recipe list
- */
-export function useFilterCollection(props) {
+export function useFilterCollection(props: FilterParams) {
   return useQuery({
     queryKey: ['filterCollection', props.collection_id],
     queryFn: () => filterRecipeCollection(props),
   })
 }
 
-/**
- * Renames recipe collection
- * @param {number} id
- * @param {string} new_name
- */
-export async function renameRecipeCollection(id, new_name) {
+export async function renameRecipeCollection(id: number, new_name: string) {
   const response = await makeRequest({
     type: "rename_recipe_collection",
     auth: session_auth.auth,
@@ -77,12 +70,7 @@ export async function renameRecipeCollection(id, new_name) {
   }
 }
 
-/**
- * Adds recipe collection
- * @param {string} name
- * @returns {Promise<number>} Added collection id
- */
-export async function addRecipeCollection(name) {
+export async function addRecipeCollection(name: string): Promise<number> {
   const response = await makeRequest({
     type: "add_recipe_collection",
     auth: session_auth.auth,
@@ -98,11 +86,7 @@ export async function addRecipeCollection(name) {
   return data.id;
 }
 
-/**
- * Removes recipe collection
- * @param {Promise<number>} id
- */
-export async function removeRecipeCollection(id) {
+export async function removeRecipeCollection(id: number) {
   const response = await makeRequest({
     type: "remove_recipe_collection",
     auth: session_auth.auth,
@@ -116,11 +100,7 @@ export async function removeRecipeCollection(id) {
   }
 }
 
-/**
- * Get list of owned recipe collections
- * @returns {Promise<number[]>} List of recipe collection ids
- */
-async function getOwnedRecipeCollections() {
+async function getOwnedRecipeCollections(): Promise<number[]> {
   const response = await makeRequest({
     type: "get_owned_recipe_collections",
     auth: session_auth.auth,
@@ -142,12 +122,7 @@ export function useOwnedCollections() {
   })
 }
 
-/**
- * Get list of allergens in collection
- * @param {number} collection_id Target collection
- * @returns {Promise<string[]>} List of allergens
- */
-async function getAllergensFromCollection(id) {
+async function getAllergensFromCollection(id: number): Promise<string[]> {
   const response = await makeRequest({
     type: "get_allergens_in_collection",
     auth: session_auth.auth,
@@ -163,19 +138,14 @@ async function getAllergensFromCollection(id) {
   return data.allergens;
 }
 
-export function useCollectionAllergens(collection_id) {
+export function useCollectionAllergens(collection_id: number) {
   return useQuery({
     queryKey: ['collectionAllergens'],
     queryFn: () => getAllergensFromCollection(collection_id),
   })
 }
 
-/**
- * Get list of ingredients in collection
- * @param {number} collection_id Target collection
- * @returns {Promise<string[]>} List of ingredients
- */
-async function getIngredientsFromCollection(id) {
+async function getIngredientsFromCollection(id: number): Promise<string[]> {
   const response = await makeRequest({
     type: "get_ingredients_in_collection",
     auth: session_auth.auth,
@@ -191,19 +161,14 @@ async function getIngredientsFromCollection(id) {
   return data.ingredients;
 }
 
-export function useCollectionIngredients(collection_id) {
+export function useCollectionIngredients(collection_id: number) {
   return useQuery({
     queryKey: ['collectionIngredients'],
     queryFn: () => getIngredientsFromCollection(collection_id),
   })
 }
 
-/**
- * Get list of authors in collection
- * @param {number} collection_id Target collection
- * @returns {Promise<string[]>} List of authors
- */
-async function getAuthorsFromCollection(id) {
+async function getAuthorsFromCollection(id: number): Promise<string[]> {
   const response = await makeRequest({
     type: "get_authors_in_collection",
     auth: session_auth.auth,
@@ -219,19 +184,14 @@ async function getAuthorsFromCollection(id) {
   return data.authors;
 }
 
-export function useCollectionAuthors(collection_id) {
+export function useCollectionAuthors(collection_id: number) {
   return useQuery({
     queryKey: ['collectionAuthors'],
     queryFn: () => getAuthorsFromCollection(collection_id),
   })
 }
 
-/**
- * Count recipes in collection
- * @param {number} collection_id Target collection
- * @returns {Promise<number>} Count of recipes
- */
-async function getRecipeCount(id) {
+async function getRecipeCount(id: number): Promise<number> {
   const response = await makeRequest({
     type: "count_recipes_in_collection",
     auth: session_auth.auth,
@@ -247,19 +207,14 @@ async function getRecipeCount(id) {
   return data.count;
 }
 
-export function useRecipeCount(collection_id) {
+export function useRecipeCount(collection_id: number) {
   return useQuery({
     queryKey: ['recipeCount'],
     queryFn: () => getRecipeCount(collection_id),
   })
 }
 
-/**
- * Get name of collection
- * @param {number} collection_id Target collection
- * @returns {Promise<string>} Name of collection
- */
-async function getRecipeCollectionName(id) {
+async function getRecipeCollectionName(id: number): Promise<string> {
   const response = await makeRequest({
     type: "get_collection_name",
     auth: session_auth.auth,
@@ -275,7 +230,7 @@ async function getRecipeCollectionName(id) {
   return data.name;
 }
 
-export function useCollectionName(collection_id) {
+export function useCollectionName(collection_id: number) {
   return useQuery({
     queryKey: ['collectionName'],
     queryFn: () => getRecipeCollectionName(collection_id),

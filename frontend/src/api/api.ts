@@ -47,7 +47,7 @@ export function getErrorMessage(responseData: Record<string, string>) {
   return message;
 }
 
-export async function makeRequest(jsonBody: Record<string, string>): Promise<Response> {
+export async function makeRequest(jsonBody: Record<string, any>): Promise<Response> {
   try {
     return await fetch('api', {
       method: "POST",

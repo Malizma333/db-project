@@ -1,6 +1,14 @@
 import { getErrorMessage, makeRequest } from "./api";
 import { session_auth } from "./user";
 
+export interface Recipe {
+  recipeName: string,
+  reference: string,
+  authors: string[],
+  ingredients: string[],
+  allergens: string[],
+}
+
 export async function addRecipe(
   collection_id: number,
   recipe_name: string,
