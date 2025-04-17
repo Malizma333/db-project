@@ -9,14 +9,14 @@ import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
-import { useAppStore, VIEW } from './store';
+import { VIEW } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
 
-import { useFilterCollection, useOwnedCollections } from './api/recipeCollection';
+import { useOwnedCollections } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
 
@@ -39,8 +39,6 @@ const styles: Record<string, React.CSSProperties> = {
 }
 
 export default function App() {
-  const { page, numRowsPerPage } = useAppStore();
-
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
@@ -48,17 +46,6 @@ export default function App() {
 
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
-  const { data: tableData } = useFilterCollection({
-    collection_id: collectionId,
-    recipe_name: "",
-    include_allergens: [],
-    exclude_allergens: [],
-    include_ingredients: [],
-    exclude_ingredients: [],
-    authors: [],
-    view_min: page * numRowsPerPage,
-    view_max: (page + 1) * numRowsPerPage
-  });
 
   const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(collectionId));
 
@@ -73,7 +60,6 @@ export default function App() {
       {collectionDef ?
         <>
           <Table
-            pageData={tableData || []}
             editMode={editMode}
           ></Table>
           <PageNav></PageNav>

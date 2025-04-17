@@ -10,39 +10,52 @@ export const queryClient = new QueryClient({
 
 export function getErrorMessage(responseData: Record<string, string>) {
   const ERROR_MSGS = {
-    parse_failed: "[ERROR] Parse failed",
-    missing_keys: "[ERROR] Missing keys:",
-    bad_values: "[ERROR] Bad values:",
-    bad_auth_token: "[ERROR] Bad authentication token",
-    bad_fetch: "[ERROR] Bad fetch:",
+    parse_error: "[ERROR] Parse failed!",
+    auth_token_error: "[ERROR] Bad authentication token!",
+    bad_fetch_error: "[ERROR] Bad fetch: ",
+    resource_error: "[ERROR] Invalid resource: ",
+    username_error: "[ERROR] Bad username!",
+    password_error: "[ERROR] Bad password!",
+    internal_server_error: "[ERROR] Robert or Bre screwed up: "
   };
 
   let message = "Unknown error";
 
   switch (responseData.type) {
-    case "missing_keys": {
-      message = ERROR_MSGS[responseData.type] + JSON.stringify(responseData.keys);
-      break;
-    }
-    case "bad_values": {
-      message = ERROR_MSGS[responseData.type] + JSON.stringify(responseData.values);
-      break;
-    }
-    case "bad_fetch": {
+    case "bad_fetch_error": {
       message = ERROR_MSGS[responseData.type] + responseData.message;
       break;
     }
-    case "bad_auth_token": {
+    case "auth_token_error": {
       message = ERROR_MSGS[responseData.type];
       break;
     }
-    case "parse_failed": {
+    case "parse_error": {
       message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "resource_error": {
+      message = ERROR_MSGS[responseData.type] + responseData.message;
+      break;
+    }
+    case "username_error": {
+      message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "password_error": {
+      message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "internal_server_error": {
+      message = ERROR_MSGS[responseData.type] + responseData.message;
       break;
     }
     default:
       break;
   }
+
+  console.log(responseData);
+  console.error(message);
 
   return message;
 }
@@ -56,7 +69,7 @@ export async function makeRequest(jsonBody: Record<string, unknown>): Promise<Re
     });
   } catch (e) {
     return new Response(JSON.stringify({
-        type: "bad_fetch",
+        type: "bad_fetch_error",
         message: (e as Error).message
       }), {
         status: 400,

@@ -4,6 +4,8 @@ import { COLUMN_MASK, useAppStore } from '../../store';
 
 import { Recipe, removeRecipe } from '../../api/recipe';
 import { useQueryClient } from '@tanstack/react-query';
+import { useFilterCollection } from 'src/api/recipeCollection';
+import { useParams } from 'react-router';
 
 const styles = {
   root: {
@@ -105,10 +107,25 @@ function TableRow(
 }
 
 export default function Table(
-  { pageData, editMode } :
-  { pageData: Recipe[], editMode: boolean }
+  { editMode } :
+  { editMode: boolean }
 ) {
-  const { getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
+  const { page, numRowsPerPage, getColumnVisible, setNewRecipeView, setSelectedRecipe } = useAppStore();
+
+  const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
+
+  const { data: pageData } = useFilterCollection({
+    collection_id: collectionId,
+    recipe_name: "",
+    include_allergens: [],
+    exclude_allergens: [],
+    include_ingredients: [],
+    exclude_ingredients: [],
+    authors: [],
+    view_min: page * numRowsPerPage,
+    view_max: (page + 1) * numRowsPerPage
+  });
 
   function onCreateRecipe() {
     setSelectedRecipe({
@@ -139,7 +156,7 @@ export default function Table(
           </div>
         </div>
       </SlCard>
-      {pageData.map((row) => {
+      {pageData !== undefined && pageData.map((row) => {
         return <TableRow editMode={editMode} rowData={row}></TableRow>;
       })}
     </div>
