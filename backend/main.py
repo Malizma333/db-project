@@ -3,9 +3,11 @@ import hashlib
 from http import server
 import json
 import os
+import random
 import sqlite3
 import string
 import threading
+import time
 import traceback
 
 FILE_ROOT = os.path.join("..", "frontend", "dist")
@@ -30,13 +32,30 @@ for root, dirs, files in os.walk(FILE_ROOT):
 
 TOKEN_LENGTH = 30
 TOKEN_CHARS = string.ascii_letters + string.digits
+# time in seconds
+TOKEN_LIFETIME = 30*60
 
 db_lock = threading.Lock()
 
 
+# token: (username, expiration time)
+tokens = dict()
+
+
+class InputError(Exception):
+    def __init__(self, t, msg=None):
+        self.t = t
+        self.msg = msg
+
+
 # return username, if it fails return -1
 def check_auth(token):
-    return "username"
+    if token in tokens:
+        if time.time() < tokens[token][1]:
+            return tokens[token][0]
+        else:
+            del tokens[token]
+    raise InputError("auth_token_error")
 
 
 # This is where most db calls get handled. takes in parsed json. outputs object
@@ -51,16 +70,17 @@ def do_thing(body):
             cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?", (body["username"],))
             results = cursor.fetchall()
             if len(results) != 1:
-                print(f"ruh roh: {results}")
-                exit()
+                raise InputError("username_error")
             r = results[0]
             hash_bytes = base64.b64decode(r[0].encode("utf-8"))
             salt_bytes = base64.b64decode(r[1].encode("utf-8"))
             trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", body["password"].encode("utf-8"), salt_bytes, 100_000)
             if hash_bytes == trial_hash_bytes:
-                ret = {"type": "login_response", "auth": "it worked!", "lifetime": "forever man"}
+                token = "".join(random.choices(TOKEN_CHARS, k=TOKEN_LENGTH))
+                tokens[token] = (body["username"], time.time() + TOKEN_LIFETIME)
+                ret = {"type": "login_response", "auth": token, "lifetime": TOKEN_LIFETIME}
             else:
-                ret = {"type": "login_response", "auth": "stinky", "lifetime": "never"}
+                raise InputError("password_error")
         elif body["type"] == "logout":
             print("logout doesn't work")
         elif body["type"] == "is_logged_in":
@@ -73,48 +93,39 @@ def do_thing(body):
         # stuff above not implemented
         elif body["type"] == "add_recipe":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                recipe_params = (body["recipe_name"], body["reference"], username)
-                stores_params = (body["collection_id"], body["recipe_name"], username)
-                cursor.execute(f"""INSERT INTO Recipe VALUES(?,?,?)""", recipe_params)
-                # may need to check if collection id is valid?
-                cursor.execute(f"""INSERT INTO Stores 
-                VALUES(?,?,?)""", stores_params)
-                for ing in body["ingredients"]:
-                    cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
-                    cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""",
-                                   (body["recipe_name"], username, ing))
-                for alg in body["allergens"]:
-                    cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
-                    cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""",
-                                   (body["recipe_name"], username, alg))
-                for aut in body["authors"]:
-                    cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""",
-                                   (body["recipe_name"], username, aut))
+            recipe_params = (body["recipe_name"], body["reference"], username)
+            stores_params = (body["collection_id"], body["recipe_name"], username)
+            cursor.execute(f"""INSERT INTO Recipe VALUES(?,?,?)""", recipe_params)
+            # may need to check if collection id is valid?
+            cursor.execute(f"""INSERT INTO Stores
+            VALUES(?,?,?)""", stores_params)
+            for ing in body["ingredients"]:
+                cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [ing])
+                cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""",
+                                (body["recipe_name"], username, ing))
+            for alg in body["allergens"]:
+                cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [alg])
+                cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""",
+                                (body["recipe_name"], username, alg))
+            for aut in body["authors"]:
+                cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""",
+                                (body["recipe_name"], username, aut))
 
-                conn.commit()
+            conn.commit()
 
         elif body["type"] == "remove_recipe":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                cursor.execute("DELETE FROM Recipe WHERE recipe_name = ? "
-                               "AND owned_by = ?", (body["recipe_name"], username))
-                conn.commit()
+            cursor.execute("DELETE FROM Recipe WHERE recipe_name = ? "
+                            "AND owned_by = ?", (body["recipe_name"], username))
+            conn.commit()
 
         # NOTE: Collection_id does not need to be passed in since recipe name is a primary key already (I think)
         elif body["type"] == "rename_recipe":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["new_recipe_name"], body["recipe_name"], username)
-                cursor.execute(f"""UPDATE Recipe SET recipe_name == ? 
-                WHERE recipe_name = ? AND owned_by = ?""", params)
-                conn.commit()
+            params = (body["new_recipe_name"], body["recipe_name"], username)
+            cursor.execute(f"""UPDATE Recipe SET recipe_name == ?
+            WHERE recipe_name = ? AND owned_by = ?""", params)
+            conn.commit()
 
         # TODO NOT FINISHED
         elif body["type"] == "filter_recipe_collection":
@@ -145,52 +156,40 @@ def do_thing(body):
 
         elif body["type"] == "rename_recipe_collection":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["new_name"], body["id"], username)
-                cursor.execute(f"""UPDATE RecipeCollection SET collection_name == ? 
-                                WHERE collection_id = ? AND managed_by = ?""", params)
-                conn.commit()
+            params = (body["new_name"], body["id"], username)
+            cursor.execute(f"""UPDATE RecipeCollection SET collection_name == ?
+                            WHERE collection_id = ? AND managed_by = ?""", params)
+            conn.commit()
 
         elif body["type"] == "add_recipe_collection":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                collect_params = (body["name"], None, username)
-                cursor.execute(f"""INSERT INTO RecipeCollection VALUES(?,?,?)""", collect_params)
-                conn.commit()
-                cursor.execute(f"""SELECT collection_id FROM RecipeCollection 
-                WHERE collection_name = ? AND managed_by = ?""", (body["name"], username))
-                conn.commit()
-                temp = cursor.fetchall()
-                co_id = temp[0][0]
-                ret = {"type": "add_recipe_collection_response", "id": co_id}
+            collect_params = (body["name"], None, username)
+            cursor.execute(f"""INSERT INTO RecipeCollection VALUES(?,?,?)""", collect_params)
+            conn.commit()
+            cursor.execute(f"""SELECT collection_id FROM RecipeCollection
+            WHERE collection_name = ? AND managed_by = ?""", (body["name"], username))
+            conn.commit()
+            temp = cursor.fetchall()
+            co_id = temp[0][0]
+            ret = {"type": "add_recipe_collection_response", "id": co_id}
 
         elif body["type"] == "remove_recipe_collection":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["id"], username)
-                cursor.execute(f"""DELETE FROM RecipeCollection WHERE collection_id = ?
-                AND managed_by = ?""", params)
-                conn.commit()
+            params = (body["id"], username)
+            cursor.execute(f"""DELETE FROM RecipeCollection WHERE collection_id = ?
+            AND managed_by = ?""", params)
+            conn.commit()
 
         elif body["type"] == "get_owned_recipe_collections":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                cursor.execute("""SELECT collection_id FROM RecipeCollection 
-                WHERE managed_by = ?""", [username])
-                temp = cursor.fetchall()
-                conn.commit()
-                ids = []
-                for t in temp:
-                    ids.append(t[0])
-                ret = {"type": "get_owned_recipe_collections_response", "ids": ids}
+            cursor.execute("""SELECT collection_id FROM RecipeCollection
+            WHERE managed_by = ?""", [username])
+            temp = cursor.fetchall()
+            conn.commit()
+            ids = []
+            for t in temp:
+                ids.append(t[0])
+            ret = {"type": "get_owned_recipe_collections_response", "ids": ids}
 
         # NOTE: This query doesn't require authentification (no auth passed)
         elif body["type"] == "get_allergens_in_collection":
@@ -232,6 +231,8 @@ def do_thing(body):
             cursor.execute(f"""SELECT collection_name FROM RecipeCollection WHERE collection_id = ?""", [body["id"]])
             temp = cursor.fetchall()
             conn.commit()
+            if len(temp) != 1:
+                raise InputError("resource_error", "Bad collection ID")
             name = temp[0][0]
             ret = {"type": "get_collection_name_response", "collection_name": name}
 
@@ -245,23 +246,17 @@ def do_thing(body):
 
         elif body["type"] == "change_reference":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["reference"], body["recipe_name"], username)
-                cursor.execute(f"""UPDATE Recipe SET reference == ? 
-                WHERE recipe_name = ? AND owned_by = ?""", params)
-                conn.commit()
+            params = (body["reference"], body["recipe_name"], username)
+            cursor.execute(f"""UPDATE Recipe SET reference == ?
+            WHERE recipe_name = ? AND owned_by = ?""", params)
+            conn.commit()
 
         elif body["type"] == "add_allergen":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["allergen"])
-                cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen"]])
-                cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["allergen"])
+            cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen"]])
+            cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
+            conn.commit()
 
         elif body["type"] == "append_allergen":
             cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen_name"]])
@@ -269,23 +264,17 @@ def do_thing(body):
 
         elif body["type"] == "remove_allergen":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["allergen"],)
-                cursor.execute(f"""DELETE FROM Contains WHERE recipe_name = ? AND owned_by = ? 
-                AND allergen_name = ?""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["allergen"],)
+            cursor.execute(f"""DELETE FROM Contains WHERE recipe_name = ? AND owned_by = ?
+            AND allergen_name = ?""", params)
+            conn.commit()
 
         elif body["type"] == "add_ingredient":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["ingredient"])
-                cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient"]])
-                cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["ingredient"])
+            cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient"]])
+            cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""", params)
+            conn.commit()
 
         elif body["type"] == "append_ingredient":
             cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient_name"]])
@@ -293,32 +282,23 @@ def do_thing(body):
 
         elif body["type"] == "remove_ingredient":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["ingredient"],)
-                cursor.execute(f"""DELETE FROM Composes WHERE recipe_name = ? AND owned_by = ? 
-                                AND ingredient_name = ?""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["ingredient"],)
+            cursor.execute(f"""DELETE FROM Composes WHERE recipe_name = ? AND owned_by = ?
+                            AND ingredient_name = ?""", params)
+            conn.commit()
 
         elif body["type"] == "add_author":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["author"])
-                cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["author"])
+            cursor.execute(f"""INSERT INTO Author VALUES(?,?,?)""", params)
+            conn.commit()
 
         elif body["type"] == "remove_author":
             username = check_auth(body["auth"])
-            if username == -1:
-                ret = {"type": "bad_auth_token"}
-            else:
-                params = (body["recipe_name"], username, body["author"],)
-                cursor.execute(f"""DELETE FROM Author WHERE recipe_name = ? AND owned_by = ?
-                                                AND author_name = ?""", params)
-                conn.commit()
+            params = (body["recipe_name"], username, body["author"],)
+            cursor.execute(f"""DELETE FROM Author WHERE recipe_name = ? AND owned_by = ?
+                                            AND author_name = ?""", params)
+            conn.commit()
 
         conn.close()
     return ret
@@ -333,8 +313,10 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         ret = 200
         if p == "/":
             p = "/index.html"
+        elif p.startswith("/collection/"):
+            p = "/index.html"
         elif p not in SERVABLE:
-            p = "/404.html"
+            p = "/index.html"
             ret = 404
 
         self.send_response(ret)
@@ -360,6 +342,12 @@ class RequestHandler(server.BaseHTTPRequestHandler):
                 ret_type = 400
             except KeyError as E:
                 ret = {"type": "key_error", "key": E.args[0]}
+                ret_type = 400
+            except InputError as E:
+                if E.msg == None:
+                    ret = {"type": E.t}
+                else:
+                    ret = {"type": E.t, "message": E.msg}
                 ret_type = 400
             except Exception as E:
                 msg = traceback.format_exc()
