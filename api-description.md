@@ -196,8 +196,8 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "include_ingredients": [<string>, ...],
   "exclude_ingredients": [<string>, ...],
   "authors": [<string>, ...],
-  "view_min": <int>,
-  "view_max": <int>,
+  "view min": <int>,
+  "view max": <int>
 }
 ```
 
@@ -210,13 +210,14 @@ Note that if the password is wrong, a `400` of type `bad_values` is returned.
   "recipes": [
     {
       "name": <string>,
-      "author": <string>,
+      "authors": [<string>, ...],
       "reference": <string>,
       "allergens": [<string>, ...],
       "ingredients": [<string>, ...],
       "owner": <string>,
     }, ...
   ],
+  "table_size": <int>
 }
 ```
 

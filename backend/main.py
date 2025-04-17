@@ -129,32 +129,62 @@ def do_thing(body):
             WHERE recipe_name = ? AND owned_by = ?""", params)
             conn.commit()
 
-        # TODO NOT FINISHED
+        # NOTE: This is assuming all inputs that function as an "include ___" will pass ALL already in database
+        # in the case that the user does not want to specifically include an attribute (except recipe name)
         elif body["type"] == "filter_recipe_collection":
-            ings = tuple(body["exclude_ingredients"])
-            algs = tuple(body["exclude_allergens"])
-            params = algs + ings + tuple([body["collection_id"]])
-            print(params)
-            cursor.execute(f"""SELECT * FROM STORES AS S 
+            rec_name = "%" + body["recipe_name"] + "%"
+            params = tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"]) + tuple(
+                body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
+                body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
+            cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name, 
+            Com.ingredient_name, T1.owned_by
+            FROM (SELECT S.recipe, S.owned_by FROM STORES AS S 
             WHERE NOT EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["exclude_allergens"]))})
             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
             AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["exclude_ingredients"]))})
             AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
-            AND S.collection_id = ?""", (params))
-            # JOIN Contains AS Cot ON S.recipe = Cot.recipe_name AND S.owned_by = Cot.owned_by
-            # JOIN Composes AS Com ON S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by
-            # (Cot.allergen_name IN ({','.join(['?']*len(body["exclude_allergens"]))})
-            # OR Com.ingredient_name IN ({','.join(['?']*len(body["exclude_ingredients"]))}));, [body["collection_id"], algs, ings])
+            AND EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["include_allergens"]))})
+            AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
+            AND EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["include_ingredients"]))})
+            AND S.recipe = Com.recipe_name AND Com.owned_by = S.owned_by)
+            AND EXISTS (SELECT * FROM Author AS A WHERE A.author_name IN ({','.join(['?'] * len(body["authors"]))})
+            AND S.recipe = A.recipe_name AND S.owned_by = A.owned_by)
+            AND S.recipe LIKE ?
+            AND S.collection_id = ?) AS T1
+
+            LEFT JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
+            JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
+            LEFT JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
+            JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
+
+            ORDER BY T1.recipe""", (params))
 
             temp = cursor.fetchall()
             conn.commit()
-            stuff = []
+            recipies = []
+            current_dict = {}
+            names_in_rec_list = []
             for t in temp:
-                stuff.append(t)
-            ret = {"type": "get_allergen_in_collection_response", "recipe&owned": stuff}
-
-
-
+                if t[0] not in names_in_rec_list:
+                    if len(current_dict) != 0:
+                        recipies.append(current_dict)
+                        current_dict = {}
+                    names_in_rec_list.append(t[0])
+                    current_dict["name"] = t[0]
+                    current_dict["authors"] = [t[1]]
+                    current_dict["reference"] = t[2]
+                    current_dict["allergens"] = [t[3]]
+                    current_dict["ingredients"] = [t[4]]
+                    current_dict["owner"] = t[5]
+                else:
+                    if t[1] not in current_dict["authors"]:
+                        current_dict["authors"].append(t[1])
+                    if t[3] not in current_dict["allergens"]:
+                        current_dict["allergens"].append(t[3])
+                    if t[4] not in current_dict["ingredients"]:
+                        current_dict["ingredients"].append(t[4])
+            recipies.append(current_dict)
+            ret = {"type": "filter_recipe_collection_response", "recipies": recipies, "table_size": len(recipies)}
 
         elif body["type"] == "rename_recipe_collection":
             username = check_auth(body["auth"])
@@ -399,8 +429,6 @@ if not os.path.isfile("recipe.db"):
     # can't test otherwise due to foreign key constraints
     # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
     # add FOREIGN KEY(owned_by) REFERENCES Account(username) to Recipe
-    # for remove ingredient and allergen: should I remove these from alg/ing
-    # if there are none in any current recipies?
 
     conn.commit()
     print("meow >:3")
