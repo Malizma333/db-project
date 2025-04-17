@@ -1,6 +1,6 @@
 import { SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { removeRecipeCollection, useCollectionName, useRecipeCount } from "src/api/recipeCollection";
+import { removeRecipeCollection, renameRecipeCollection, useCollectionName, useRecipeCount } from "src/api/recipeCollection";
 
 const styles = {
   collectionTitle: {
@@ -25,11 +25,6 @@ export default function CollectionCard(
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
-  console.log("Search", searchTerm);
-  console.log("Collection id", collectionId);
-  console.log("Collection name", collectionName);
-  console.log("Collection recipes", recipeCount);
-
   async function onDeleteCollection(id: number) {
     try {
       await removeRecipeCollection(id);
@@ -39,13 +34,28 @@ export default function CollectionCard(
     }
   }
 
-  return (collectionName === undefined || !collectionName.includes(searchTerm)) ? null : (
+  async function onRenameCollection(id: number, newName: string) {
+    try {
+      await renameRecipeCollection(id, newName);
+      await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
+    } catch(e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+    }
+  }
+
+  return (
+    collectionName === undefined ||
+    !collectionName.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+  ) ? null : (
     <SlCard style={styles.collectionCard}>
       <div slot="header" style={styles.collectionTitle}>
         <SlInput
           className="collectionsName"
           filled
           value={collectionName}
+          onSlBlur={(e) => {void onRenameCollection(collectionId, (e.target as any).value)}}
         ></SlInput>
         <SlCopyButton
           value={window.location.origin + "/collection/" + collectionId}

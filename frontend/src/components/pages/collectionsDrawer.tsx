@@ -41,9 +41,10 @@ export default function CollectionsDrawer() {
     try {
       await addRecipeCollection("New Collection");
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
-      await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
     } catch(e) {
-      console.error(e);
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
     }
   }
 
@@ -63,7 +64,7 @@ export default function CollectionsDrawer() {
             type="search"
             placeholder="Find a collection..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm((e.target as any).value)}
+            onSlChange={(e) => setSearchTerm((e.target as any).value)}
           ></SlInput>
           {collectionIds.map(
             (collectionId) =>

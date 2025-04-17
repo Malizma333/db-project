@@ -228,7 +228,7 @@ async function getRecipeCollectionName(id: number): Promise<string> {
     throw new Error(getErrorMessage(data));
   }
 
-  return data.name;
+  return data.collection_name;
 }
 
 export function useCollectionName(collection_id: number) {
