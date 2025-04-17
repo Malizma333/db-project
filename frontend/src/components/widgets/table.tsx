@@ -66,7 +66,7 @@ function TableRow(
   }
 
   async function onDeleteRecipe() {
-    await removeRecipe(rowData.recipeName);
+    await removeRecipe(rowData.name);
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   }
 
@@ -74,7 +74,7 @@ function TableRow(
     <SlCard style={{"--border-radius": "0"}}>
       <div style={styles.row}>
         {getColumnVisible(COLUMN_MASK.NAME) && <div style={styles.cell}>
-          {rowData.recipeName}
+          {rowData.name}
         </div>}
         {getColumnVisible(COLUMN_MASK.AUTHOR) && <div style={styles.cell}>
           {rowData.authors.join(",")}
@@ -129,7 +129,7 @@ export default function Table(
 
   function onCreateRecipe() {
     setSelectedRecipe({
-      recipeName: "",
+      name: "",
       reference: "",
       authors: [],
       allergens: [],

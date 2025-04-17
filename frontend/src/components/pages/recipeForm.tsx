@@ -94,7 +94,7 @@ export default function RecipeForm(
         style={styles.inputField}
         type="text"
         value={selectedRecipeName}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, recipeName: (e.target as any).value })}
+        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, name: (e.target as any).value })}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput

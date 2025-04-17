@@ -140,31 +140,33 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
           </SlDropdown>
         )
       }
-      {!collectionDef ? null : <>
+      <SlIconButton
+        disabled={!collectionDef}
+        name="shuffle"
+        label="Generate Random Recipe"
+        onClick={() => {void onRandomRecipe()}}
+      ></SlIconButton>
+      <SlIconButton
+        disabled={!collectionDef}
+        name="sliders"
+        label="Search Settings"
+        onClick={() => setSettingsView()}
+      ></SlIconButton>
+      <SlInput
+        disabled={!collectionDef}
+        clearable
+        type="search"
+        placeholder={`Search ${collectionName || ""}...`}
+        style={{flex: "1"}}
+      >
         <SlIconButton
-          name="shuffle"
-          label="Generate Random Recipe"
-          onClick={() => {void onRandomRecipe()}}
+          disabled={!collectionDef}
+          name="search"
+          label="Run Search"
+          slot="suffix"
+          onClick={() => {void onApplySearch()}}
         ></SlIconButton>
-        <SlIconButton
-          name="sliders"
-          label="Search Settings"
-          onClick={() => setSettingsView()}
-        ></SlIconButton>
-        <SlInput
-          clearable
-          type="search"
-          placeholder={`Search ${collectionName}...`}
-          style={{flex: "1"}}
-        >
-          <SlIconButton
-            name="search"
-            label="Run Search"
-            slot="suffix"
-            onClick={() => {void onApplySearch()}}
-          ></SlIconButton>
-        </SlInput>
-      </>}
+      </SlInput>
     </div>
   )
 }

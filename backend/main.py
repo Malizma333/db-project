@@ -137,6 +137,8 @@ def do_thing(body):
             params = tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"]) + tuple(
                 body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
+            
+            # Temp fix query w/ full outer joins and no exists
             cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name, 
             Com.ingredient_name, T1.owned_by
             FROM (SELECT S.recipe, S.owned_by FROM STORES AS S 
@@ -144,32 +146,48 @@ def do_thing(body):
             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
             AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["exclude_ingredients"]))})
             AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
-            AND EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["include_allergens"]))})
-            AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
-            AND EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["include_ingredients"]))})
-            AND S.recipe = Com.recipe_name AND Com.owned_by = S.owned_by)
-            AND EXISTS (SELECT * FROM Author AS A WHERE A.author_name IN ({','.join(['?'] * len(body["authors"]))})
-            AND S.recipe = A.recipe_name AND S.owned_by = A.owned_by)
             AND S.recipe LIKE ?
             AND S.collection_id = ?) AS T1
 
-            LEFT JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
-            JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
-            LEFT JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
-            JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
+            FULL OUTER JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
+            FULL OUTER JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
+            FULL OUTER JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
+            FULL OUTER JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
 
             ORDER BY T1.recipe""", (params))
+#             cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name, 
+#             Com.ingredient_name, T1.owned_by
+#             FROM (SELECT S.recipe, S.owned_by FROM STORES AS S 
+#             WHERE NOT EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["exclude_allergens"]))})
+#             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
+#             AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["exclude_ingredients"]))})
+#             AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
+#             AND EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["include_allergens"]))})
+#             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
+#             AND EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["include_ingredients"]))})
+#             AND S.recipe = Com.recipe_name AND Com.owned_by = S.owned_by)
+#             AND EXISTS (SELECT * FROM Author AS A WHERE A.author_name IN ({','.join(['?'] * len(body["authors"]))})
+#             AND S.recipe = A.recipe_name AND S.owned_by = A.owned_by)
+#             AND S.recipe LIKE ?
+#             AND S.collection_id = ?) AS T1
+# 
+#             LEFT JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
+#             JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
+#             LEFT JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
+#             JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
+# 
+#             ORDER BY T1.recipe""", (params))
 
             temp = cursor.fetchall()
             conn.commit()
-            recipies = []
+            recipes = []
             result = []
             current_dict = {}
             names_in_rec_list = []
             for t in temp:
                 if t[0] not in names_in_rec_list:
                     if len(current_dict) != 0:
-                        recipies.append(current_dict)
+                        recipes.append(current_dict)
                         current_dict = {}
                     names_in_rec_list.append(t[0])
                     current_dict["name"] = t[0]
@@ -186,18 +204,18 @@ def do_thing(body):
                     if t[4] not in current_dict["ingredients"]:
                         current_dict["ingredients"].append(t[4])
             if len(current_dict) != 0:
-                recipies.append(current_dict)
+                recipes.append(current_dict)
 
-            if body["view_min"] > len(recipies)-1:
-                body["view_min"] = len(recipies) - 1
-            if body["view_max"] > len(recipies):
-                body["view_max"] = len(recipies)
-            if len(recipies) > 0:
+            if body["view_min"] > len(recipes)-1:
+                body["view_min"] = len(recipes) - 1
+            if body["view_max"] > len(recipes):
+                body["view_max"] = len(recipes)
+            if len(recipes) > 0:
                 for i in range(body["view_min"], body["view_max"]):
                     print(i)
-                    result.append(recipies[i])
+                    result.append(recipes[i])
 
-            ret = {"type": "filter_recipe_collection_response", "recipies": result, "table_size": len(result)}
+            ret = {"type": "filter_recipe_collection_response", "recipes": result, "table_size": len(result)}
 
         elif body["type"] == "rename_recipe_collection":
             username = check_auth(body["auth"])
@@ -420,7 +438,7 @@ if not os.path.isfile("recipe.db"):
     for table in sqlfile:
         cur.execute(table)
     # testing code
-    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipies"}
+    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipes"}
     #print(do_thing(v))
     #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Dog Food Recipes"}
     #print(do_thing(v))

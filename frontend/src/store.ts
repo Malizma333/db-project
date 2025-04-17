@@ -86,7 +86,7 @@ export const useAppStore = create<InitStateType>(
     toggleColumn: (mask: COLUMN_MASK) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
     setClientUsername: (clientUsername: string) => set({ clientUsername }),
     setSelectedRecipe: (recipeData: Recipe) => set({
-      selectedRecipeName: recipeData.recipeName,
+      selectedRecipeName: recipeData.name,
       selectedRecipeReference: recipeData.reference,
       selectedRecipeAllergens: recipeData.allergens,
       selectedRecipeIngredients: recipeData.ingredients,

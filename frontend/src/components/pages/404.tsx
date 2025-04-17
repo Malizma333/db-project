@@ -4,7 +4,7 @@ const style: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   flex: "11",
-  fontSize: "50px",
+  fontSize: "25px",
   justifyContent: "center",
   userSelect: "none",
   fontFamily: "monospace",

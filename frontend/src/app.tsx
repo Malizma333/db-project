@@ -38,6 +38,11 @@ const styles: Record<string, React.CSSProperties> = {
   }
 }
 
+// TODO confirm deletions
+// TODO submit on enter for forms
+// TODO add dropdown for ingredients and allergens
+// TODO fix issue with empty allergens and ingredients
+// TODO link to collection
 export default function App() {
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
