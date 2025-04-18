@@ -32,7 +32,7 @@ CREATE TABLE Author (
 CREATE TABLE Recipe (
   name              VARCHAR(100) NOT NULL,
   owner             VARCHAR(100) NOT NULL,
-  reference         VARCHAR(2083),
+  reference         VARCHAR(2083) NOT NULL,
   PRIMARY KEY(name, owner)
 );
 

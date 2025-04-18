@@ -141,15 +141,23 @@ def do_thing(body):
                 body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
 
-            p = (body["collection_id"], "%"+body["recipe_name"]+"%",)
+            p = (body["collection_id"], "%"+body["recipe_name"]+"%",) + tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"])
             # Is this horribly inefficient? Who knows :D
-            q =  """SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
+            q =  f"""SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
                     FROM (
                         SELECT Stores.recipe_name, Stores.recipe_owner
                         FROM Stores
                         WHERE
                             Stores.collection_id = ?
                             AND Stores.recipe_name LIKE ?
+                            AND NOT EXISTS (SELECT * FROM Contains WHERE
+                                contains.allergen_name IN ({",".join("?" * len(body["exclude_allergens"]))})
+                                AND Stores.recipe_name = Contains.recipe_name
+                                AND Stores.recipe_owner = Contains.recip_owner)
+                            AND NOT EXISTS (SELECT * FROM Composes WHERE
+                                contains.ingredient_name IN ({",".join("?" * len(body["exclude_ingredients"]))})
+                                AND Stores.recipe_name = Composes.recipe_name
+                                AND Stores.recipe_owner = Composes.recip_owner)
                     ) AS FiltRecipe
 
                     JOIN Recipe ON
@@ -220,17 +228,26 @@ def do_thing(body):
                         current_dict = {}
                     names_in_rec_list.append(t[0])
                     current_dict["name"] = t[0]
-                    current_dict["authors"] = [t[1]]
+                    if t[1] != None:
+                        current_dict["authors"] = [t[1]]
+                    else:
+                        current_dict["authors"] = []
                     current_dict["reference"] = t[2]
-                    current_dict["allergens"] = [t[3]]
-                    current_dict["ingredients"] = [t[4]]
+                    if t[3] != None:
+                        current_dict["allergens"] = [t[3]]
+                    else:
+                        current_dict["allergens"] = []
+                    if t[4] != None:
+                        current_dict["ingredients"] = [t[4]]
+                    else:
+                        current_dict["ingredients"] = []
                     current_dict["owner"] = t[5]
                 else:
-                    if t[1] not in current_dict["authors"]:
+                    if t[1] not in current_dict["authors"] and t[1] != None:
                         current_dict["authors"].append(t[1])
-                    if t[3] not in current_dict["allergens"]:
+                    if t[3] not in current_dict["allergens"] and t[3] != None:
                         current_dict["allergens"].append(t[3])
-                    if t[4] not in current_dict["ingredients"]:
+                    if t[4] not in current_dict["ingredients"] and t[4] != None:
                         current_dict["ingredients"].append(t[4])
             if len(current_dict) != 0:
                 recipes.append(current_dict)
