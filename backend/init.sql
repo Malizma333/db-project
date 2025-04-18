@@ -1,5 +1,8 @@
 PRAGMA foreign_keys = ON;
 
+-- Apparently sqlite doesn't care about types. we could make them all strict
+-- tables...?
+-- It doesn't care about length of strings no matter what, though.
 CREATE TABLE RecipeCollection (
   id                INTEGER PRIMARY KEY,
   manager           VARCHAR(100) NOT NULL,
