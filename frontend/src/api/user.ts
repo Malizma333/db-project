@@ -1,15 +1,21 @@
-import { getErrorMessage, makeRequest } from "./api";
+import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
 import { useQuery } from "@tanstack/react-query";
 
 interface AuthInfo {
   auth: string,
-  lifetime: number
+  lifetime: number,
+  user: string,
 };
 
-export let session_auth: AuthInfo = {
-  auth: "",
-  lifetime: -1
-};
+export let session_auth: AuthInfo = { auth: "", lifetime: -1, user: "" };
+
+export function initSessionAuth() {
+  session_auth = {
+    auth: sessionStorage.getItem("session.auth") || "",
+    lifetime: parseInt(sessionStorage.getItem("session.lifetime") || "-1"),
+    user: sessionStorage.getItem("session.user") || "",
+  }
+}
 
 export async function login(username: string, password: string) {
   const response = await makeRequest({
@@ -18,16 +24,21 @@ export async function login(username: string, password: string) {
     password,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   session_auth = {
     auth: data.auth,
     lifetime: data.lifetime,
+    user: username,
   }
+
+  sessionStorage.setItem("session.auth", data.auth);
+  sessionStorage.setItem("session.lifetime", data.lifetime);
+  sessionStorage.setItem("session.user", username);
 }
 
 export async function logout() {
@@ -36,16 +47,21 @@ export async function logout() {
     auth: session_auth.auth,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   session_auth = {
     auth: "",
-    lifetime: -1
+    lifetime: -1,
+    user: "",
   };
+
+  sessionStorage.removeItem("session.auth");
+  sessionStorage.removeItem("session.lifetime");
+  sessionStorage.removeItem("session.user");
 }
 
 async function loggedIn() {
@@ -76,11 +92,14 @@ export async function changeUsername(password: string, new_username: string) {
     new_username,
   });
 
-  const data: Record<string, string> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
+
+  session_auth.user = new_username;
+  sessionStorage.setItem("session.user", new_username);
 }
 
 export async function changePassword(password: string, new_password: string) {
@@ -91,9 +110,9 @@ export async function changePassword(password: string, new_password: string) {
     new_password,
   });
 
-  const data: Record<string, string> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 }

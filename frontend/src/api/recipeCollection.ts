@@ -1,5 +1,5 @@
 import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
-import { skipToken, UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
 
@@ -21,7 +21,6 @@ interface FilterReturn {
   recipes: Recipe[]
 }
 
-// TODO? (Add assertions in general)
 function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
 export async function filterRecipeCollection({
@@ -208,7 +207,6 @@ export function useCollectionAuthors(collection_id: number) {
   })
 }
 
-// TODO: This should also work with a filter applied
 export async function getRecipeCount(id: number): Promise<number> {
   const response = await makeRequest({
     type: "count_recipes_in_collection",

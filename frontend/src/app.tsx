@@ -5,15 +5,16 @@ import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
 import PageNav from './components/widgets/pageNav';
 import LoginDialog from './components/pages/loginDialog';
-import { VIEW } from './store';
+import { useAppStore, VIEW } from './store';
 import ChangePassDialog from './components/pages/changePassDialog';
 import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
 import { useOwnedCollections } from './api/recipeCollection';
-import { useLoggedIn } from './api/user';
+import { session_auth, useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
+import { useEffect } from 'react';
 
 // used for importing icons without copying into public directory
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
@@ -36,9 +37,13 @@ const styles: Record<string, React.CSSProperties> = {
   }
 }
 
+// TODO Replace recipe count with recipe filter count
+// TODO fix tool rearrange bug
 // TODO confirm deletions
 // TODO submit on enter for forms
+// TODO Add assertions to api reception
 export default function App() {
+  const { setClientUsername } = useAppStore();
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
@@ -48,6 +53,10 @@ export default function App() {
   const { data: ownedCollections } = useOwnedCollections();
 
   const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(collectionId));
+
+  useEffect(() => {
+    setClientUsername(session_auth.user);
+  }, []);
 
   return (
     <div style={styles.root}>

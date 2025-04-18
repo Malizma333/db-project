@@ -7,6 +7,7 @@ import { queryClient } from './api/api.js'
 import FourOFourPage from './components/pages/404'
 import { useCollectionExists } from './api/recipeCollection'
 import { SlSpinner } from '@shoelace-style/shoelace/dist/react'
+import { initSessionAuth } from './api/user'
 
 function CollectionIdGuard() {
   const params = useParams();
@@ -32,6 +33,8 @@ function CollectionIdGuard() {
     collectionExists ? <App></App> :
     <FourOFourPage></FourOFourPage>;
 }
+
+initSessionAuth();
 
 render(
   <QueryClientProvider client={queryClient}>

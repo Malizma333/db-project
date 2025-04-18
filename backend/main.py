@@ -322,6 +322,7 @@ def do_thing(body):
             cursor.execute(f"""INSERT INTO Contains VALUES(?,?,?)""", params)
             conn.commit()
 
+        # TODO add collection id
         elif body["type"] == "append_allergen":
             cursor.execute(f"""INSERT or IGNORE INTO Allergen VALUES(?)""", [body["allergen_name"]])
             conn.commit()
@@ -340,6 +341,7 @@ def do_thing(body):
             cursor.execute(f"""INSERT INTO Composes VALUES(?,?,?)""", params)
             conn.commit()
 
+        # TODO add collection id
         elif body["type"] == "append_ingredient":
             cursor.execute(f"""INSERT or IGNORE INTO Ingredient VALUES(?)""", [body["ingredient_name"]])
             conn.commit()
