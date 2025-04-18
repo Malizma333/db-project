@@ -25,6 +25,8 @@ export default function CollectionCard(
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
+  const collectionUrl = window.location.origin + "/collection/" + collectionId;
+
   async function onDeleteCollection(id: number) {
     try {
       await removeRecipeCollection(id);
@@ -57,8 +59,15 @@ export default function CollectionCard(
           value={collectionName}
           onSlBlur={(e) => {void onRenameCollection(collectionId, (e.target as any).value)}}
         ></SlInput>
+        <SlTooltip content="Open Collection">
+          <SlIconButton
+            name="box-arrow-up-right"
+            label="Go to Recipe"
+            onClick={() => {window.location.assign(collectionUrl)}}
+          ></SlIconButton>
+        </SlTooltip>
         <SlCopyButton
-          value={window.location.origin + "/collection/" + collectionId}
+          value={collectionUrl}
           copyLabel="Share Collection"
           successLabel="Copied"
           errorLabel="Failed to copy"
