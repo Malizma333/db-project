@@ -141,24 +141,29 @@ def do_thing(body):
                 body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
 
-            p = (body["recipe_name"],)
+            p = (body["collection_id"], "%"+body["recipe_name"]+"%",)
             # Is this horribly inefficient? Who knows :D
             q =  """SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
-                    FROM Recipe
-                        JOIN Stores ON
-                            Recipe.name = Stores.recipe_name
-                            AND Recipe.owner = Stores.recipe_owner
-                        JOIN Contains ON
-                            Recipe.name = Contains.recipe_name
-                            AND Recipe.owner = Contains.recipe_name
-                        JOIN Composes ON
-                            Recipe.name = Composes.recipe_name
-                            AND Recipe.owner = Composes.recipe_name
-                        JOIN Author ON
-                            Recipe.name = Author.recipe_name
-                            AND Recipe.owner = Author.recipe_name
-                    WHERE Stores.collection_id
-                    AND Recipe.name LIKE ?"""
+                    FROM (
+                        SELECT Stores.recipe_name, Stores.recipe_owner
+                        FROM Stores
+                        WHERE
+                            Stores.collection_id = ?
+                            AND Stores.recipe_name LIKE ?
+                    ) AS FiltRecipe
+
+                    JOIN Recipe ON
+                        FiltRecipe.recipe_name = Recipe.name
+                        AND FiltRecipe.recipe_owner = Recipe.owner
+                    LEFT JOIN Contains ON
+                        FiltRecipe.recipe_name = Contains.recipe_name
+                        AND FiltRecipe.recipe_owner = Contains.recipe_owner
+                    LEFT JOIN Composes ON
+                        FiltRecipe.recipe_name = Composes.recipe_name
+                        AND FiltRecipe.recipe_owner = Composes.recipe_owner
+                    LEFT JOIN Author ON
+                        FiltRecipe.recipe_name = Author.recipe_name
+                        AND FiltRecipe.recipe_owner = Author.recipe_owner"""
             cursor.execute(q, p)
 
             # # Temp fix query w/ full outer joins and no exists
@@ -202,6 +207,7 @@ def do_thing(body):
 #             ORDER BY T1.recipe""", (params))
 
             temp = cursor.fetchall()
+            print(temp)
             conn.commit()
             recipes = []
             result = []
