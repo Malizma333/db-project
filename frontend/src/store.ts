@@ -11,48 +11,69 @@ export enum VIEW {
   NEW_RECIPE_FORM = 6,
   UPDATE_RECIPE_FORM = 7,
   RECIPE_SUMMARY = 8,
-};
+}
 
 export enum COLUMN_MASK {
-  NAME=1,
-  AUTHOR=2,
-  ALLERGENS=4,
-  REFERENCE=8,
-  INGREDIENTS=16
-};
+  NAME = 1,
+  AUTHOR = 2,
+  ALLERGENS = 4,
+  REFERENCE = 8,
+  INGREDIENTS = 16,
+}
 
 interface InitStateType {
-  clientUsername: string,
-  view: VIEW,
-  page: number,
-  numRowsPerPage: number,
-  visibleColumns: COLUMN_MASK,
-  selectedRecipeName: string,
-  selectedRecipeReference: string,
-  selectedRecipeAllergens: string[],
-  selectedRecipeIngredients: string[],
-  selectedRecipeAuthors: string[]
-  setMainView: () => void,
-  setSettingsView: () => void,
-  setLoginView: () => void,
-  setChangeUserView: () => void,
-  setChangePassView: () => void,
-  setCollectionsView: () => void,
-  setNewRecipeView: () => void,
-  setUpdateRecipeView: () => void,
-  setRecipeSummaryView: () => void,
-  gotoFirstPage: () => void,
-  gotoPrevPage: () => void,
-  gotoNextPage: (numPages: number) => void,
-  gotoLastPage: (numPages: number) => void,
-  setRowsPerPage: (numRowsPerPage: number) => void,
-  getColumnVisible: (mask: COLUMN_MASK) => boolean,
-  toggleColumn: (mask: COLUMN_MASK) => void,
-  setClientUsername: (clientUsername: string) => void,
-  setSelectedRecipe: (recipeData: Recipe) => void,
+  clientUsername: string;
+  view: VIEW;
+  page: number;
+  numRowsPerPage: number;
+  visibleColumns: COLUMN_MASK;
+  selectedRecipeName: string;
+  selectedRecipeReference: string;
+  selectedRecipeAllergens: string[];
+  selectedRecipeIngredients: string[];
+  selectedRecipeAuthors: string[];
+  recipeSearchFilter: string;
+  includeAllergensFilter: string[];
+  excludeAllergensFilter: string[];
+  includeIngredientsFilter: string[];
+  excludeIngredientsFilter: string[];
+  includeAuthorsFilter: string[];
+  excludeAuthorsFilter: string[];
+  setMainView: () => void;
+  setSettingsView: () => void;
+  setLoginView: () => void;
+  setChangeUserView: () => void;
+  setChangePassView: () => void;
+  setCollectionsView: () => void;
+  setNewRecipeView: () => void;
+  setUpdateRecipeView: () => void;
+  setRecipeSummaryView: () => void;
+  gotoFirstPage: () => void;
+  gotoPrevPage: () => void;
+  gotoNextPage: (numPages: number) => void;
+  gotoLastPage: (numPages: number) => void;
+  setRowsPerPage: (numRowsPerPage: number) => void;
+  getColumnVisible: (mask: COLUMN_MASK) => boolean;
+  toggleColumn: (mask: COLUMN_MASK) => void;
+  setClientUsername: (clientUsername: string) => void;
+  setSelectedRecipe: (recipeData: Recipe) => void;
+  setRecipeSearchFilter: (recipeSearchFilter: string) => void;
+  setIncludeAllergensFilter: (includeAllergensFilter: string[]) => void;
+  setExcludeAllergensFilter: (excludeAllergensFilter: string[]) => void;
+  setIncludeIngredientsFilter: (includeIngredientsFilter: string[]) => void;
+  setExcludeIngredientsFilter: (excludeIngredientsFilter: string[]) => void;
+  setIncludeAuthorsFilter: (includeAuthorsFilter: string[]) => void;
+  setExcludeAuthorsFilter: (excludeAuthorsFilter: string[]) => void;
 }
 
 const initStoreState = {
+  recipeSearchFilter: "",
+  includeAllergensFilter: [],
+  excludeAllergensFilter: [],
+  includeIngredientsFilter: [],
+  excludeIngredientsFilter: [],
+  includeAuthorsFilter: [],
+  excludeAuthorsFilter: [],
   clientUsername: "",
   view: VIEW.MAIN,
   page: 0,
@@ -63,34 +84,49 @@ const initStoreState = {
   selectedRecipeAuthors: [],
   selectedRecipeIngredients: [],
   selectedRecipeAllergens: [],
-}
+};
 
-export const useAppStore = create<InitStateType>(
-  (set, get) => ({
-    ...initStoreState,
-    setMainView: () => set({ view: VIEW.MAIN }),
-    setSettingsView: () => set({ view: VIEW.SEARCH_SETTINGS }),
-    setLoginView: () => set({ view: VIEW.LOGIN_PROMPT }),
-    setChangeUserView: () => set({ view: VIEW.CHANGE_USERNAME }),
-    setChangePassView: () => set({ view: VIEW.CHANGE_PASSWORD }),
-    setCollectionsView: () => set({ view: VIEW.COLLECTIONS_LIST }),
-    setNewRecipeView: () => set({ view: VIEW.NEW_RECIPE_FORM }),
-    setUpdateRecipeView: () => set({ view: VIEW.UPDATE_RECIPE_FORM }),
-    setRecipeSummaryView: () => set({ view: VIEW.RECIPE_SUMMARY }),
-    gotoFirstPage: () => set({ page: 0 }),
-    gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
-    gotoNextPage: (numPages: number) => set((state) => ({ page: Math.min(numPages - 1, state.page + 1) })),
-    gotoLastPage: (numPages: number) => set(() => ({ page: numPages - 1 })),
-    setRowsPerPage: (numRowsPerPage: number) => set({ numRowsPerPage }),
-    getColumnVisible: (mask: COLUMN_MASK) => ((get().visibleColumns & mask) > 0),
-    toggleColumn: (mask: COLUMN_MASK) => set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
-    setClientUsername: (clientUsername: string) => set({ clientUsername }),
-    setSelectedRecipe: (recipeData: Recipe) => set({
+export const useAppStore = create<InitStateType>((set, get) => ({
+  ...initStoreState,
+  setMainView: () => set({ view: VIEW.MAIN }),
+  setSettingsView: () => set({ view: VIEW.SEARCH_SETTINGS }),
+  setLoginView: () => set({ view: VIEW.LOGIN_PROMPT }),
+  setChangeUserView: () => set({ view: VIEW.CHANGE_USERNAME }),
+  setChangePassView: () => set({ view: VIEW.CHANGE_PASSWORD }),
+  setCollectionsView: () => set({ view: VIEW.COLLECTIONS_LIST }),
+  setNewRecipeView: () => set({ view: VIEW.NEW_RECIPE_FORM }),
+  setUpdateRecipeView: () => set({ view: VIEW.UPDATE_RECIPE_FORM }),
+  setRecipeSummaryView: () => set({ view: VIEW.RECIPE_SUMMARY }),
+  gotoFirstPage: () => set({ page: 0 }),
+  gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
+  gotoNextPage: (numPages: number) =>
+    set((state) => ({ page: Math.min(numPages - 1, state.page + 1) })),
+  gotoLastPage: (numPages: number) => set(() => ({ page: numPages - 1 })),
+  setRowsPerPage: (numRowsPerPage: number) => set({ numRowsPerPage }),
+  getColumnVisible: (mask: COLUMN_MASK) => (get().visibleColumns & mask) > 0,
+  toggleColumn: (mask: COLUMN_MASK) =>
+    set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
+  setClientUsername: (clientUsername: string) => set({ clientUsername }),
+  setSelectedRecipe: (recipeData: Recipe) =>
+    set({
       selectedRecipeName: recipeData.name,
       selectedRecipeReference: recipeData.reference,
       selectedRecipeAllergens: recipeData.allergens,
       selectedRecipeIngredients: recipeData.ingredients,
       selectedRecipeAuthors: recipeData.authors,
     }),
-  })
-);
+  setRecipeSearchFilter: (recipeSearchFilter: string) =>
+    set({ recipeSearchFilter }),
+  setIncludeAllergensFilter: (includeAllergensFilter: string[]) =>
+    set({ includeAllergensFilter }),
+  setExcludeAllergensFilter: (excludeAllergensFilter: string[]) =>
+    set({ excludeAllergensFilter }),
+  setIncludeIngredientsFilter: (includeIngredientsFilter: string[]) =>
+    set({ includeIngredientsFilter }),
+  setExcludeIngredientsFilter: (excludeIngredientsFilter: string[]) =>
+    set({ excludeIngredientsFilter }),
+  setIncludeAuthorsFilter: (includeAuthorsFilter: string[]) =>
+    set({ includeAuthorsFilter }),
+  setExcludeAuthorsFilter: (excludeAuthorsFilter: string[]) =>
+    set({ excludeAuthorsFilter }),
+}));

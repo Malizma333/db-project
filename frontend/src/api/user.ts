@@ -2,20 +2,20 @@ import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
 import { useQuery } from "@tanstack/react-query";
 
 interface AuthInfo {
-  auth: string,
-  user: string,
-};
+  auth: string;
+  user: string;
+}
 
 export let session_auth: AuthInfo = {
   auth: "",
-  user: ""
+  user: "",
 };
 
 export function initSessionAuth() {
   session_auth = {
     auth: sessionStorage.getItem("session.auth") || "",
     user: sessionStorage.getItem("session.user") || "",
-  }
+  };
 }
 
 export async function login(username: string, password: string) {
@@ -34,7 +34,7 @@ export async function login(username: string, password: string) {
   session_auth = {
     auth: data.auth,
     user: username,
-  }
+  };
 
   sessionStorage.setItem("session.auth", data.auth);
   sessionStorage.setItem("session.user", username);
@@ -77,9 +77,9 @@ async function loggedIn() {
 
 export function useLoggedIn() {
   return useQuery({
-    queryKey: ['loggedIn'],
+    queryKey: ["loggedIn"],
     queryFn: () => loggedIn(),
-  })
+  });
 }
 
 export async function changeUsername(password: string, new_username: string) {

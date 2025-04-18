@@ -1,23 +1,25 @@
-import '@shoelace-style/shoelace/dist/themes/dark.css';
-import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
-import SettingsDrawer from './components/pages/settingsDrawer';
-import Toolbar from './components/widgets/toolbar';
-import Table from './components/widgets/table';
-import PageNav from './components/widgets/pageNav';
-import LoginDialog from './components/pages/loginDialog';
-import { useAppStore, VIEW } from './store';
-import ChangePassDialog from './components/pages/changePassDialog';
-import ChangeNameDialog from './components/pages/changeNameDialog';
-import CollectionsDrawer from './components/pages/collectionsDrawer';
-import RecipeForm from './components/pages/recipeForm';
-import RecipeSummary from './components/pages/recipeSummary';
-import { useOwnedCollections } from './api/recipeCollection';
-import { session_auth, useLoggedIn } from './api/user';
-import { useParams } from 'react-router';
-import { useEffect } from 'react';
+import "@shoelace-style/shoelace/dist/themes/dark.css";
+import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
+import SettingsDrawer from "./components/pages/settingsDrawer";
+import Toolbar from "./components/widgets/toolbar";
+import Table from "./components/widgets/table";
+import PageNav from "./components/widgets/pageNav";
+import LoginDialog from "./components/pages/loginDialog";
+import { useAppStore, VIEW } from "./store";
+import ChangePassDialog from "./components/pages/changePassDialog";
+import ChangeNameDialog from "./components/pages/changeNameDialog";
+import CollectionsDrawer from "./components/pages/collectionsDrawer";
+import RecipeForm from "./components/pages/recipeForm";
+import RecipeSummary from "./components/pages/recipeSummary";
+import { useOwnedCollections } from "./api/recipeCollection";
+import { session_auth, useLoggedIn } from "./api/user";
+import { useParams } from "react-router";
+import { useEffect } from "react";
 
 // used for importing icons without copying into public directory
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
+setBasePath(
+  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/",
+);
 
 const styles: Record<string, React.CSSProperties> = {
   root: {
@@ -34,10 +36,10 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "72px",
     justifyContent: "center",
     userSelect: "none",
-  }
-}
+  },
+};
 
-// TODO Replace recipe count with recipe filter count
+// TODO remove recipe should use old recipe name
 // TODO fix tool rearrange bug
 // TODO confirm deletions
 // TODO submit on enter for forms
@@ -53,7 +55,12 @@ export default function App() {
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
 
-  const editMode = !!(collectionDef && loggedIn && ownedCollections && ownedCollections.includes(collectionId));
+  const editMode = !!(
+    collectionDef &&
+    loggedIn &&
+    ownedCollections &&
+    ownedCollections.includes(collectionId)
+  );
 
   useEffect(() => {
     setClientUsername(session_auth.user);
@@ -67,11 +74,9 @@ export default function App() {
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
       <Toolbar collectionDef={collectionDef}></Toolbar>
-      {collectionDef ?
+      {collectionDef ? (
         <>
-          <Table
-            editMode={editMode}
-          ></Table>
+          <Table editMode={editMode}></Table>
           <PageNav></PageNav>
           <RecipeForm
             formTitle="New Recipe"
@@ -86,8 +91,10 @@ export default function App() {
             viewState={VIEW.UPDATE_RECIPE_FORM}
           ></RecipeForm>
           <RecipeSummary></RecipeSummary>
-        </> : <div style={styles.missingCollection}>No collection selected!</div>
-      }
+        </>
+      ) : (
+        <div style={styles.missingCollection}>No collection selected!</div>
+      )}
     </div>
   );
 }

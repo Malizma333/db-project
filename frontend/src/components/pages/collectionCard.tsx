@@ -1,6 +1,18 @@
-import { SlCard, SlCopyButton, SlInput, SlIcon, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
+import {
+  SlCard,
+  SlCopyButton,
+  SlInput,
+  SlIcon,
+  SlIconButton,
+  SlTooltip,
+} from "@shoelace-style/shoelace/dist/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { removeRecipeCollection, renameRecipeCollection, useCollectionName, useRecipeCount } from "src/api/recipeCollection";
+import {
+  removeRecipeCollection,
+  renameRecipeCollection,
+  useCollectionName,
+  useRecipeCount,
+} from "src/api/recipeCollection";
 
 const styles = {
   collectionTitle: {
@@ -16,10 +28,13 @@ const styles = {
   },
 };
 
-export default function CollectionCard(
-  { collectionId, searchTerm } :
-  { collectionId: number, searchTerm: string }
-) {
+export default function CollectionCard({
+  collectionId,
+  searchTerm,
+}: {
+  collectionId: number;
+  searchTerm: string;
+}) {
   const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
@@ -31,7 +46,7 @@ export default function CollectionCard(
     try {
       await removeRecipeCollection(id);
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
   }
@@ -40,30 +55,34 @@ export default function CollectionCard(
     try {
       await renameRecipeCollection(id, newName);
       await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
-    } catch(e) {
+    } catch (e) {
       if (e instanceof Error) {
         console.error(e.message);
       }
     }
   }
 
-  return (
-    collectionName === undefined ||
-    !collectionName.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
-  ) ? null : (
+  return collectionName === undefined ||
+    !collectionName
+      .toLocaleLowerCase()
+      .includes(searchTerm.toLocaleLowerCase()) ? null : (
     <SlCard style={styles.collectionCard}>
       <div slot="header" style={styles.collectionTitle}>
         <SlInput
           className="collectionsName"
           filled
           value={collectionName}
-          onSlBlur={(e) => {void onRenameCollection(collectionId, (e.target as any).value)}}
+          onSlBlur={(e) => {
+            void onRenameCollection(collectionId, (e.target as any).value);
+          }}
         ></SlInput>
         <SlTooltip content="Open Collection">
           <SlIconButton
             name="box-arrow-up-right"
             label="Go to Recipe"
-            onClick={() => {window.location.assign(collectionUrl)}}
+            onClick={() => {
+              window.location.assign(collectionUrl);
+            }}
           ></SlIconButton>
         </SlTooltip>
         <SlCopyButton
@@ -78,7 +97,9 @@ export default function CollectionCard(
           <SlIconButton
             name="trash"
             label="Delete Collection"
-            onClick={() => {void onDeleteCollection(collectionId)}}
+            onClick={() => {
+              void onDeleteCollection(collectionId);
+            }}
           ></SlIconButton>
         </SlTooltip>
       </div>

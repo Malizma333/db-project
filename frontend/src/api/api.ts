@@ -1,9 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
 
 export interface ResponseDataType {
-  type: string,
-  message?: string
-  [key: string]: unknown
+  type: string;
+  message?: string;
+  [key: string]: unknown;
 }
 
 export const AUTH_ERROR = "AUTH_ERROR";
@@ -23,7 +23,7 @@ export function getErrorMessage(responseData: ResponseDataType) {
     resource_error: "[ERROR] Invalid resource: ",
     username_error: "Invalid username or password!",
     password_error: "Invalid username or password!",
-    internal_server_error: "[ERROR] Robert or Bre screwed up: "
+    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
   };
 
   let message = "Unknown error";
@@ -64,20 +64,25 @@ export function getErrorMessage(responseData: ResponseDataType) {
   return message;
 }
 
-export async function makeRequest(jsonBody: Record<string, unknown>): Promise<Response> {
+export async function makeRequest(
+  jsonBody: Record<string, unknown>,
+): Promise<Response> {
   try {
-    const data = await fetch('/api', {
+    const data = await fetch("/api", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jsonBody),
     });
     return data;
   } catch (e) {
-    return new Response(JSON.stringify({
+    return new Response(
+      JSON.stringify({
         type: "bad_fetch_error",
-        message: (e as Error).message
-      }), {
+        message: (e as Error).message,
+      }),
+      {
         status: 400,
-    }); 
+      },
+    );
   }
 }

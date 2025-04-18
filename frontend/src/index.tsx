@@ -1,37 +1,41 @@
-import { ContainerNode, render } from 'preact'
-import './index.css'
-import App from './app'
-import { BrowserRouter, Route, Routes, useParams } from 'react-router'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClient } from './api/api.js'
-import FourOFourPage from './components/pages/404'
-import { useCollectionExists } from './api/recipeCollection'
-import { SlSpinner } from '@shoelace-style/shoelace/dist/react'
-import { initSessionAuth } from './api/user'
+import { ContainerNode, render } from "preact";
+import "./index.css";
+import App from "./app";
+import { BrowserRouter, Route, Routes, useParams } from "react-router";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./api/api.js";
+import FourOFourPage from "./components/pages/404";
+import { useCollectionExists } from "./api/recipeCollection";
+import { SlSpinner } from "@shoelace-style/shoelace/dist/react";
+import { initSessionAuth } from "./api/user";
 
 function CollectionIdGuard() {
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
-  const { data: collectionExists, isFetching } = useCollectionExists(collectionId);
+  const { data: collectionExists, isFetching } =
+    useCollectionExists(collectionId);
 
   const absCenter = {
-    alignItems: 'center',
+    alignItems: "center",
     bottom: 0,
-    display: 'flex',
-    justifyContent: 'center',
+    display: "flex",
+    justifyContent: "center",
     left: 0,
-    margin: 'auto',
-    position: 'absolute',
+    margin: "auto",
+    position: "absolute",
     right: 0,
     top: 0,
   };
 
-  return isFetching ? <div style={absCenter}>
-      <SlSpinner style="font-size: 350px; --track-width: 30px;">
-      </SlSpinner>
-    </div> :
-    collectionExists ? <App></App> :
-    <FourOFourPage></FourOFourPage>;
+  return isFetching ? (
+    <div style={absCenter}>
+      <SlSpinner style="font-size: 350px; --track-width: 30px;"></SlSpinner>
+    </div>
+  ) : collectionExists ? (
+    <App></App>
+  ) : (
+    <FourOFourPage></FourOFourPage>
+  );
 }
 
 initSessionAuth();
@@ -41,10 +45,13 @@ render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App></App>}></Route>
-        <Route path="/collection/:id" element={<CollectionIdGuard></CollectionIdGuard>}></Route>
+        <Route
+          path="/collection/:id"
+          element={<CollectionIdGuard></CollectionIdGuard>}
+        ></Route>
         <Route path="*" element={<FourOFourPage></FourOFourPage>} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>,
-  document.getElementById('app') as ContainerNode
+  document.getElementById("app") as ContainerNode,
 );

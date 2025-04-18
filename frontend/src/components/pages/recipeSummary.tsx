@@ -1,12 +1,12 @@
-import { SlDialog } from '@shoelace-style/shoelace/dist/react';
-import { useAppStore, VIEW } from '../../store';
-import TagPicker from '../widgets/tagPicker';
+import { SlDialog } from "@shoelace-style/shoelace/dist/react";
+import { useAppStore, VIEW } from "../../store";
+import TagPicker from "../widgets/tagPicker";
 
 const styles = {
   summaryField: {
     marginBottom: "1em",
   },
-}
+};
 
 export default function RecipeSummary() {
   const {
@@ -47,6 +47,5 @@ export default function RecipeSummary() {
         viewMode
       ></TagPicker>
     </SlDialog>
-  )
+  );
 }
-

@@ -4,18 +4,18 @@ import globals from "globals";
 
 export default defineConfig([
   {
-    ignores: ["dist", "*.config.*"]
+    ignores: ["dist", "*.config.*"],
   },
   {
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.browser,
       },
       parserOptions: {
         project: true,
         tsconfigRootDir: import.meta.dirname,
       },
-    }
+    },
   },
   ts.configs.recommendedTypeChecked,
 ]);

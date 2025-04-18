@@ -2,11 +2,11 @@ import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
 import { session_auth } from "./user";
 
 export interface Recipe {
-  name: string,
-  reference: string,
-  authors: string[],
-  ingredients: string[],
-  allergens: string[],
+  name: string;
+  reference: string;
+  authors: string[];
+  ingredients: string[];
+  allergens: string[];
 }
 
 export async function addRecipe(
@@ -15,7 +15,7 @@ export async function addRecipe(
   reference: string,
   authors: string[],
   ingredients: string[],
-  allergens: string[]
+  allergens: string[],
 ) {
   const response = await makeRequest({
     type: "add_recipe",

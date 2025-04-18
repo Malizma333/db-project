@@ -1,24 +1,38 @@
-import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef } from 'preact/hooks';
-import { useAppStore, VIEW } from '../../store';
-import { SlNotification } from '../widgets/notification';
-import TagPicker, { TagType } from '../widgets/tagPicker';
-import { useParams } from 'react-router';
-import { addRecipe, removeRecipe } from '../../api/recipe';
-import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
-import { SlHideEvent } from '@shoelace-style/shoelace';
-import { useQueryClient } from '@tanstack/react-query';
+import {
+  SlInput,
+  SlDialog,
+  SlButton,
+} from "@shoelace-style/shoelace/dist/react";
+import { useRef } from "preact/hooks";
+import { useAppStore, VIEW } from "../../store";
+import { SlNotification } from "../widgets/notification";
+import TagPicker, { TagType } from "../widgets/tagPicker";
+import { useParams } from "react-router";
+import { addRecipe, removeRecipe } from "../../api/recipe";
+import {
+  useCollectionAllergens,
+  useCollectionIngredients,
+} from "../../api/recipeCollection";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   inputField: {
     marginBottom: "1em",
   },
-}
+};
 
-export default function RecipeForm(
-  { formTitle, submitLabel, submitMessage, viewState } :
-  { formTitle: string, submitLabel: string, submitMessage: string, viewState: VIEW }
-) {
+export default function RecipeForm({
+  formTitle,
+  submitLabel,
+  submitMessage,
+  viewState,
+}: {
+  formTitle: string;
+  submitLabel: string;
+  submitMessage: string;
+  viewState: VIEW;
+}) {
   const {
     view,
     setMainView,
@@ -68,7 +82,7 @@ export default function RecipeForm(
         selectedRecipe.reference,
         selectedRecipe.authors,
         selectedRecipe.ingredients,
-        selectedRecipe.allergens
+        selectedRecipe.allergens,
       );
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
       onCloseDialog(hideEvent);
@@ -76,7 +90,7 @@ export default function RecipeForm(
         // @ts-expect-error Not sure what to type this ref as
         submitAlert.current.base.toast();
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
   }
@@ -89,46 +103,72 @@ export default function RecipeForm(
       label={formTitle}
     >
       {/* @ts-expect-error React refs not well supported by Shoelace */}
-      <SlNotification message={submitMessage} variant="success" ref={submitAlert}></SlNotification>
+      <SlNotification
+        message={submitMessage}
+        variant="success"
+        ref={submitAlert}
+      ></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeName}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, name: (e.target as any).value })}
+        onSlChange={(e) =>
+          setSelectedRecipe({
+            ...selectedRecipe,
+            name: (e.target as any).value,
+          })
+        }
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeAuthors.join(",")}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, authors: (e.target as any).value.split(",") })}
+        onSlChange={(e) =>
+          setSelectedRecipe({
+            ...selectedRecipe,
+            authors: (e.target as any).value.split(","),
+          })
+        }
         placeholder="Authors"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
         value={selectedRecipeReference}
-        onSlChange={(e) => setSelectedRecipe({ ...selectedRecipe, reference: (e.target as any).value })}
+        onSlChange={(e) =>
+          setSelectedRecipe({
+            ...selectedRecipe,
+            reference: (e.target as any).value,
+          })
+        }
         placeholder="Reference"
       ></SlInput>
       <TagPicker
         variant="primary"
         available={allAllergens}
         selected={selectedRecipeAllergens}
-        setSelected={(allergens) => setSelectedRecipe({ ...selectedRecipe, allergens })}
+        setSelected={(allergens) =>
+          setSelectedRecipe({ ...selectedRecipe, allergens })
+        }
         tagType={TagType.Allergen}
       ></TagPicker>
       <TagPicker
         variant="primary"
         available={allIngredients}
         selected={selectedRecipeIngredients}
-        setSelected={(ingredients) => setSelectedRecipe({ ...selectedRecipe, ingredients })}
+        setSelected={(ingredients) =>
+          setSelectedRecipe({ ...selectedRecipe, ingredients })
+        }
         tagType={TagType.Ingredient}
       ></TagPicker>
-      <SlButton onClick={(e) => {void onAddRecipe(e)}}>
+      <SlButton
+        onClick={(e) => {
+          void onAddRecipe(e);
+        }}
+      >
         {submitLabel}
       </SlButton>
     </SlDialog>
-  )
+  );
 }
-

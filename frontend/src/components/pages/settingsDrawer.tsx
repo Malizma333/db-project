@@ -1,40 +1,57 @@
-import { SlButton, SlCheckbox, SlDrawer, SlInput } from '@shoelace-style/shoelace/dist/react';
-import TagPicker from '../widgets/tagPicker';
-import { useState } from 'preact/hooks';
-import { useAppStore, VIEW, COLUMN_MASK } from '../../store';
-import { useParams } from 'react-router';
+import {
+  SlButton,
+  SlCheckbox,
+  SlDrawer,
+  SlInput,
+} from "@shoelace-style/shoelace/dist/react";
+import TagPicker from "../widgets/tagPicker";
+import { useState } from "preact/hooks";
+import { useAppStore, VIEW, COLUMN_MASK } from "../../store";
+import { useParams } from "react-router";
 
-import { useCollectionAllergens, useCollectionAuthors, useCollectionIngredients } from '../../api/recipeCollection';
-import { SlHideEvent } from '@shoelace-style/shoelace';
-import { useQueryClient } from '@tanstack/react-query';
+import {
+  useCollectionAllergens,
+  useCollectionAuthors,
+  useCollectionIngredients,
+} from "../../api/recipeCollection";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   settingContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginBottom: '1em',
+    display: "flex",
+    flexDirection: "row",
+    marginBottom: "1em",
   },
   filterContainer: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    flexDirection: 'column',
-  }
-}
+    flexDirection: "column",
+  },
+};
 
-function FilterPicker(
-  { columnName, columnOptions = [] }:
-  { columnName: string, columnOptions?: string[] }
-) {
-  const [included, setIncluded] = useState<string[]>([]);
-  const [excluded, setExcluded] = useState<string[]>([]);
-
+function FilterPicker({
+  columnName,
+  included,
+  excluded,
+  setIncluded,
+  setExcluded,
+  columnOptions = [],
+}: {
+  columnName: string;
+  included: string[];
+  excluded: string[];
+  setIncluded: (v: string[]) => void;
+  setExcluded: (v: string[]) => void;
+  columnOptions?: string[];
+}) {
   return (
     <div style={styles.settingContainer}>
       <div style={styles.filterContainer}>
         Include {columnName}
         <TagPicker
           variant="success"
-          available={columnOptions.filter(tag => !excluded.includes(tag))}
+          available={columnOptions.filter((tag) => !excluded.includes(tag))}
           selected={included}
           setSelected={setIncluded}
         ></TagPicker>
@@ -43,24 +60,41 @@ function FilterPicker(
         Exclude {columnName}
         <TagPicker
           variant="danger"
-          available={columnOptions.filter(tag => !included.includes(tag))}
+          available={columnOptions.filter((tag) => !included.includes(tag))}
           selected={excluded}
           setSelected={setExcluded}
         ></TagPicker>
       </div>
     </div>
-  )
+  );
 }
 
 export default function SettingsDrawer() {
   const {
-    view, numRowsPerPage,
-    getColumnVisible, toggleColumn, setMainView, setRowsPerPage, gotoFirstPage
+    view,
+    numRowsPerPage,
+    includeAllergensFilter,
+    excludeAllergensFilter,
+    includeAuthorsFilter,
+    excludeAuthorsFilter,
+    includeIngredientsFilter,
+    excludeIngredientsFilter,
+    getColumnVisible,
+    toggleColumn,
+    setMainView,
+    setRowsPerPage,
+    gotoFirstPage,
+    setIncludeAllergensFilter,
+    setExcludeAllergensFilter,
+    setIncludeAuthorsFilter,
+    setExcludeAuthorsFilter,
+    setIncludeIngredientsFilter,
+    setExcludeIngredientsFilter,
   } = useAppStore();
 
   const queryClient = useQueryClient();
   const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1")
+  const collectionId = parseInt(params["id"] || "-1");
 
   const { data: allAuthors } = useCollectionAuthors(collectionId);
   const { data: allAllergens } = useCollectionAllergens(collectionId);
@@ -109,7 +143,10 @@ export default function SettingsDrawer() {
             value={numRowsPerPage.toString()}
             min={minRowsPerPage}
             max={maxRowsPerPage}
-            onSlBlur={(e) => {void onSetRowsPerPage(parseInt((e.target as any).value))}}></SlInput>
+            onSlBlur={(e) => {
+              void onSetRowsPerPage(parseInt((e.target as any).value));
+            }}
+          ></SlInput>
         </div>
       </div>
       <div style={styles.settingContainer}>
@@ -119,35 +156,70 @@ export default function SettingsDrawer() {
             size="small"
             checked={getColumnVisible(COLUMN_MASK.NAME)}
             onSlChange={() => toggleColumn(COLUMN_MASK.NAME)}
-          >Recipe Name</SlCheckbox>
+          >
+            Recipe Name
+          </SlCheckbox>
           <SlCheckbox
             size="small"
             checked={getColumnVisible(COLUMN_MASK.AUTHOR)}
             onSlChange={() => toggleColumn(COLUMN_MASK.AUTHOR)}
-          >Author</SlCheckbox>
+          >
+            Author
+          </SlCheckbox>
           <SlCheckbox
-                size="small"
-                checked={getColumnVisible(COLUMN_MASK.ALLERGENS)}
-              onSlChange={() => toggleColumn(COLUMN_MASK.ALLERGENS)}
-          >Allergens</SlCheckbox>
+            size="small"
+            checked={getColumnVisible(COLUMN_MASK.ALLERGENS)}
+            onSlChange={() => toggleColumn(COLUMN_MASK.ALLERGENS)}
+          >
+            Allergens
+          </SlCheckbox>
           <SlCheckbox
             size="small"
             checked={getColumnVisible(COLUMN_MASK.REFERENCE)}
             onSlChange={() => toggleColumn(COLUMN_MASK.REFERENCE)}
-          >Reference</SlCheckbox>
+          >
+            Reference
+          </SlCheckbox>
           <SlCheckbox
             size="small"
             checked={getColumnVisible(COLUMN_MASK.INGREDIENTS)}
             onSlChange={() => toggleColumn(COLUMN_MASK.INGREDIENTS)}
-          >Ingredients</SlCheckbox>
+          >
+            Ingredients
+          </SlCheckbox>
         </div>
       </div>
-      <FilterPicker columnName={"Author"} columnOptions={allAuthors}></FilterPicker>
-      <FilterPicker columnName={"Allergens"} columnOptions={allAllergens}></FilterPicker>
-      <FilterPicker columnName={"Ingredients"} columnOptions={allIngredients}></FilterPicker>
-      <SlButton onClick={() => {void onApplySearch()}}>
+      <FilterPicker
+        columnName={"Author"}
+        included={includeAuthorsFilter}
+        setIncluded={setIncludeAuthorsFilter}
+        excluded={excludeAuthorsFilter}
+        setExcluded={setExcludeAuthorsFilter}
+        columnOptions={allAuthors}
+      ></FilterPicker>
+      <FilterPicker
+        columnName={"Allergens"}
+        included={includeAllergensFilter}
+        excluded={excludeAllergensFilter}
+        setIncluded={setIncludeAllergensFilter}
+        setExcluded={setExcludeAllergensFilter}
+        columnOptions={allAllergens}
+      ></FilterPicker>
+      <FilterPicker
+        columnName={"Ingredients"}
+        included={includeIngredientsFilter}
+        excluded={excludeIngredientsFilter}
+        setIncluded={setIncludeIngredientsFilter}
+        setExcluded={setExcludeIngredientsFilter}
+        columnOptions={allIngredients}
+      ></FilterPicker>
+      <SlButton
+        onClick={() => {
+          void onApplySearch();
+        }}
+      >
         Apply
       </SlButton>
     </SlDrawer>
-  )
+  );
 }

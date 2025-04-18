@@ -1,16 +1,20 @@
-import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
-import { useAppStore, VIEW } from '../../store';
-import { SlNotification } from '../widgets/notification';
+import {
+  SlInput,
+  SlDialog,
+  SlButton,
+} from "@shoelace-style/shoelace/dist/react";
+import { useRef, useState } from "preact/hooks";
+import { useAppStore, VIEW } from "../../store";
+import { SlNotification } from "../widgets/notification";
 
-import { login } from '../../api/user';
-import { useQueryClient } from '@tanstack/react-query';
+import { login } from "../../api/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   inputField: {
     marginBottom: "1em",
   },
-}
+};
 
 export default function LoginDialog() {
   const { view, setMainView, setClientUsername } = useAppStore();
@@ -54,7 +58,11 @@ export default function LoginDialog() {
       label="Log In"
     >
       {/* @ts-expect-error React refs not well supported by Shoelace */}
-      <SlNotification message="Logged in successfully" variant="success" ref={logInAlert}></SlNotification>
+      <SlNotification
+        message="Logged in successfully"
+        variant="success"
+        ref={logInAlert}
+      ></SlNotification>
       <SlInput
         style={styles.inputField}
         type="text"
@@ -72,10 +80,13 @@ export default function LoginDialog() {
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => {void onLogIn()}}>
+      <SlButton
+        onClick={() => {
+          void onLogIn();
+        }}
+      >
         Log In
       </SlButton>
     </SlDialog>
-  )
+  );
 }
-
