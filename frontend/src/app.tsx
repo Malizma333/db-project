@@ -27,7 +27,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     height: "95vh",
   },
-  missingCollection: {
+  noCollectionText: {
     alignItems: "center",
     color: "gray",
     display: "flex",
@@ -42,7 +42,7 @@ const styles: Record<string, React.CSSProperties> = {
 // TODO fix collection filters
 // TODO confirm deletions
 // TODO submit on enter for forms
-// TODO handle invalid auth requests
+// TODO handle invalid auth requests gracefully
 // TODO fix other type errors
 // TODO refactor randomize to be less bad
 export default function App() {
@@ -93,7 +93,7 @@ export default function App() {
           <RecipeSummary></RecipeSummary>
         </>
       ) : (
-        <div style={styles.missingCollection}>No collection selected!</div>
+        <div style={styles.noCollectionText}>No collection selected!</div>
       )}
     </div>
   );
