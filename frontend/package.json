@@ -18,7 +18,8 @@
     "preact-render-to-string": "^5.1.2",
     "react-router": "^7.5.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "zustand-computed": "^2.0.2"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",

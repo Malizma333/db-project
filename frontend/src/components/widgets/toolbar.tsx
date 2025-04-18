@@ -76,7 +76,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   }
 
   async function onRandomRecipe() {
-    const numRecipes = await getRecipeCount(collectionId);
+    const numRecipes = await filterRecipeCollection(collectionId);
     const ind = Math.floor(Math.random() * (numRecipes || 0));
     const randRecipe = await filterRecipeCollection({
       collection_id: collectionId,
@@ -98,7 +98,6 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     setClientUsername("");
     await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
     if (logOutAlert.current !== null) {
-      // @ts-expect-error Not sure what to type this ref as
       logOutAlert.current.base.toast();
     }
   }
@@ -128,7 +127,6 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
 
   return (
     <div style={styles.root}>
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification
         variant="success"
         message="Logged out successfully"

@@ -49,7 +49,6 @@ export default function ChangePassDialog() {
 
     onCloseDialog();
     if (changePassAlert.current !== null) {
-      // @ts-expect-error Not sure what to type this ref as
       changePassAlert.current.base.toast();
     }
   }
@@ -61,7 +60,6 @@ export default function ChangePassDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Password"
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification
         message="Password changed successfully"
         variant="success"

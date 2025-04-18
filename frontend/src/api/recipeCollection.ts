@@ -3,7 +3,7 @@ import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
 
-interface FilterParams {
+export interface FilterParams {
   collection_id: number;
   recipe_name: string;
   include_allergens: string[];

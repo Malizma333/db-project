@@ -5016,15 +5016,13 @@ var Re = class extends N {
       i = e.clientHeight,
       r = this.localize.dir() === "rtl",
       s = this.getAllTabs(),
-      a = s
-        .slice(0, s.indexOf(e))
-        .reduce(
-          (c, n) => ({
-            left: c.left + n.clientWidth,
-            top: c.top + n.clientHeight,
-          }),
-          { left: 0, top: 0 },
-        );
+      a = s.slice(0, s.indexOf(e)).reduce(
+        (c, n) => ({
+          left: c.left + n.clientWidth,
+          top: c.top + n.clientHeight,
+        }),
+        { left: 0, top: 0 },
+      );
     switch (this.placement) {
       case "top":
       case "bottom":

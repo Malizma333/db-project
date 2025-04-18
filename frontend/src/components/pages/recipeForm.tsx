@@ -15,6 +15,7 @@ import {
 } from "../../api/recipeCollection";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 const styles = {
   inputField: {
@@ -35,28 +36,18 @@ export default function RecipeForm({
 }) {
   const {
     view,
+    selectedRecipe,
+    selectedRecipeName,
     setMainView,
     setSelectedRecipe,
-    selectedRecipeName,
-    selectedRecipeReference,
-    selectedRecipeAllergens,
-    selectedRecipeIngredients,
-    selectedRecipeAuthors,
   } = useAppStore();
-
-  const selectedRecipe = {
-    recipeName: selectedRecipeName,
-    reference: selectedRecipeReference,
-    allergens: selectedRecipeAllergens,
-    ingredients: selectedRecipeIngredients,
-    authors: selectedRecipeAuthors,
-  };
 
   const queryClient = useQueryClient();
 
   const submitAlert = useRef(null);
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
+  const [newName, setNewName] = useState(selectedRecipeName);
 
   const { data: allAllergens } = useCollectionAllergens(collectionId);
   const { data: allIngredients } = useCollectionIngredients(collectionId);
@@ -74,11 +65,11 @@ export default function RecipeForm({
   async function onAddRecipe(hideEvent: SlHideEvent) {
     try {
       if (viewState === VIEW.UPDATE_RECIPE_FORM) {
-        await removeRecipe(selectedRecipeName);
+        await removeRecipe(selectedRecipe.name);
       }
       await addRecipe(
         collectionId,
-        selectedRecipe.recipeName,
+        newName,
         selectedRecipe.reference,
         selectedRecipe.authors,
         selectedRecipe.ingredients,
@@ -87,7 +78,6 @@ export default function RecipeForm({
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
       onCloseDialog(hideEvent);
       if (submitAlert.current !== null) {
-        // @ts-expect-error Not sure what to type this ref as
         submitAlert.current.base.toast();
       }
     } catch (e) {
@@ -102,7 +92,6 @@ export default function RecipeForm({
       onSlHide={(e) => onCloseDialog(e)}
       label={formTitle}
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification
         message={submitMessage}
         variant="success"
@@ -111,19 +100,14 @@ export default function RecipeForm({
       <SlInput
         style={styles.inputField}
         type="text"
-        value={selectedRecipeName}
-        onSlChange={(e) =>
-          setSelectedRecipe({
-            ...selectedRecipe,
-            name: (e.target as any).value,
-          })
-        }
+        value={newName}
+        onSlChange={(e) => setNewName((e.target as any).value)}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
         style={styles.inputField}
         type="text"
-        value={selectedRecipeAuthors.join(",")}
+        value={selectedRecipe.authors.join(",")}
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
@@ -135,7 +119,7 @@ export default function RecipeForm({
       <SlInput
         style={styles.inputField}
         type="text"
-        value={selectedRecipeReference}
+        value={selectedRecipe.reference}
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
@@ -147,7 +131,7 @@ export default function RecipeForm({
       <TagPicker
         variant="primary"
         available={allAllergens}
-        selected={selectedRecipeAllergens}
+        selected={selectedRecipe.reference}
         setSelected={(allergens) =>
           setSelectedRecipe({ ...selectedRecipe, allergens })
         }
@@ -156,7 +140,7 @@ export default function RecipeForm({
       <TagPicker
         variant="primary"
         available={allIngredients}
-        selected={selectedRecipeIngredients}
+        selected={selectedRecipe.ingredients}
         setSelected={(ingredients) =>
           setSelectedRecipe({ ...selectedRecipe, ingredients })
         }

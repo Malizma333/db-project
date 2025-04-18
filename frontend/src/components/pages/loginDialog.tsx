@@ -40,7 +40,6 @@ export default function LoginDialog() {
       setClientUsername(username);
       onCloseDialog();
       if (logInAlert.current !== null) {
-        // @ts-expect-error Not sure what to type this ref as
         logInAlert.current.base.toast();
       }
     } catch (e) {
@@ -57,7 +56,6 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification
         message="Logged in successfully"
         variant="success"

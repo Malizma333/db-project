@@ -43,7 +43,6 @@ export default function ChangeNameDialog() {
 
     onCloseDialog();
     if (changeNameAlert.current !== null) {
-      // @ts-expect-error Not sure what to type this ref as
       changeNameAlert.current.base.toast();
     }
   }
@@ -55,7 +54,6 @@ export default function ChangeNameDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
       <SlNotification
         message="Changed username successfully"
         variant="success"

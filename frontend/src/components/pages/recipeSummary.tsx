@@ -9,15 +9,7 @@ const styles = {
 };
 
 export default function RecipeSummary() {
-  const {
-    view,
-    setMainView,
-    selectedRecipeName,
-    selectedRecipeReference,
-    selectedRecipeAllergens,
-    selectedRecipeIngredients,
-    selectedRecipeAuthors,
-  } = useAppStore();
+  const { view, setMainView, selectedRecipe } = useAppStore();
 
   function onCloseDialog() {
     setMainView();
@@ -28,22 +20,22 @@ export default function RecipeSummary() {
       class="dialog-overview"
       open={view === VIEW.RECIPE_SUMMARY}
       onSlHide={() => onCloseDialog()}
-      label={selectedRecipeName}
+      label={selectedRecipe.name}
     >
       <strong>Author(s)</strong>
-      <div style={styles.summaryField}>{selectedRecipeAuthors.join(",")}</div>
+      <div style={styles.summaryField}>{selectedRecipe.authors.join(",")}</div>
       <strong>Reference</strong>
-      <div style={styles.summaryField}>{selectedRecipeReference}</div>
+      <div style={styles.summaryField}>{selectedRecipe.reference}</div>
       <strong>Allergens</strong>
       <TagPicker
         variant="primary"
-        selected={selectedRecipeAllergens}
+        selected={selectedRecipe.allergens}
         viewMode
       ></TagPicker>
       <strong>Ingredients</strong>
       <TagPicker
         variant="primary"
-        selected={selectedRecipeIngredients}
+        selected={selectedRecipe.ingredients}
         viewMode
       ></TagPicker>
     </SlDialog>
