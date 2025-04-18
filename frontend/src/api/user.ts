@@ -3,16 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 
 interface AuthInfo {
   auth: string,
-  lifetime: number,
   user: string,
 };
 
-export let session_auth: AuthInfo = { auth: "", lifetime: -1, user: "" };
+export let session_auth: AuthInfo = {
+  auth: "",
+  user: ""
+};
 
 export function initSessionAuth() {
   session_auth = {
     auth: sessionStorage.getItem("session.auth") || "",
-    lifetime: parseInt(sessionStorage.getItem("session.lifetime") || "-1"),
     user: sessionStorage.getItem("session.user") || "",
   }
 }
@@ -32,12 +33,10 @@ export async function login(username: string, password: string) {
 
   session_auth = {
     auth: data.auth,
-    lifetime: data.lifetime,
     user: username,
   }
 
   sessionStorage.setItem("session.auth", data.auth);
-  sessionStorage.setItem("session.lifetime", data.lifetime);
   sessionStorage.setItem("session.user", username);
 }
 
@@ -55,7 +54,6 @@ export async function logout() {
 
   session_auth = {
     auth: "",
-    lifetime: -1,
     user: "",
   };
 
