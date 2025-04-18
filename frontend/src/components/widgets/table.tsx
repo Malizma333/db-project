@@ -145,6 +145,7 @@ export default function Table({ editMode }: { editMode: boolean }) {
   const {
     page,
     numRowsPerPage,
+    filterProps,
     getColumnVisible,
     setNewRecipeView,
     setSelectedRecipe,
@@ -154,13 +155,8 @@ export default function Table({ editMode }: { editMode: boolean }) {
   const collectionId = parseInt(params["id"] || "-1");
 
   const { data: pageData } = useFilterCollection({
+    ...filterProps,
     collection_id: collectionId,
-    recipe_name: "",
-    include_allergens: [],
-    exclude_allergens: [],
-    include_ingredients: [],
-    exclude_ingredients: [],
-    authors: [],
     view_min: page * numRowsPerPage,
     view_max: (page + 1) * numRowsPerPage,
   });

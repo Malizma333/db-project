@@ -23,18 +23,6 @@ interface FilterReturn {
 
 function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
-export const EMPTY_FILTER: FilterParams = {
-  collection_id: -1,
-  recipe_name: "",
-  include_allergens: [],
-  exclude_allergens: [],
-  include_ingredients: [],
-  exclude_ingredients: [],
-  authors: [],
-  view_min: -1,
-  view_max: -1,
-};
-
 export async function filterRecipeCollection({
   collection_id,
   recipe_name,
@@ -78,6 +66,48 @@ export function useFilterCollection(props: FilterParams) {
   return useQuery({
     queryKey: ["filterCollection", props.collection_id],
     queryFn: () => filterRecipeCollection(props),
+  });
+}
+
+export async function countRecipesInFilter({
+  collection_id,
+  recipe_name,
+  include_allergens,
+  exclude_allergens,
+  include_ingredients,
+  exclude_ingredients,
+  authors,
+  view_min,
+  view_max,
+}: FilterParams): Promise<number> {
+  const response = await makeRequest({
+    type: "filter_recipe_collection",
+    collection_id,
+    recipe_name,
+    include_allergens,
+    exclude_allergens,
+    include_ingredients,
+    exclude_ingredients,
+    authors,
+    view_min,
+    view_max,
+  });
+
+  const data: unknown = await response.json();
+
+  assertFilterParams(data);
+
+  if (response.status !== 200) {
+    throw new Error(getErrorMessage(data));
+  }
+
+  return data.table_size;
+}
+
+export function useCountRecipesInFilter(props: FilterParams) {
+  return useQuery({
+    queryKey: ["filterCollection", props.collection_id],
+    queryFn: () => countRecipesInFilter(props),
   });
 }
 

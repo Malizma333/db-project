@@ -39,12 +39,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-// TODO remove recipe should use old recipe name
 // TODO fix tool rearrange bug
 // TODO confirm deletions
 // TODO submit on enter for forms
 // TODO handle invalid auth requests
 // TODO Add assertions to api reception
+// TODO fix other type errors
+// TODO refactor randomize to be less bad
 export default function App() {
   const { setClientUsername } = useAppStore();
   const params = useParams();

@@ -15,8 +15,8 @@ import { useRef } from "preact/hooks";
 import { logout, useLoggedIn } from "../../api/user";
 import { useParams } from "react-router";
 import {
+  countRecipesInFilter,
   filterRecipeCollection,
-  getRecipeCount,
   useCollectionName,
 } from "../../api/recipeCollection";
 import { useQueryClient } from "@tanstack/react-query";
@@ -39,6 +39,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   const {
     clientUsername,
     recipeSearchFilter,
+    filterProps,
     setSettingsView,
     setLoginView,
     setChangePassView,
@@ -76,19 +77,20 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   }
 
   async function onRandomRecipe() {
-    const numRecipes = await filterRecipeCollection(collectionId);
-    const ind = Math.floor(Math.random() * (numRecipes || 0));
-    const randRecipe = await filterRecipeCollection({
+    const numRecipes = await countRecipesInFilter({
+      ...filterProps,
       collection_id: collectionId,
-      recipe_name: "",
-      authors: [],
-      include_allergens: [],
-      exclude_allergens: [],
-      include_ingredients: [],
-      exclude_ingredients: [],
+    });
+
+    const ind = Math.floor(Math.random() * (numRecipes || 0));
+
+    const randRecipe = await filterRecipeCollection({
+      ...filterProps,
+      collection_id: collectionId,
       view_min: ind,
       view_max: ind + 1,
     });
+
     setSelectedRecipe(randRecipe[0]);
     setRecipeSummaryView();
   }
