@@ -142,7 +142,24 @@ def do_thing(body):
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
 
             p = (body["collection_id"], "%"+body["recipe_name"]+"%",) + tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"])
+            includes = ""
+            if len(body["include_allergens"]) != 0:
+                p += tuple(body["include_allergens"])
+                includes += f"""AND EXISTS (SELECT * FROM Contains WHERE
+                                    Contains.allergen_name IN ({",".join("?" * len(body["include_allergens"]))})
+                                    AND Stores.recipe_name = Contains.recipe_name
+                                    AND Stores.recipe_owner = Contains.recipe_owner)
+                            """
+            if len(body["include_ingredients"]) != 0:
+                p += tuple(body["include_ingredients"])
+                includes += f"""AND EXISTS (SELECT * FROM Composes WHERE
+                                    Composes.ingredient_name IN ({",".join("?" * len(body["include_ingredients"]))})
+                                    AND Stores.recipe_name = Composes.recipe_name
+                                    AND Stores.recipe_owner = Composes.recipe_owner)
+                            """
             # Is this horribly inefficient? Who knows :D
+            # TODO: rewrite (maybe just get a list of recipes on first pass,
+            #       then get details separately?)
             q =  f"""SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
                     FROM (
                         SELECT Stores.recipe_name, Stores.recipe_owner
@@ -151,13 +168,14 @@ def do_thing(body):
                             Stores.collection_id = ?
                             AND Stores.recipe_name LIKE ?
                             AND NOT EXISTS (SELECT * FROM Contains WHERE
-                                contains.allergen_name IN ({",".join("?" * len(body["exclude_allergens"]))})
+                                Contains.allergen_name IN ({",".join("?" * len(body["exclude_allergens"]))})
                                 AND Stores.recipe_name = Contains.recipe_name
-                                AND Stores.recipe_owner = Contains.recip_owner)
+                                AND Stores.recipe_owner = Contains.recipe_owner)
                             AND NOT EXISTS (SELECT * FROM Composes WHERE
-                                contains.ingredient_name IN ({",".join("?" * len(body["exclude_ingredients"]))})
+                                Composes.ingredient_name IN ({",".join("?" * len(body["exclude_ingredients"]))})
                                 AND Stores.recipe_name = Composes.recipe_name
-                                AND Stores.recipe_owner = Composes.recip_owner)
+                                AND Stores.recipe_owner = Composes.recipe_owner)
+                            {includes}
                     ) AS FiltRecipe
 
                     JOIN Recipe ON
@@ -173,46 +191,6 @@ def do_thing(body):
                         FiltRecipe.recipe_name = Author.recipe_name
                         AND FiltRecipe.recipe_owner = Author.recipe_owner"""
             cursor.execute(q, p)
-
-            # # Temp fix query w/ full outer joins and no exists
-            # cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name,
-            # Com.ingredient_name, T1.owned_by
-            # FROM (SELECT S.recipe, S.owned_by FROM STORES AS S
-            # WHERE NOT EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join('?' * len(body["exclude_allergens"]))})
-            # AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
-            # AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join('?' * len(body["exclude_ingredients"]))})
-            # AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
-            # AND S.recipe LIKE ?
-            # AND S.collection_id = ?) AS T1
-            #
-            # FULL OUTER JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
-            # FULL OUTER JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
-            # FULL OUTER JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
-            # FULL OUTER JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
-            #
-            # ORDER BY T1.recipe""", (params))
-#             cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name, 
-#             Com.ingredient_name, T1.owned_by
-#             FROM (SELECT S.recipe, S.owned_by FROM STORES AS S 
-#             WHERE NOT EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["exclude_allergens"]))})
-#             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
-#             AND NOT EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["exclude_ingredients"]))})
-#             AND S.recipe = Com.recipe_name AND S.owned_by = Com.owned_by)
-#             AND EXISTS (SELECT * FROM Contains AS Cot WHERE Cot.allergen_name IN ({','.join(['?'] * len(body["include_allergens"]))})
-#             AND S.recipe = Cot.recipe_name AND Cot.owned_by = S.owned_by)
-#             AND EXISTS (SELECT * FROM Composes AS Com WHERE Com.ingredient_name IN ({','.join(['?'] * len(body["include_ingredients"]))})
-#             AND S.recipe = Com.recipe_name AND Com.owned_by = S.owned_by)
-#             AND EXISTS (SELECT * FROM Author AS A WHERE A.author_name IN ({','.join(['?'] * len(body["authors"]))})
-#             AND S.recipe = A.recipe_name AND S.owned_by = A.owned_by)
-#             AND S.recipe LIKE ?
-#             AND S.collection_id = ?) AS T1
-# 
-#             LEFT JOIN Author AS A ON T1.recipe = A.recipe_name AND T1.owned_by = A.owned_by
-#             JOIN Recipe AS R ON T1.recipe = R.recipe_name AND T1.owned_by = R.owned_by
-#             LEFT JOIN Contains AS Cot ON T1.recipe = Cot.recipe_name AND T1.owned_by = Cot.owned_by
-#             JOIN Composes AS Com ON T1.recipe = Com.recipe_name AND T1.owned_by = Com.owned_by
-# 
-#             ORDER BY T1.recipe""", (params))
 
             temp = cursor.fetchall()
             print(temp)
@@ -437,6 +415,9 @@ def do_thing(body):
                               AND name = ?""",
                            (body["recipe_name"], username, body["author"]))
             conn.commit()
+
+        else:
+            raise InputError("type_error")
 
         conn.close()
     return ret

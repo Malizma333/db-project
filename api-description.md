@@ -22,6 +22,15 @@ but was not found.
 }
 ```
 
+This error is for when an invalid value for they key `type` is found.
+
+```
+400
+{
+  "type": "type_error",
+}
+```
+
 This error is for database keys (like collection.id) that don't exist, maybe
 some other things later.
 
