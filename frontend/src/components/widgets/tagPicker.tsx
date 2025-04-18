@@ -28,6 +28,8 @@ export default function TagPicker(
     }
   }
 
+  // TODO refactor to wrap tags and add a new textbox somewhere
+
   return (
     <div style={styles.root}>
       {selected.map((tag, index) => {
@@ -37,7 +39,7 @@ export default function TagPicker(
           </SlTag>
         )
       })}
-      {!viewMode && selected.length < available.length &&
+      {!viewMode &&
         <SlDropdown>
           <SlIconButton slot="trigger" name="plus"></SlIconButton>
           <SlMenu style={styles.menu} onSlSelect={(e) => onAddTag(e.detail.item.value)}>

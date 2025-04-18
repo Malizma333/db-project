@@ -212,7 +212,6 @@ def do_thing(body):
                 body["view_max"] = len(recipes)
             if len(recipes) > 0:
                 for i in range(body["view_min"], body["view_max"]):
-                    print(i)
                     result.append(recipes[i])
 
             ret = {"type": "filter_recipe_collection_response", "recipes": result, "table_size": len(result)}

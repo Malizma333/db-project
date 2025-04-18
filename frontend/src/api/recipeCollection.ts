@@ -1,4 +1,4 @@
-import { getErrorMessage, makeRequest } from "./api";
+import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
@@ -14,6 +14,15 @@ interface FilterParams {
   view_min: number,
   view_max: number
 }
+
+interface FilterReturn {
+  type: string,
+  table_size: number,
+  recipes: Recipe[]
+}
+
+// TODO?
+function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
 export async function filterRecipeCollection({
   collection_id,
@@ -39,13 +48,23 @@ export async function filterRecipeCollection({
     view_max
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
+
+  assertFilterParams(data);
 
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
   }
 
-  return data.recipes;
+  console.log(data.recipes)
+
+  return data.recipes.map((recipe) => (
+    {
+      ...recipe,
+      allergens: recipe.allergens.filter((allergen) => allergen !== null),
+      ingredients: recipe.ingredients.filter((ingredient) => ingredient !== null),
+    }
+  ));
 }
 
 export function useFilterCollection(props: FilterParams) {
@@ -63,10 +82,10 @@ export async function renameRecipeCollection(id: number, new_name: string) {
     new_name,
   });
 
-  const data: Record<string, string> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 }
 
@@ -77,10 +96,10 @@ export async function addRecipeCollection(name: string): Promise<number> {
     name,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.id;
@@ -93,10 +112,10 @@ export async function removeRecipeCollection(id: number) {
     id,
   });
 
-  const data: Record<string, string> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 }
 
@@ -106,10 +125,10 @@ async function getOwnedRecipeCollections(): Promise<number[]> {
     auth: session_auth.auth,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.ids;
@@ -129,10 +148,10 @@ async function getAllergensFromCollection(id: number): Promise<string[]> {
     id,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.allergens;
@@ -152,10 +171,10 @@ async function getIngredientsFromCollection(id: number): Promise<string[]> {
     id,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.ingredients;
@@ -175,10 +194,10 @@ async function getAuthorsFromCollection(id: number): Promise<string[]> {
     id,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.authors;
@@ -199,10 +218,10 @@ export async function getRecipeCount(id: number): Promise<number> {
     id,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.count;
@@ -222,10 +241,10 @@ async function getRecipeCollectionName(id: number): Promise<string> {
     id,
   });
 
-  const data: Record<string, any> = await response.json();
+  const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data as ResponseDataType));
   }
 
   return data.collection_name;

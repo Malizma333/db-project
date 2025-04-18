@@ -1,5 +1,11 @@
 import { QueryClient } from "@tanstack/react-query";
 
+export interface ResponseDataType {
+  type: string,
+  message?: string
+  [key: string]: unknown
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -8,11 +14,11 @@ export const queryClient = new QueryClient({
   },
 });
 
-export function getErrorMessage(responseData: Record<string, string>) {
+export function getErrorMessage(responseData: ResponseDataType) {
   const ERROR_MSGS = {
     parse_error: "[ERROR] Parse failed!",
     auth_token_error: "[ERROR] Bad authentication token!",
-    bad_fetch_error: "[ERROR] Bad fetch: ",
+    bad_fetch_error: "Fetch failed! Server seems to be down...",
     resource_error: "[ERROR] Invalid resource: ",
     username_error: "Invalid username or password!",
     password_error: "Invalid username or password!",
