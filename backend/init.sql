@@ -1,59 +1,67 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE RecipeCollection (
-  collection_name   VARCHAR(20),
-  collection_id     INTEGER PRIMARY KEY,
-  managed_by        VARCHAR(20) NOT NULL
+  id                INTEGER PRIMARY KEY,
+  manager           VARCHAR(100) NOT NULL,
+  name              VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Account (
-  username          VARCHAR(100) PRIMARY KEY,
-  password_hash     VARCHAR(50),
-  password_salt     VARCHAR(50)
+  username          VARCHAR(100) PRIMARY KEY NOT NULL,
+  password_hash     VARCHAR(50) NOT NULL,
+  password_salt     VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE Stores (
-  collection_id     INTEGER,
-  recipe            VARCHAR(20),
-  owned_by          VARCHAR(20),
-  FOREIGN KEY(recipe, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY(collection_id) REFERENCES RecipeCollection(collection_id) ON DELETE CASCADE
+  collection_id     INTEGER NOT NULL,
+  recipe_name       VARCHAR(100) NOT NULL,
+  recipe_owner      VARCHAR(100) NOT NULL,
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY(collection_id) REFERENCES RecipeCollection(id) ON DELETE CASCADE
 );
 
-
+-- is the primary key needed here?
 CREATE TABLE Author (
-  recipe_name       VARCHAR(20),
-  owned_by          VARCHAR(20),
-  author_name       VARCHAR(20),
-  PRIMARY KEY(author_name, owned_by, recipe_name),
-  FOREIGN KEY(recipe_name, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE
+  name              VARCHAR(100) NOT NULL,
+  recipe_name       VARCHAR(100) NOT NULL,
+  recipe_owner      VARCHAR(100) NOT NULL,
+  PRIMARY KEY(name, recipe_name, recipe_owner),
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Recipe (
-  recipe_name       VARCHAR(20),
+  name              VARCHAR(100) NOT NULL,
+  owner             VARCHAR(100) NOT NULL,
   reference         VARCHAR(2083),
-  owned_by          VARCHAR(20) NOT NULL,
-  PRIMARY KEY(recipe_name, owned_by)
+  PRIMARY KEY(name, owner)
 );
 
 CREATE TABLE Contains (
-  recipe_name       VARCHAR(20),
-  owned_by          VARCHAR(20),
-  allergen_name     VARCHAR(20) REFERENCES Allergen(allergen_name),
-  FOREIGN KEY(recipe_name, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE
+  recipe_name               VARCHAR(100) NOT NULL,
+  recipe_owner              VARCHAR(100) NOT NULL,
+  allergen_name             VARCHAR(100) NOT NULL,
+  allergen_collection_id    INTEGER NOT NULL,
+  FOREIGN KEY(allergen_name, allergen_collection_id) REFERENCES Allergen(name, collection_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Composes (
-  recipe_name       VARCHAR(20),
-  owned_by          VARCHAR(20),
-  ingredient_name   VARCHAR(20) REFERENCES Ingredient(ingredient_name),
-  FOREIGN KEY(recipe_name, owned_by) REFERENCES Recipe(recipe_name, owned_by) ON DELETE CASCADE ON UPDATE CASCADE
+  recipe_name               VARCHAR(100) NOT NULL,
+  recipe_owner              VARCHAR(100) NOT NULL,
+  ingredient_name           VARCHAR(100) NOT NULL,
+  ingredient_collection_id  INTEGER NOT NULL,
+  FOREIGN KEY(ingredient_name, ingredient_collection_id) REFERENCES Ingredient(name, collection_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Allergen (
-  allergen_name     VARCHAR(20) PRIMARY KEY
+  name              VARCHAR(100) NOT NULL,
+  collection_id     INTEGER NOT NULL REFERENCES RecipeCollection(id),
+  PRIMARY KEY(name, collection_id)
 );
 
 CREATE TABLE Ingredient (
-  ingredient_name   VARCHAR(20) PRIMARY KEY
+  name              VARCHAR(100) NOT NULL,
+  collection_id     INTEGER REFERENCES RecipeCollection(id) NOT NULL,
+  PRIMARY KEY(name, collection_id)
 );
