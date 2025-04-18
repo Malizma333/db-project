@@ -3,25 +3,24 @@ import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
 
-interface FilterParams {
-  collection_id: number,
-  recipe_name: string,
-  include_allergens: string[],
-  exclude_allergens: string[],
-  include_ingredients: string[],
-  exclude_ingredients: string[],
-  authors: string[],
-  view_min: number,
-  view_max: number
+export interface FilterParams {
+  collection_id: number;
+  recipe_name: string;
+  include_allergens: string[];
+  exclude_allergens: string[];
+  include_ingredients: string[];
+  exclude_ingredients: string[];
+  authors: string[];
+  view_min: number;
+  view_max: number;
 }
 
 interface FilterReturn {
-  type: string,
-  table_size: number,
-  recipes: Recipe[]
+  type: string;
+  table_size: number;
+  recipes: Recipe[];
 }
 
-// TODO?
 function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
 export async function filterRecipeCollection({
@@ -33,7 +32,7 @@ export async function filterRecipeCollection({
   exclude_ingredients,
   authors,
   view_min,
-  view_max
+  view_max,
 }: FilterParams): Promise<Recipe[]> {
   const response = await makeRequest({
     type: "filter_recipe_collection",
@@ -45,7 +44,7 @@ export async function filterRecipeCollection({
     exclude_ingredients,
     authors,
     view_min,
-    view_max
+    view_max,
   });
 
   const data: unknown = await response.json();
@@ -56,22 +55,60 @@ export async function filterRecipeCollection({
     throw new Error(getErrorMessage(data));
   }
 
-  console.log(data.recipes)
-
-  return data.recipes.map((recipe) => (
-    {
-      ...recipe,
-      allergens: recipe.allergens.filter((allergen) => allergen !== null),
-      ingredients: recipe.ingredients.filter((ingredient) => ingredient !== null),
-    }
-  ));
+  return data.recipes.map((recipe) => ({
+    ...recipe,
+    allergens: recipe.allergens.filter((allergen) => allergen !== null),
+    ingredients: recipe.ingredients.filter((ingredient) => ingredient !== null),
+  }));
 }
 
 export function useFilterCollection(props: FilterParams) {
   return useQuery({
-    queryKey: ['filterCollection', props.collection_id],
+    queryKey: ["filterCollection", props.collection_id],
     queryFn: () => filterRecipeCollection(props),
-  })
+  });
+}
+
+export async function countRecipesInFilter({
+  collection_id,
+  recipe_name,
+  include_allergens,
+  exclude_allergens,
+  include_ingredients,
+  exclude_ingredients,
+  authors,
+  view_min,
+  view_max,
+}: FilterParams): Promise<number> {
+  const response = await makeRequest({
+    type: "filter_recipe_collection",
+    collection_id,
+    recipe_name,
+    include_allergens,
+    exclude_allergens,
+    include_ingredients,
+    exclude_ingredients,
+    authors,
+    view_min,
+    view_max,
+  });
+
+  const data: unknown = await response.json();
+
+  assertFilterParams(data);
+
+  if (response.status !== 200) {
+    throw new Error(getErrorMessage(data));
+  }
+
+  return data.table_size;
+}
+
+export function useCountRecipesInFilter(props: FilterParams) {
+  return useQuery({
+    queryKey: ["filterCollectionCount", props.collection_id],
+    queryFn: () => countRecipesInFilter(props),
+  });
 }
 
 export async function renameRecipeCollection(id: number, new_name: string) {
@@ -136,9 +173,10 @@ async function getOwnedRecipeCollections(): Promise<number[]> {
 
 export function useOwnedCollections() {
   return useQuery({
-    queryKey: ['ownedCollections'],
-    queryFn: session_auth.auth !== "" ? () => getOwnedRecipeCollections() : skipToken,
-  })
+    queryKey: ["ownedCollections"],
+    queryFn:
+      session_auth.auth !== "" ? () => getOwnedRecipeCollections() : skipToken,
+  });
 }
 
 async function getAllergensFromCollection(id: number): Promise<string[]> {
@@ -159,9 +197,9 @@ async function getAllergensFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionAllergens(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionAllergens', collection_id],
+    queryKey: ["collectionAllergens", collection_id],
     queryFn: () => getAllergensFromCollection(collection_id),
-  })
+  });
 }
 
 async function getIngredientsFromCollection(id: number): Promise<string[]> {
@@ -182,9 +220,9 @@ async function getIngredientsFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionIngredients(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionIngredients', collection_id],
+    queryKey: ["collectionIngredients", collection_id],
     queryFn: () => getIngredientsFromCollection(collection_id),
-  })
+  });
 }
 
 async function getAuthorsFromCollection(id: number): Promise<string[]> {
@@ -205,12 +243,11 @@ async function getAuthorsFromCollection(id: number): Promise<string[]> {
 
 export function useCollectionAuthors(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionAuthors', collection_id],
+    queryKey: ["collectionAuthors", collection_id],
     queryFn: () => getAuthorsFromCollection(collection_id),
-  })
+  });
 }
 
-// TODO: This should also work with a filter applied
 export async function getRecipeCount(id: number): Promise<number> {
   const response = await makeRequest({
     type: "count_recipes_in_collection",
@@ -229,9 +266,10 @@ export async function getRecipeCount(id: number): Promise<number> {
 
 export function useRecipeCount(collection_id: number) {
   return useQuery({
-    queryKey: ['recipeCount', collection_id],
-    queryFn: collection_id !== -1 ? () => getRecipeCount(collection_id) : skipToken,
-  })
+    queryKey: ["recipeCount", collection_id],
+    queryFn:
+      collection_id !== -1 ? () => getRecipeCount(collection_id) : skipToken,
+  });
 }
 
 async function getRecipeCollectionName(id: number): Promise<string> {
@@ -252,7 +290,38 @@ async function getRecipeCollectionName(id: number): Promise<string> {
 
 export function useCollectionName(collection_id: number) {
   return useQuery({
-    queryKey: ['collectionName', collection_id],
-    queryFn: collection_id !== -1 ? () => getRecipeCollectionName(collection_id) : skipToken,
-  })
+    queryKey: ["collectionName", collection_id],
+    queryFn:
+      collection_id !== -1
+        ? () => getRecipeCollectionName(collection_id)
+        : skipToken,
+  });
+}
+
+async function getCollectionExists(id: number): Promise<boolean> {
+  const response = await makeRequest({
+    type: "get_collection_exists",
+    auth: session_auth.auth,
+    id,
+  });
+
+  return response.status === 200;
+}
+
+export function useCollectionExists(collection_id: number) {
+  return useQuery({
+    queryKey: ["collectionExists", collection_id],
+    queryFn: async () => {
+      try {
+        await getRecipeCollectionName(collection_id);
+        return true;
+      } catch (e) {
+        if (e instanceof Error) {
+          // pass
+        }
+        return false;
+      }
+    },
+    staleTime: Infinity,
+  });
 }

@@ -140,7 +140,7 @@ def do_thing(body):
             params = tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"]) + tuple(
                 body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
-            
+
             p = (body["recipe_name"],)
             # Is this horribly inefficient? Who knows :D
             q =  """SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
@@ -245,6 +245,7 @@ def do_thing(body):
                            (body["new_name"], body["id"], username))
             conn.commit()
 
+        # TODO: Big and random ids
         elif body["type"] == "add_recipe_collection":
             username = check_auth(body["auth"])
             cursor.execute("INSERT INTO RecipeCollection VALUES(?,?,?)",

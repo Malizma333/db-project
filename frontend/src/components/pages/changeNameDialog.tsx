@@ -1,15 +1,19 @@
-import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
-import { useAppStore, VIEW } from '../../store';
-import { SlNotification } from '../widgets/notification';
+import {
+  SlInput,
+  SlDialog,
+  SlButton,
+} from "@shoelace-style/shoelace/dist/react";
+import { useRef, useState } from "preact/hooks";
+import { useAppStore, VIEW } from "../../store";
+import { SlNotification } from "../widgets/notification";
 
-import { changeUsername } from '../../api/user';
+import { changeUsername } from "../../api/user";
 
 const styles = {
   inputField: {
     marginBottom: "1em",
   },
-}
+};
 
 export default function ChangeNameDialog() {
   const { view, setMainView, setClientUsername } = useAppStore();
@@ -30,7 +34,7 @@ export default function ChangeNameDialog() {
     try {
       await changeUsername(password, newUsername);
       setClientUsername(newUsername);
-    } catch(e) {
+    } catch (e) {
       if (e instanceof Error) {
         setHelpText(e.message);
       }
@@ -39,7 +43,6 @@ export default function ChangeNameDialog() {
 
     onCloseDialog();
     if (changeNameAlert.current !== null) {
-      // @ts-expect-error Not sure what to type this ref as
       changeNameAlert.current.base.toast();
     }
   }
@@ -51,8 +54,11 @@ export default function ChangeNameDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Username"
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
-      <SlNotification message="Changed username successfully" variant="success" ref={changeNameAlert}></SlNotification>
+      <SlNotification
+        message="Changed username successfully"
+        variant="success"
+        ref={changeNameAlert}
+      ></SlNotification>
       <SlInput
         style={styles.inputField}
         helpText="Must be 8 - 20 characters"
@@ -71,10 +77,13 @@ export default function ChangeNameDialog() {
         placeholder="Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => {void onChangeUsername()}}>
+      <SlButton
+        onClick={() => {
+          void onChangeUsername();
+        }}
+      >
         Confirm
       </SlButton>
     </SlDialog>
-  )
+  );
 }
-

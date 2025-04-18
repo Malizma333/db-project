@@ -1,15 +1,19 @@
-import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react';
-import { useRef, useState } from 'preact/hooks';
-import { useAppStore, VIEW } from '../../store';
-import { SlNotification } from '../widgets/notification';
+import {
+  SlInput,
+  SlDialog,
+  SlButton,
+} from "@shoelace-style/shoelace/dist/react";
+import { useRef, useState } from "preact/hooks";
+import { useAppStore, VIEW } from "../../store";
+import { SlNotification } from "../widgets/notification";
 
-import { changePassword } from '../../api/user';
+import { changePassword } from "../../api/user";
 
 const styles = {
   inputField: {
     marginBottom: "1em",
   },
-}
+};
 
 export default function ChangePassDialog() {
   const { view, setMainView } = useAppStore();
@@ -45,7 +49,6 @@ export default function ChangePassDialog() {
 
     onCloseDialog();
     if (changePassAlert.current !== null) {
-      // @ts-expect-error Not sure what to type this ref as
       changePassAlert.current.base.toast();
     }
   }
@@ -57,8 +60,11 @@ export default function ChangePassDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Password"
     >
-      {/* @ts-expect-error React refs not well supported by Shoelace */}
-      <SlNotification message="Password changed successfully" variant="success" ref={changePassAlert}></SlNotification>
+      <SlNotification
+        message="Password changed successfully"
+        variant="success"
+        ref={changePassAlert}
+      ></SlNotification>
       <SlInput
         style={styles.inputField}
         type="password"
@@ -86,10 +92,13 @@ export default function ChangePassDialog() {
         placeholder="Retype New Password"
         passwordToggle
       ></SlInput>
-      <SlButton onClick={() => {void onSetPassword()}}>
+      <SlButton
+        onClick={() => {
+          void onSetPassword();
+        }}
+      >
         Confirm
       </SlButton>
     </SlDialog>
-  )
+  );
 }
-

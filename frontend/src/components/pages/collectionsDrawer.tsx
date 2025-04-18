@@ -1,7 +1,15 @@
-import { SlDrawer, SlInput, SlIconButton, SlTooltip } from "@shoelace-style/shoelace/dist/react";
+import {
+  SlDrawer,
+  SlInput,
+  SlIconButton,
+  SlTooltip,
+} from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
 
-import { addRecipeCollection, useOwnedCollections } from "../../api/recipeCollection";
+import {
+  addRecipeCollection,
+  useOwnedCollections,
+} from "../../api/recipeCollection";
 import { useState } from "preact/hooks";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import CollectionCard from "./collectionCard";
@@ -33,7 +41,7 @@ export default function CollectionsDrawer() {
     if (e.eventPhase === Event.AT_TARGET) {
       setMainView();
     } else {
-      e.preventDefault()
+      e.preventDefault();
     }
   }
 
@@ -41,7 +49,7 @@ export default function CollectionsDrawer() {
     try {
       await addRecipeCollection("New Collection");
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
-    } catch(e) {
+    } catch (e) {
       if (e instanceof Error) {
         console.error(e.message);
       }
@@ -66,23 +74,24 @@ export default function CollectionsDrawer() {
             value={searchTerm}
             onSlChange={(e) => setSearchTerm((e.target as any).value)}
           ></SlInput>
-          {collectionIds.map(
-            (collectionId) =>
-              <CollectionCard
-                collectionId={collectionId}
-                searchTerm={searchTerm}
-              ></CollectionCard>
-          )}
+          {collectionIds.map((collectionId) => (
+            <CollectionCard
+              collectionId={collectionId}
+              searchTerm={searchTerm}
+            ></CollectionCard>
+          ))}
           <SlTooltip content="Add Collection">
             <SlIconButton
               name="plus"
               label="Add Collection"
-              style={{fontSize: "2em"}}
-              onClick={() => {void onCreateCollection()}}
+              style={{ fontSize: "2em" }}
+              onClick={() => {
+                void onCreateCollection();
+              }}
             ></SlIconButton>
           </SlTooltip>
         </div>
       )}
     </SlDrawer>
-  )
+  );
 }
