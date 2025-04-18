@@ -21,7 +21,7 @@ interface FilterReturn {
   recipes: Recipe[]
 }
 
-// TODO?
+// TODO? (Add assertions in general)
 function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
 export async function filterRecipeCollection({
@@ -55,8 +55,6 @@ export async function filterRecipeCollection({
   if (response.status !== 200) {
     throw new Error(getErrorMessage(data));
   }
-
-  console.log(data.recipes)
 
   return data.recipes.map((recipe) => (
     {

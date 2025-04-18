@@ -2,7 +2,7 @@ import { SlInput, SlDialog, SlButton } from '@shoelace-style/shoelace/dist/react
 import { useRef } from 'preact/hooks';
 import { useAppStore, VIEW } from '../../store';
 import { SlNotification } from '../widgets/notification';
-import TagPicker from '../widgets/tagPicker';
+import TagPicker, { TagType } from '../widgets/tagPicker';
 import { useParams } from 'react-router';
 import { addRecipe, removeRecipe } from '../../api/recipe';
 import { useCollectionAllergens, useCollectionIngredients } from '../../api/recipeCollection';
@@ -116,12 +116,14 @@ export default function RecipeForm(
         available={allAllergens}
         selected={selectedRecipeAllergens}
         setSelected={(allergens) => setSelectedRecipe({ ...selectedRecipe, allergens })}
+        tagType={TagType.Allergen}
       ></TagPicker>
       <TagPicker
         variant="primary"
         available={allIngredients}
         selected={selectedRecipeIngredients}
         setSelected={(ingredients) => setSelectedRecipe({ ...selectedRecipe, ingredients })}
+        tagType={TagType.Ingredient}
       ></TagPicker>
       <SlButton onClick={(e) => {void onAddRecipe(e)}}>
         {submitLabel}

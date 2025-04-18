@@ -1,4 +1,7 @@
 import { SlTag, SlIconButton, SlDropdown, SlMenu, SlMenuItem, SlInput } from '@shoelace-style/shoelace/dist/react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { createAllergen, createIngredient } from 'src/api/recipe';
 
 const styles = {
   root: {
@@ -6,10 +9,23 @@ const styles = {
     display: 'flex',
     height: '2em',
     justifyContent: 'start',
+    position: 'relative',
   },
   menu: {
     height: '8em',
+  },
+  addNew: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    margin: 'auto',
   }
+}
+
+export enum TagType {
+  Allergen = "Allergy",
+  Ingredient = "Ingredient"
 }
 
 export default function TagPicker(
@@ -20,9 +36,12 @@ export default function TagPicker(
     available?: string[],
     setSelected?: (s: string[]) => void,
     viewMode?: boolean,
-    tagType?: string
+    tagType?: TagType
   }
 ) {
+  const [newTag, setNewTag] = useState("");
+  const queryClient = useQueryClient();
+
   function onRemoveTag(i: number) {
     if (setSelected !== undefined) {
       setSelected(selected.slice(0, i).concat(selected.slice(i + 1)))
@@ -35,7 +54,21 @@ export default function TagPicker(
     }
   }
 
-  // TODO refactor to wrap tags and add a new textbox somewhere
+  async function onCreateTag() {
+    try {
+      if (tagType === TagType.Allergen) {
+        await createAllergen(newTag);
+        await queryClient.invalidateQueries({ queryKey: ["collectionAllergens"]});
+      } else if (tagType === TagType.Ingredient) {
+        await createIngredient(newTag);
+        await queryClient.invalidateQueries({ queryKey: ["collectionIngredients"]});
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+    }
+  }
 
   return (
     <div style={styles.root}>
@@ -58,8 +91,19 @@ export default function TagPicker(
           </SlMenu>
         </SlDropdown>
       }
-      {!viewMode &&
-        <SlInput placeholder={"New " + tagType}>
+      {!viewMode && tagType !== undefined &&
+        <SlInput
+          style={styles.addNew}
+          placeholder={"New " + tagType}
+          value={newTag}
+          onSlChange={(e) => setNewTag((e.target as any).value)}
+        >
+          <SlIconButton
+            slot="suffix"
+            name="plus"
+            label="Create Tag"
+            onClick={() => {void onCreateTag()}}
+          ></SlIconButton>
         </SlInput>
       }
     </div>
