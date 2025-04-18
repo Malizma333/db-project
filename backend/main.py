@@ -139,6 +139,7 @@ def do_thing(body):
                 body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
             
             # Temp fix query w/ full outer joins and no exists
+            # TODO: Fix this for includes (and also on invalid id returns data)
             cursor.execute(f"""SELECT T1.recipe, A.author_name, R.reference, Cot.allergen_name, 
             Com.ingredient_name, T1.owned_by
             FROM (SELECT S.recipe, S.owned_by FROM STORES AS S 
@@ -223,6 +224,7 @@ def do_thing(body):
                             WHERE collection_id = ? AND managed_by = ?""", params)
             conn.commit()
 
+        # TODO: Big and random ids
         elif body["type"] == "add_recipe_collection":
             username = check_auth(body["auth"])
             collect_params = (body["name"], None, username)

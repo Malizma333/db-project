@@ -1,4 +1,4 @@
-import { SlTag, SlIconButton, SlDropdown, SlMenu, SlMenuItem } from '@shoelace-style/shoelace/dist/react';
+import { SlTag, SlIconButton, SlDropdown, SlMenu, SlMenuItem, SlInput } from '@shoelace-style/shoelace/dist/react';
 
 const styles = {
   root: {
@@ -13,8 +13,15 @@ const styles = {
 }
 
 export default function TagPicker(
-  { variant, selected, available=[], setSelected=undefined, viewMode=false } :
-  { variant: "success" | "warning" | "danger" | "primary", selected: string[], available?: string[], setSelected?: (s: string[]) => void, viewMode?: boolean }
+  { variant, selected, available=[], setSelected=undefined, viewMode=false, tagType=undefined } :
+  {
+    variant: "success" | "warning" | "danger" | "primary",
+    selected: string[],
+    available?: string[],
+    setSelected?: (s: string[]) => void,
+    viewMode?: boolean,
+    tagType?: string
+  }
 ) {
   function onRemoveTag(i: number) {
     if (setSelected !== undefined) {
@@ -32,14 +39,12 @@ export default function TagPicker(
 
   return (
     <div style={styles.root}>
-      {selected.map((tag, index) => {
-        return (
-          <SlTag key={index} variant={variant} removable={!viewMode} size="small" onSlRemove={() => onRemoveTag(index)}>
-            {tag}
-          </SlTag>
-        )
-      })}
-      {!viewMode &&
+      {selected.map((tag, index) => (
+        <SlTag key={index} variant={variant} removable={!viewMode} size="small" onSlRemove={() => onRemoveTag(index)}>
+          {tag}
+        </SlTag>
+      ))}
+      {!viewMode && available.length > selected.length &&
         <SlDropdown>
           <SlIconButton slot="trigger" name="plus"></SlIconButton>
           <SlMenu style={styles.menu} onSlSelect={(e) => onAddTag(e.detail.item.value)}>
@@ -52,6 +57,10 @@ export default function TagPicker(
             })}
           </SlMenu>
         </SlDropdown>
+      }
+      {!viewMode &&
+        <SlInput placeholder={"New " + tagType}>
+        </SlInput>
       }
     </div>
   )

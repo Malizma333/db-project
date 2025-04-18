@@ -1,5 +1,5 @@
 import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
-import { skipToken, useQuery } from "@tanstack/react-query";
+import { skipToken, UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
 
@@ -254,5 +254,24 @@ export function useCollectionName(collection_id: number) {
   return useQuery({
     queryKey: ['collectionName', collection_id],
     queryFn: collection_id !== -1 ? () => getRecipeCollectionName(collection_id) : skipToken,
+  })
+}
+
+// Function to check if a collection exists (if fetching the name returns an error)
+export function useCollectionExists(collection_id: number) {
+  return useQuery({
+    queryKey: ['collectionExists', collection_id],
+    queryFn: async () => {
+      try {
+        await getRecipeCollectionName(collection_id)
+        return true;
+      } catch (e) {
+        if (e instanceof Error) {
+          // pass
+        }
+        return false;
+      }
+    },
+    staleTime: Infinity
   })
 }

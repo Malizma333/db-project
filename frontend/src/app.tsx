@@ -1,9 +1,5 @@
 import '@shoelace-style/shoelace/dist/themes/dark.css';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
-
-// used for importing icons without copying into public directory
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
-
 import SettingsDrawer from './components/pages/settingsDrawer';
 import Toolbar from './components/widgets/toolbar';
 import Table from './components/widgets/table';
@@ -15,10 +11,12 @@ import ChangeNameDialog from './components/pages/changeNameDialog';
 import CollectionsDrawer from './components/pages/collectionsDrawer';
 import RecipeForm from './components/pages/recipeForm';
 import RecipeSummary from './components/pages/recipeSummary';
-
 import { useOwnedCollections } from './api/recipeCollection';
 import { useLoggedIn } from './api/user';
 import { useParams } from 'react-router';
+
+// used for importing icons without copying into public directory
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.0/cdn/');
 
 const styles: Record<string, React.CSSProperties> = {
   root: {
@@ -41,7 +39,6 @@ const styles: Record<string, React.CSSProperties> = {
 // TODO confirm deletions
 // TODO submit on enter for forms
 // TODO add dropdown for ingredients and allergens
-// TODO fix issue with empty allergens and ingredients
 // TODO link to collection
 export default function App() {
   const params = useParams();

@@ -69,7 +69,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-right"
-          onClick={() => {void onNavigateNextPage(numPages)}}
+          onClick={() => {void onNavigateNextPage()}}
           label="Next Page"
         ></SlIconButton>
       </SlTooltip>
@@ -77,7 +77,7 @@ export default function PageNav() {
         <SlIconButton
           disabled={page === numPages - 1}
           name="chevron-double-right"
-          onClick={() => {void onNavigateLastPage(numPages)}}
+          onClick={() => {void onNavigateLastPage()}}
           label="Last Page"
         ></SlIconButton>
       </SlTooltip>
