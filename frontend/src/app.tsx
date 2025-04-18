@@ -39,7 +39,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-// TODO fix tool rearrange bug
+// TODO fix collection filters
 // TODO confirm deletions
 // TODO submit on enter for forms
 // TODO handle invalid auth requests
