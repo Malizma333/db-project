@@ -5,4 +5,5 @@ import preact from "@preact/preset-vite";
 export default defineConfig({
   plugins: [preact(), tsconfigPaths()],
   server: { port: 8008 },
+  build: { minify: false }, // TODO remove
 });

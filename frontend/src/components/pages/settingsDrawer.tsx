@@ -5,7 +5,6 @@ import {
   SlInput,
 } from "@shoelace-style/shoelace/dist/react";
 import TagPicker from "../widgets/tagPicker";
-import { useState } from "preact/hooks";
 import { useAppStore, VIEW, COLUMN_MASK } from "../../store";
 import { useParams } from "react-router";
 
@@ -40,9 +39,9 @@ function FilterPicker({
 }: {
   columnName: string;
   included: string[];
-  excluded: string[];
+  excluded?: string[];
   setIncluded: (v: string[]) => void;
-  setExcluded: (v: string[]) => void;
+  setExcluded?: (v: string[]) => void;
   columnOptions?: string[];
 }) {
   return (
@@ -51,20 +50,24 @@ function FilterPicker({
         Include {columnName}
         <TagPicker
           variant="success"
-          available={columnOptions.filter((tag) => !excluded.includes(tag))}
+          available={columnOptions.filter(
+            (tag) => excluded !== undefined && !excluded.includes(tag),
+          )}
           selected={included}
           setSelected={setIncluded}
         ></TagPicker>
       </div>
-      <div style={styles.filterContainer}>
-        Exclude {columnName}
-        <TagPicker
-          variant="danger"
-          available={columnOptions.filter((tag) => !included.includes(tag))}
-          selected={excluded}
-          setSelected={setExcluded}
-        ></TagPicker>
-      </div>
+      {excluded !== undefined && (
+        <div style={styles.filterContainer}>
+          Exclude {columnName}
+          <TagPicker
+            variant="danger"
+            available={columnOptions.filter((tag) => !included.includes(tag))}
+            selected={excluded}
+            setSelected={setExcluded}
+          ></TagPicker>
+        </div>
+      )}
     </div>
   );
 }
@@ -76,7 +79,6 @@ export default function SettingsDrawer() {
     includeAllergensFilter,
     excludeAllergensFilter,
     includeAuthorsFilter,
-    excludeAuthorsFilter,
     includeIngredientsFilter,
     excludeIngredientsFilter,
     getColumnVisible,
@@ -87,7 +89,6 @@ export default function SettingsDrawer() {
     setIncludeAllergensFilter,
     setExcludeAllergensFilter,
     setIncludeAuthorsFilter,
-    setExcludeAuthorsFilter,
     setIncludeIngredientsFilter,
     setExcludeIngredientsFilter,
   } = useAppStore();
@@ -193,8 +194,6 @@ export default function SettingsDrawer() {
         columnName={"Author"}
         included={includeAuthorsFilter}
         setIncluded={setIncludeAuthorsFilter}
-        excluded={excludeAuthorsFilter}
-        setExcluded={setExcludeAuthorsFilter}
         columnOptions={allAuthors}
       ></FilterPicker>
       <FilterPicker

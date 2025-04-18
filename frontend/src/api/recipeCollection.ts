@@ -106,7 +106,7 @@ export async function countRecipesInFilter({
 
 export function useCountRecipesInFilter(props: FilterParams) {
   return useQuery({
-    queryKey: ["filterCollection", props.collection_id],
+    queryKey: ["filterCollectionCount", props.collection_id],
     queryFn: () => countRecipesInFilter(props),
   });
 }

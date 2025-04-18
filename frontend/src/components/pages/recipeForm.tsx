@@ -131,7 +131,7 @@ export default function RecipeForm({
       <TagPicker
         variant="primary"
         available={allAllergens}
-        selected={selectedRecipe.reference}
+        selected={selectedRecipe.allergens}
         setSelected={(allergens) =>
           setSelectedRecipe({ ...selectedRecipe, allergens })
         }
