@@ -30311,725 +30311,14 @@ function useBaseQuery(options, Observer, queryClient2) {
 function useQuery(options, queryClient2) {
   return useBaseQuery(options, QueryObserver);
 }
-const AUTH_ERROR = "AUTH_ERROR";
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 1e3 * 60 * 60 * 24,
-      // 24 hours
-    },
-  },
-});
-function getErrorMessage(responseData) {
-  const ERROR_MSGS = {
-    parse_error: "[ERROR] Parse failed!",
-    bad_fetch_error: "Fetch failed! Server seems to be down...",
-    resource_error: "[ERROR] Invalid resource: ",
-    username_error: "Invalid username or password!",
-    password_error: "Invalid username or password!",
-    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
-  };
-  let message = "Unknown error";
-  switch (responseData.type) {
-    case "bad_fetch_error": {
-      message = ERROR_MSGS[responseData.type] + responseData.message;
-      break;
-    }
-    case "auth_token_error": {
-      message = AUTH_ERROR;
-      break;
-    }
-    case "parse_error": {
-      message = ERROR_MSGS[responseData.type];
-      break;
-    }
-    case "resource_error": {
-      message = ERROR_MSGS[responseData.type] + responseData.message;
-      break;
-    }
-    case "username_error": {
-      message = ERROR_MSGS[responseData.type];
-      break;
-    }
-    case "password_error": {
-      message = ERROR_MSGS[responseData.type];
-      break;
-    }
-    case "internal_server_error": {
-      message = ERROR_MSGS[responseData.type] + responseData.message;
-      break;
-    }
-  }
-  return message;
-}
-async function makeRequest(jsonBody) {
-  try {
-    const data = await fetch("/api", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(jsonBody),
-    });
-    return data;
-  } catch (e3) {
-    return new Response(
-      JSON.stringify({
-        type: "bad_fetch_error",
-        message: e3.message,
-      }),
-      {
-        status: 400,
-      },
-    );
-  }
-}
-function assertRecipe(x2) {
-  if (typeof x2 !== "object" || x2 === null) {
-    throw new Error();
-  }
-  if (!("name" in x2 && typeof x2["name"] === "string")) {
-    throw new Error();
-  }
-  if (!("reference" in x2 && typeof x2["reference"] === "string")) {
-    throw new Error();
-  }
-  if (
-    !(
-      "authors" in x2 &&
-      Array.isArray(x2["authors"]) &&
-      x2["authors"].every((y2) => typeof y2 === "string")
-    )
-  ) {
-    throw new Error();
-  }
-  if (
-    !(
-      "allergens" in x2 &&
-      Array.isArray(x2["allergens"]) &&
-      x2["allergens"].every((y2) => typeof y2 === "string")
-    )
-  ) {
-    throw new Error();
-  }
-  if (
-    !(
-      "ingredients" in x2 &&
-      Array.isArray(x2["ingredients"]) &&
-      x2["ingredients"].every((y2) => typeof y2 === "string")
-    )
-  ) {
-    throw new Error();
-  }
-}
-function assertFilterResponse(x2) {
-  if (typeof x2 !== "object" || x2 === null) {
-    throw new Error();
-  }
-  if (!("type" in x2 && typeof x2["type"] === "string")) {
-    throw new Error();
-  }
-  if (!("table_size" in x2 && typeof x2["table_size"] === "number")) {
-    throw new Error();
-  }
-  if (!("recipes" in x2 && Array.isArray(x2["recipes"]))) {
-    throw new Error();
-  }
-  x2["recipes"].forEach((r3) => assertRecipe(r3));
-}
-function assertErrorResponse(x2) {
-  if (typeof x2 !== "object" || x2 === null) {
-    throw new Error();
-  }
-  if (!("type" in x2 && typeof x2["type"] === "string")) {
-    throw new Error();
-  }
-}
-function assertAuthResponse(x2) {
-  if (typeof x2 !== "object" || x2 === null) {
-    throw new Error();
-  }
-  if (!("type" in x2 && typeof x2["type"] === "string")) {
-    throw new Error();
-  }
-  if (!("auth" in x2 && typeof x2["auth"] === "string")) {
-    throw new Error();
-  }
-}
-let session_auth = {
-  auth: "",
-  user: "",
-};
-function initSessionAuth() {
-  session_auth = {
-    auth: sessionStorage.getItem("session.auth") || "",
-    user: sessionStorage.getItem("session.user") || "",
-  };
-}
-async function login(username, password) {
-  const response = await makeRequest({
-    type: "login",
-    username,
-    password,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-  assertAuthResponse(data);
-  session_auth = {
-    auth: data.auth,
-    user: username,
-  };
-  sessionStorage.setItem("session.auth", data.auth);
-  sessionStorage.setItem("session.user", username);
-}
-async function logout() {
-  const response = await makeRequest({
-    type: "logout",
-    auth: session_auth.auth,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-  session_auth = {
-    auth: "",
-    user: "",
-  };
-  sessionStorage.removeItem("session.auth");
-  sessionStorage.removeItem("session.lifetime");
-  sessionStorage.removeItem("session.user");
-}
-async function loggedIn() {
-  if (!session_auth) {
-    return false;
-  }
-  const response = await makeRequest({
-    type: "is_logged_in",
-    auth: session_auth.auth,
-  });
-  return response.status === 200;
-}
-function useLoggedIn() {
-  return useQuery({
-    queryKey: ["loggedIn"],
-    queryFn: () => loggedIn(),
-  });
-}
-async function changeUsername(password, new_username) {
-  const response = await makeRequest({
-    type: "change_username",
-    auth: session_auth.auth,
-    password,
-    new_username,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-  session_auth.user = new_username;
-  sessionStorage.setItem("session.user", new_username);
-}
-async function changePassword(password, new_password) {
-  const response = await makeRequest({
-    type: "change_password",
-    auth: session_auth.auth,
-    password,
-    new_password,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-}
-async function addRecipe(
-  collection_id,
-  recipe_name,
-  reference,
-  authors,
-  ingredients,
-  allergens,
-) {
-  const response = await makeRequest({
-    type: "add_recipe",
-    auth: session_auth.auth,
-    collection_id,
-    recipe_name,
-    reference,
-    authors,
-    ingredients,
-    allergens,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-}
-async function removeRecipe(recipe_name) {
-  const response = await makeRequest({
-    type: "remove_recipe",
-    auth: session_auth.auth,
-    recipe_name,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-}
-async function createAllergen(allergen_name) {
-  const response = await makeRequest({
-    type: "append_allergen",
-    allergen_name,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-}
-async function createIngredient(ingredient_name) {
-  const response = await makeRequest({
-    type: "append_ingredient",
-    ingredient_name,
-  });
-  const data = await response.json();
-  if (response.status !== 200) {
-    assertErrorResponse(data);
-    throw new Error(getErrorMessage(data));
-  }
-}
-const styles$c = {
-  root: {
-    alignItems: "center",
-    display: "flex",
-    height: "2em",
-    justifyContent: "start",
-    position: "relative",
-  },
-  menu: {
-    height: "8em",
-  },
-  addNew: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    bottom: 0,
-    margin: "auto",
-  },
-};
-var TagType = /* @__PURE__ */ ((TagType2) => {
-  TagType2["Allergen"] = "Allergy";
-  TagType2["Ingredient"] = "Ingredient";
-  return TagType2;
-})(TagType || {});
-function TagPicker({
-  variant,
-  selected,
-  available = [],
-  setSelected = void 0,
-  viewMode = false,
-  tagType = void 0,
-}) {
-  const [newTag, setNewTag] = h$2("");
-  const queryClient2 = useQueryClient();
-  function onRemoveTag(i3) {
-    if (setSelected !== void 0) {
-      setSelected(selected.slice(0, i3).concat(selected.slice(i3 + 1)));
-    }
-  }
-  function onAddTag(name) {
-    if (setSelected !== void 0) {
-      setSelected(selected.concat([name]));
-    }
-  }
-  async function onCreateTag() {
-    try {
-      if (tagType === "Allergy") {
-        await createAllergen(newTag);
-        await queryClient2.invalidateQueries({
-          queryKey: ["collectionAllergens"],
-        });
-      } else if (tagType === "Ingredient") {
-        await createIngredient(newTag);
-        await queryClient2.invalidateQueries({
-          queryKey: ["collectionIngredients"],
-        });
-      }
-    } catch (e3) {
-      if (e3 instanceof Error) {
-        console.error(e3.message);
-      }
-    }
-  }
-  return /* @__PURE__ */ u$5("div", {
-    style: styles$c.root,
-    children: [
-      selected.map((tag, index) =>
-        /* @__PURE__ */ u$5(
-          tag_default,
-          {
-            variant,
-            removable: !viewMode,
-            size: "small",
-            onSlRemove: () => onRemoveTag(index),
-            children: tag,
-          },
-          index,
-        ),
-      ),
-      !viewMode &&
-        available.length > selected.length &&
-        /* @__PURE__ */ u$5(dropdown_default, {
-          children: [
-            /* @__PURE__ */ u$5(icon_button_default, {
-              slot: "trigger",
-              name: "plus",
-            }),
-            /* @__PURE__ */ u$5(menu_default, {
-              style: styles$c.menu,
-              onSlSelect: (e3) => onAddTag(e3.detail.item.value),
-              children: available
-                .filter((tag) => !selected.includes(tag))
-                .map((tag) => {
-                  return /* @__PURE__ */ u$5(menu_item_default, {
-                    value: tag,
-                    children: tag,
-                  });
-                }),
-            }),
-          ],
-        }),
-      !viewMode &&
-        tagType !== void 0 &&
-        /* @__PURE__ */ u$5(input_default, {
-          style: styles$c.addNew,
-          placeholder: "New " + tagType,
-          value: newTag,
-          onSlChange: (e3) => setNewTag(e3.target.value),
-          children: /* @__PURE__ */ u$5(icon_button_default, {
-            slot: "suffix",
-            name: "plus",
-            label: "Create Tag",
-            onClick: () => {
-              void onCreateTag();
-            },
-          }),
-        }),
-    ],
-  });
-}
-const createStoreImpl = (createState) => {
-  let state;
-  const listeners = /* @__PURE__ */ new Set();
-  const setState = (partial, replace) => {
-    const nextState = typeof partial === "function" ? partial(state) : partial;
-    if (!Object.is(nextState, state)) {
-      const previousState = state;
-      state = (
-        replace != null
-          ? replace
-          : typeof nextState !== "object" || nextState === null
-      )
-        ? nextState
-        : Object.assign({}, state, nextState);
-      listeners.forEach((listener) => listener(state, previousState));
-    }
-  };
-  const getState = () => state;
-  const getInitialState = () => initialState;
-  const subscribe = (listener) => {
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  };
-  const api = { setState, getState, getInitialState, subscribe };
-  const initialState = (state = createState(setState, getState, api));
-  return api;
-};
-const createStore = (createState) =>
-  createState ? createStoreImpl(createState) : createStoreImpl;
-const identity = (arg) => arg;
-function useStore(api, selector = identity) {
-  const slice = Rn.useSyncExternalStore(
-    api.subscribe,
-    () => selector(api.getState()),
-    () => selector(api.getInitialState()),
-  );
-  Rn.useDebugValue(slice);
-  return slice;
-}
-const createImpl = (createState) => {
-  const api = createStore(createState);
-  const useBoundStore = (selector) => useStore(api, selector);
-  Object.assign(useBoundStore, api);
-  return useBoundStore;
-};
-const create = (createState) => createImpl;
 var dist$1 = {};
 var hasRequiredDist$1;
 function requireDist$1() {
   if (hasRequiredDist$1) return dist$1;
   hasRequiredDist$1 = 1;
-  (function (exports) {
-    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-    function shallow$1(objA, objB) {
-      if (Object.is(objA, objB)) {
-        return true;
-      }
-      if (
-        typeof objA !== "object" ||
-        objA === null ||
-        typeof objB !== "object" ||
-        objB === null
-      ) {
-        return false;
-      }
-      if (objA instanceof Map && objB instanceof Map) {
-        if (objA.size !== objB.size) return false;
-        for (const [key, value] of objA) {
-          if (!Object.is(value, objB.get(key))) {
-            return false;
-          }
-        }
-        return true;
-      }
-      if (objA instanceof Set && objB instanceof Set) {
-        if (objA.size !== objB.size) return false;
-        for (const value of objA) {
-          if (!objB.has(value)) {
-            return false;
-          }
-        }
-        return true;
-      }
-      const keysA = Object.keys(objA);
-      if (keysA.length !== Object.keys(objB).length) {
-        return false;
-      }
-      for (const keyA of keysA) {
-        if (
-          !Object.prototype.hasOwnProperty.call(objB, keyA) ||
-          !Object.is(objA[keyA], objB[keyA])
-        ) {
-          return false;
-        }
-      }
-      return true;
-    }
-    const computedImpl = (compute, opts) => (f2) => {
-      const trackedSelectors = /* @__PURE__ */ new Set();
-      return (set, get, api) => {
-        const equalityFn =
-          (opts == null ? void 0 : opts.equalityFn) ?? shallow$1;
-        if (opts == null ? void 0 : opts.keys) {
-          const selectorKeys = opts.keys;
-          for (const key of selectorKeys) {
-            trackedSelectors.add(key);
-          }
-        }
-        const useSelectors =
-          (opts == null ? void 0 : opts.disableProxy) !== true ||
-          !!(opts == null ? void 0 : opts.keys);
-        const useProxy =
-          (opts == null ? void 0 : opts.disableProxy) !== true &&
-          !(opts == null ? void 0 : opts.keys);
-        const computeAndMerge = (state) => {
-          const stateProxy = new Proxy(
-            { ...state },
-            {
-              get: (_2, prop) => {
-                trackedSelectors.add(prop);
-                return state[prop];
-              },
-            },
-          );
-          const computedState = compute(useProxy ? stateProxy : { ...state });
-          for (const k3 of Object.keys(computedState)) {
-            if (equalityFn(computedState[k3], state[k3])) {
-              computedState[k3] = state[k3];
-            }
-          }
-          return { ...state, ...computedState };
-        };
-        const setWithComputed = (update2, replace, ...args) => {
-          set(
-            (state) => {
-              const updated =
-                typeof update2 === "object" ? update2 : update2(state);
-              if (
-                useSelectors &&
-                trackedSelectors.size !== 0 &&
-                !Object.keys(updated).some((k3) => trackedSelectors.has(k3))
-              ) {
-                return { ...state, ...updated };
-              }
-              return computeAndMerge({ ...state, ...updated });
-            },
-            replace,
-            ...args,
-          );
-        };
-        const _api = api;
-        _api.setState = setWithComputed;
-        const st = f2(setWithComputed, get, _api);
-        return Object.assign({}, st, compute(st));
-      };
-    };
-    const createComputed = computedImpl;
-    exports.createComputed = createComputed;
-  })(dist$1);
-  return dist$1;
-}
-var distExports = requireDist$1();
-var VIEW = /* @__PURE__ */ ((VIEW2) => {
-  VIEW2[(VIEW2["SEARCH_SETTINGS"] = 0)] = "SEARCH_SETTINGS";
-  VIEW2[(VIEW2["MAIN"] = 1)] = "MAIN";
-  VIEW2[(VIEW2["COLLECTIONS_LIST"] = 2)] = "COLLECTIONS_LIST";
-  VIEW2[(VIEW2["CHANGE_USERNAME"] = 3)] = "CHANGE_USERNAME";
-  VIEW2[(VIEW2["CHANGE_PASSWORD"] = 4)] = "CHANGE_PASSWORD";
-  VIEW2[(VIEW2["LOGIN_PROMPT"] = 5)] = "LOGIN_PROMPT";
-  VIEW2[(VIEW2["NEW_RECIPE_FORM"] = 6)] = "NEW_RECIPE_FORM";
-  VIEW2[(VIEW2["UPDATE_RECIPE_FORM"] = 7)] = "UPDATE_RECIPE_FORM";
-  VIEW2[(VIEW2["RECIPE_SUMMARY"] = 8)] = "RECIPE_SUMMARY";
-  return VIEW2;
-})(VIEW || {});
-var COLUMN_MASK = /* @__PURE__ */ ((COLUMN_MASK2) => {
-  COLUMN_MASK2[(COLUMN_MASK2["NAME"] = 1)] = "NAME";
-  COLUMN_MASK2[(COLUMN_MASK2["AUTHOR"] = 2)] = "AUTHOR";
-  COLUMN_MASK2[(COLUMN_MASK2["ALLERGENS"] = 4)] = "ALLERGENS";
-  COLUMN_MASK2[(COLUMN_MASK2["REFERENCE"] = 8)] = "REFERENCE";
-  COLUMN_MASK2[(COLUMN_MASK2["INGREDIENTS"] = 16)] = "INGREDIENTS";
-  return COLUMN_MASK2;
-})(COLUMN_MASK || {});
-const initStoreState = {
-  clientUsername: "",
-  view: 1,
-  page: 0,
-  numRowsPerPage: 10,
-  visibleColumns: 1 | 2 | 8,
-  recipeSearchFilter: "",
-  includeAllergensFilter: [],
-  excludeAllergensFilter: [],
-  includeIngredientsFilter: [],
-  excludeIngredientsFilter: [],
-  includeAuthorsFilter: [],
-  selectedRecipeName: "",
-  selectedRecipeReference: "",
-  selectedRecipeAuthors: [],
-  selectedRecipeIngredients: [],
-  selectedRecipeAllergens: [],
-};
-const computed = distExports.createComputed((state) => ({
-  filterProps: {
-    collection_id: -1,
-    recipe_name: state.recipeSearchFilter,
-    include_allergens: state.includeAllergensFilter,
-    exclude_allergens: state.excludeAllergensFilter,
-    include_ingredients: state.includeIngredientsFilter,
-    exclude_ingredients: state.excludeIngredientsFilter,
-    authors: state.includeAuthorsFilter,
-    view_min: -1,
-    view_max: -1,
-  },
-  selectedRecipe: {
-    name: state.selectedRecipeName,
-    reference: state.selectedRecipeReference,
-    authors: state.selectedRecipeAuthors,
-    allergens: state.selectedRecipeAllergens,
-    ingredients: state.selectedRecipeIngredients,
-  },
-}));
-const useAppStore = create()(
-  computed((set, get) => ({
-    ...initStoreState,
-    setMainView: () =>
-      set({
-        view: 1,
-        /* MAIN */
-      }),
-    setSettingsView: () =>
-      set({
-        view: 0,
-        /* SEARCH_SETTINGS */
-      }),
-    setLoginView: () =>
-      set({
-        view: 5,
-        /* LOGIN_PROMPT */
-      }),
-    setChangeUserView: () =>
-      set({
-        view: 3,
-        /* CHANGE_USERNAME */
-      }),
-    setChangePassView: () =>
-      set({
-        view: 4,
-        /* CHANGE_PASSWORD */
-      }),
-    setCollectionsView: () =>
-      set({
-        view: 2,
-        /* COLLECTIONS_LIST */
-      }),
-    setNewRecipeView: () =>
-      set({
-        view: 6,
-        /* NEW_RECIPE_FORM */
-      }),
-    setUpdateRecipeView: () =>
-      set({
-        view: 7,
-        /* UPDATE_RECIPE_FORM */
-      }),
-    setRecipeSummaryView: () =>
-      set({
-        view: 8,
-        /* RECIPE_SUMMARY */
-      }),
-    gotoFirstPage: () => set({ page: 0 }),
-    gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
-    gotoNextPage: (numPages) =>
-      set((state) => ({ page: Math.min(numPages - 1, state.page + 1) })),
-    gotoLastPage: (numPages) => set(() => ({ page: numPages - 1 })),
-    setRowsPerPage: (numRowsPerPage) => set({ numRowsPerPage }),
-    getColumnVisible: (mask) => (get().visibleColumns & mask) > 0,
-    toggleColumn: (mask) =>
-      set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
-    setClientUsername: (clientUsername) => set({ clientUsername }),
-    setSelectedRecipe: (recipeData) =>
-      set({
-        selectedRecipeName: recipeData.name,
-        selectedRecipeReference: recipeData.reference,
-        selectedRecipeAllergens: recipeData.allergens,
-        selectedRecipeIngredients: recipeData.ingredients,
-        selectedRecipeAuthors: recipeData.authors,
-      }),
-    setRecipeSearchFilter: (recipeSearchFilter) => set({ recipeSearchFilter }),
-    setIncludeAllergensFilter: (includeAllergensFilter) =>
-      set({ includeAllergensFilter }),
-    setExcludeAllergensFilter: (excludeAllergensFilter) =>
-      set({ excludeAllergensFilter }),
-    setIncludeIngredientsFilter: (includeIngredientsFilter) =>
-      set({ includeIngredientsFilter }),
-    setExcludeIngredientsFilter: (excludeIngredientsFilter) =>
-      set({ excludeIngredientsFilter }),
-    setIncludeAuthorsFilter: (includeAuthorsFilter) =>
-      set({ includeAuthorsFilter }),
-  })),
-);
-var dist = {};
-var hasRequiredDist;
-function requireDist() {
-  if (hasRequiredDist) return dist;
-  hasRequiredDist = 1;
-  Object.defineProperty(dist, "__esModule", { value: true });
-  dist.parse = parse;
-  dist.serialize = serialize;
+  Object.defineProperty(dist$1, "__esModule", { value: true });
+  dist$1.parse = parse;
+  dist$1.serialize = serialize;
   const cookieNameRegExp = /^[\u0021-\u003A\u003C\u003E-\u007E]+$/;
   const cookieValueRegExp = /^[\u0021-\u003A\u003C-\u007E]*$/;
   const domainValueRegExp =
@@ -31187,9 +30476,9 @@ function requireDist() {
   function isDate(val) {
     return __toString.call(val) === "[object Date]";
   }
-  return dist;
+  return dist$1;
 }
-requireDist();
+requireDist$1();
 /**
  * react-router v7.5.0
  *
@@ -33502,6 +32791,732 @@ function useViewTransitionState(to, opts = {}) {
   );
 }
 new TextEncoder();
+const AUTH_ERROR = "AUTH_ERROR";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: 1e3 * 60 * 60 * 24,
+      // 24 hours
+    },
+  },
+});
+function getErrorMessage(responseData) {
+  const ERROR_MSGS = {
+    parse_error: "[ERROR] Parse failed!",
+    bad_fetch_error: "Fetch failed! Server seems to be down...",
+    resource_error: "[ERROR] Invalid resource: ",
+    username_error: "Invalid username or password!",
+    password_error: "Invalid username or password!",
+    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
+  };
+  let message = "Unknown error";
+  switch (responseData.type) {
+    case "bad_fetch_error": {
+      message = ERROR_MSGS[responseData.type] + responseData.message;
+      break;
+    }
+    case "auth_token_error": {
+      message = AUTH_ERROR;
+      break;
+    }
+    case "parse_error": {
+      message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "resource_error": {
+      message = ERROR_MSGS[responseData.type] + responseData.message;
+      break;
+    }
+    case "username_error": {
+      message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "password_error": {
+      message = ERROR_MSGS[responseData.type];
+      break;
+    }
+    case "internal_server_error": {
+      message = ERROR_MSGS[responseData.type] + responseData.message;
+      break;
+    }
+  }
+  return message;
+}
+async function makeRequest(jsonBody) {
+  try {
+    const data = await fetch("/api", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonBody),
+    });
+    return data;
+  } catch (e3) {
+    return new Response(
+      JSON.stringify({
+        type: "bad_fetch_error",
+        message: e3.message,
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
+}
+function assertRecipe(x2) {
+  const ERROR_MSG = "[ERROR] Invalid recipe assertion!";
+  if (typeof x2 !== "object" || x2 === null) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("name" in x2 && typeof x2["name"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("reference" in x2 && typeof x2["reference"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+  if (
+    !(
+      "authors" in x2 &&
+      Array.isArray(x2["authors"]) &&
+      x2["authors"].every((y2) => typeof y2 === "string")
+    )
+  ) {
+    throw new Error(ERROR_MSG);
+  }
+  if (
+    !(
+      "allergens" in x2 &&
+      Array.isArray(x2["allergens"]) &&
+      x2["allergens"].every((y2) => typeof y2 === "string")
+    )
+  ) {
+    throw new Error(ERROR_MSG);
+  }
+  if (
+    !(
+      "ingredients" in x2 &&
+      Array.isArray(x2["ingredients"]) &&
+      x2["ingredients"].every((y2) => typeof y2 === "string")
+    )
+  ) {
+    throw new Error(ERROR_MSG);
+  }
+}
+function assertFilterResponse(x2) {
+  const ERROR_MSG = "[ERROR] Invalid filter assertion!";
+  if (typeof x2 !== "object" || x2 === null) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("type" in x2 && typeof x2["type"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("table_size" in x2 && typeof x2["table_size"] === "number")) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("recipes" in x2 && Array.isArray(x2["recipes"]))) {
+    throw new Error(ERROR_MSG);
+  }
+  x2["recipes"].forEach((r3) => assertRecipe(r3));
+}
+function assertErrorResponse(x2) {
+  const ERROR_MSG = "[ERROR] Invalid error assertion!";
+  if (typeof x2 !== "object" || x2 === null) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("type" in x2 && typeof x2["type"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+}
+function assertAuthResponse(x2) {
+  const ERROR_MSG = "[ERROR] Invalid auth assertion!";
+  if (typeof x2 !== "object" || x2 === null) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("type" in x2 && typeof x2["type"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+  if (!("auth" in x2 && typeof x2["auth"] === "string")) {
+    throw new Error(ERROR_MSG);
+  }
+}
+let session_auth = {
+  auth: "",
+  user: "",
+};
+function initSessionAuth() {
+  session_auth = {
+    auth: sessionStorage.getItem("session.auth") || "",
+    user: sessionStorage.getItem("session.user") || "",
+  };
+}
+async function login(username, password) {
+  const response = await makeRequest({
+    type: "login",
+    username,
+    password,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+  assertAuthResponse(data);
+  session_auth = {
+    auth: data.auth,
+    user: username,
+  };
+  sessionStorage.setItem("session.auth", data.auth);
+  sessionStorage.setItem("session.user", username);
+}
+async function logout() {
+  const response = await makeRequest({
+    type: "logout",
+    auth: session_auth.auth,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+  session_auth = {
+    auth: "",
+    user: "",
+  };
+  sessionStorage.removeItem("session.auth");
+  sessionStorage.removeItem("session.lifetime");
+  sessionStorage.removeItem("session.user");
+}
+async function loggedIn() {
+  if (!session_auth) {
+    return false;
+  }
+  const response = await makeRequest({
+    type: "is_logged_in",
+    auth: session_auth.auth,
+  });
+  return response.status === 200;
+}
+function useLoggedIn() {
+  return useQuery({
+    queryKey: ["loggedIn"],
+    queryFn: () => loggedIn(),
+  });
+}
+async function changeUsername(password, new_username) {
+  const response = await makeRequest({
+    type: "change_username",
+    auth: session_auth.auth,
+    password,
+    new_username,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+  session_auth.user = new_username;
+  sessionStorage.setItem("session.user", new_username);
+}
+async function changePassword(password, new_password) {
+  const response = await makeRequest({
+    type: "change_password",
+    auth: session_auth.auth,
+    password,
+    new_password,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
+async function addRecipe(
+  collection_id,
+  recipe_name,
+  reference,
+  authors,
+  ingredients,
+  allergens,
+) {
+  const response = await makeRequest({
+    type: "add_recipe",
+    auth: session_auth.auth,
+    collection_id,
+    recipe_name,
+    reference,
+    authors,
+    ingredients,
+    allergens,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
+async function removeRecipe(recipe_name) {
+  const response = await makeRequest({
+    type: "remove_recipe",
+    auth: session_auth.auth,
+    recipe_name,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
+async function createAllergen(allergen_name, collection_id) {
+  const response = await makeRequest({
+    type: "create_allergen",
+    allergen_name,
+    collection_id,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
+async function createIngredient(ingredient_name, collection_id) {
+  const response = await makeRequest({
+    type: "create_ingredient",
+    ingredient_name,
+    collection_id,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
+const styles$c = {
+  root: {
+    alignItems: "center",
+    display: "flex",
+    height: "2em",
+    justifyContent: "start",
+    position: "relative",
+  },
+  menu: {
+    height: "8em",
+  },
+  addNew: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    margin: "auto",
+  },
+};
+var TagType = /* @__PURE__ */ ((TagType2) => {
+  TagType2["Allergen"] = "Allergy";
+  TagType2["Ingredient"] = "Ingredient";
+  return TagType2;
+})(TagType || {});
+function TagPicker({
+  variant,
+  selected,
+  available = [],
+  setSelected = void 0,
+  viewMode = false,
+  tagType = void 0,
+}) {
+  const [newTag, setNewTag] = h$2("");
+  const queryClient2 = useQueryClient();
+  const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
+  function onRemoveTag(i3) {
+    if (setSelected !== void 0) {
+      setSelected(selected.slice(0, i3).concat(selected.slice(i3 + 1)));
+    }
+  }
+  function onAddTag(name) {
+    if (setSelected !== void 0) {
+      setSelected(selected.concat([name]));
+    }
+  }
+  async function onCreateTag() {
+    if (newTag === "") return;
+    try {
+      if (tagType === "Allergy") {
+        await createAllergen(newTag, collectionId);
+        await queryClient2.invalidateQueries({
+          queryKey: ["collectionAllergens"],
+        });
+        if (!selected.includes(newTag)) {
+          onAddTag(newTag);
+        }
+      } else if (tagType === "Ingredient") {
+        await createIngredient(newTag, collectionId);
+        await queryClient2.invalidateQueries({
+          queryKey: ["collectionIngredients"],
+        });
+        if (!selected.includes(newTag)) {
+          onAddTag(newTag);
+        }
+      }
+    } catch (e3) {
+      if (e3 instanceof Error) {
+        console.error(e3.message);
+      }
+    }
+  }
+  return /* @__PURE__ */ u$5("div", {
+    style: styles$c.root,
+    children: [
+      selected.map((tag, index) =>
+        /* @__PURE__ */ u$5(
+          tag_default,
+          {
+            variant,
+            removable: !viewMode,
+            size: "small",
+            onSlRemove: () => onRemoveTag(index),
+            children: tag,
+          },
+          index,
+        ),
+      ),
+      !viewMode &&
+        available.length > selected.length &&
+        /* @__PURE__ */ u$5(dropdown_default, {
+          children: [
+            /* @__PURE__ */ u$5(icon_button_default, {
+              slot: "trigger",
+              name: "plus",
+            }),
+            /* @__PURE__ */ u$5(menu_default, {
+              style: styles$c.menu,
+              onSlSelect: (e3) => onAddTag(e3.detail.item.value),
+              children: available
+                .filter((tag) => !selected.includes(tag))
+                .map((tag) => {
+                  return /* @__PURE__ */ u$5(menu_item_default, {
+                    value: tag,
+                    children: tag,
+                  });
+                }),
+            }),
+          ],
+        }),
+      !viewMode &&
+        tagType !== void 0 &&
+        /* @__PURE__ */ u$5(input_default, {
+          style: styles$c.addNew,
+          placeholder: "New " + tagType,
+          value: newTag,
+          onSlChange: (e3) => setNewTag(e3.target.value),
+          children: /* @__PURE__ */ u$5(icon_button_default, {
+            slot: "suffix",
+            name: "plus",
+            label: "Create Tag",
+            onClick: () => {
+              void onCreateTag();
+            },
+          }),
+        }),
+    ],
+  });
+}
+const createStoreImpl = (createState) => {
+  let state;
+  const listeners = /* @__PURE__ */ new Set();
+  const setState = (partial, replace) => {
+    const nextState = typeof partial === "function" ? partial(state) : partial;
+    if (!Object.is(nextState, state)) {
+      const previousState = state;
+      state = (
+        replace != null
+          ? replace
+          : typeof nextState !== "object" || nextState === null
+      )
+        ? nextState
+        : Object.assign({}, state, nextState);
+      listeners.forEach((listener) => listener(state, previousState));
+    }
+  };
+  const getState = () => state;
+  const getInitialState = () => initialState;
+  const subscribe = (listener) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+  const api = { setState, getState, getInitialState, subscribe };
+  const initialState = (state = createState(setState, getState, api));
+  return api;
+};
+const createStore = (createState) =>
+  createState ? createStoreImpl(createState) : createStoreImpl;
+const identity = (arg) => arg;
+function useStore(api, selector = identity) {
+  const slice = Rn.useSyncExternalStore(
+    api.subscribe,
+    () => selector(api.getState()),
+    () => selector(api.getInitialState()),
+  );
+  Rn.useDebugValue(slice);
+  return slice;
+}
+const createImpl = (createState) => {
+  const api = createStore(createState);
+  const useBoundStore = (selector) => useStore(api, selector);
+  Object.assign(useBoundStore, api);
+  return useBoundStore;
+};
+const create = (createState) => createImpl;
+var dist = {};
+var hasRequiredDist;
+function requireDist() {
+  if (hasRequiredDist) return dist;
+  hasRequiredDist = 1;
+  (function (exports) {
+    Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+    function shallow$1(objA, objB) {
+      if (Object.is(objA, objB)) {
+        return true;
+      }
+      if (
+        typeof objA !== "object" ||
+        objA === null ||
+        typeof objB !== "object" ||
+        objB === null
+      ) {
+        return false;
+      }
+      if (objA instanceof Map && objB instanceof Map) {
+        if (objA.size !== objB.size) return false;
+        for (const [key, value] of objA) {
+          if (!Object.is(value, objB.get(key))) {
+            return false;
+          }
+        }
+        return true;
+      }
+      if (objA instanceof Set && objB instanceof Set) {
+        if (objA.size !== objB.size) return false;
+        for (const value of objA) {
+          if (!objB.has(value)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      const keysA = Object.keys(objA);
+      if (keysA.length !== Object.keys(objB).length) {
+        return false;
+      }
+      for (const keyA of keysA) {
+        if (
+          !Object.prototype.hasOwnProperty.call(objB, keyA) ||
+          !Object.is(objA[keyA], objB[keyA])
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+    const computedImpl = (compute, opts) => (f2) => {
+      const trackedSelectors = /* @__PURE__ */ new Set();
+      return (set, get, api) => {
+        const equalityFn =
+          (opts == null ? void 0 : opts.equalityFn) ?? shallow$1;
+        if (opts == null ? void 0 : opts.keys) {
+          const selectorKeys = opts.keys;
+          for (const key of selectorKeys) {
+            trackedSelectors.add(key);
+          }
+        }
+        const useSelectors =
+          (opts == null ? void 0 : opts.disableProxy) !== true ||
+          !!(opts == null ? void 0 : opts.keys);
+        const useProxy =
+          (opts == null ? void 0 : opts.disableProxy) !== true &&
+          !(opts == null ? void 0 : opts.keys);
+        const computeAndMerge = (state) => {
+          const stateProxy = new Proxy(
+            { ...state },
+            {
+              get: (_2, prop) => {
+                trackedSelectors.add(prop);
+                return state[prop];
+              },
+            },
+          );
+          const computedState = compute(useProxy ? stateProxy : { ...state });
+          for (const k3 of Object.keys(computedState)) {
+            if (equalityFn(computedState[k3], state[k3])) {
+              computedState[k3] = state[k3];
+            }
+          }
+          return { ...state, ...computedState };
+        };
+        const setWithComputed = (update2, replace, ...args) => {
+          set(
+            (state) => {
+              const updated =
+                typeof update2 === "object" ? update2 : update2(state);
+              if (
+                useSelectors &&
+                trackedSelectors.size !== 0 &&
+                !Object.keys(updated).some((k3) => trackedSelectors.has(k3))
+              ) {
+                return { ...state, ...updated };
+              }
+              return computeAndMerge({ ...state, ...updated });
+            },
+            replace,
+            ...args,
+          );
+        };
+        const _api = api;
+        _api.setState = setWithComputed;
+        const st = f2(setWithComputed, get, _api);
+        return Object.assign({}, st, compute(st));
+      };
+    };
+    const createComputed = computedImpl;
+    exports.createComputed = createComputed;
+  })(dist);
+  return dist;
+}
+var distExports = requireDist();
+var VIEW = /* @__PURE__ */ ((VIEW2) => {
+  VIEW2[(VIEW2["SEARCH_SETTINGS"] = 0)] = "SEARCH_SETTINGS";
+  VIEW2[(VIEW2["MAIN"] = 1)] = "MAIN";
+  VIEW2[(VIEW2["COLLECTIONS_LIST"] = 2)] = "COLLECTIONS_LIST";
+  VIEW2[(VIEW2["CHANGE_USERNAME"] = 3)] = "CHANGE_USERNAME";
+  VIEW2[(VIEW2["CHANGE_PASSWORD"] = 4)] = "CHANGE_PASSWORD";
+  VIEW2[(VIEW2["LOGIN_PROMPT"] = 5)] = "LOGIN_PROMPT";
+  VIEW2[(VIEW2["NEW_RECIPE_FORM"] = 6)] = "NEW_RECIPE_FORM";
+  VIEW2[(VIEW2["UPDATE_RECIPE_FORM"] = 7)] = "UPDATE_RECIPE_FORM";
+  VIEW2[(VIEW2["RECIPE_SUMMARY"] = 8)] = "RECIPE_SUMMARY";
+  return VIEW2;
+})(VIEW || {});
+var COLUMN_MASK = /* @__PURE__ */ ((COLUMN_MASK2) => {
+  COLUMN_MASK2[(COLUMN_MASK2["NAME"] = 1)] = "NAME";
+  COLUMN_MASK2[(COLUMN_MASK2["AUTHOR"] = 2)] = "AUTHOR";
+  COLUMN_MASK2[(COLUMN_MASK2["ALLERGENS"] = 4)] = "ALLERGENS";
+  COLUMN_MASK2[(COLUMN_MASK2["REFERENCE"] = 8)] = "REFERENCE";
+  COLUMN_MASK2[(COLUMN_MASK2["INGREDIENTS"] = 16)] = "INGREDIENTS";
+  return COLUMN_MASK2;
+})(COLUMN_MASK || {});
+const initStoreState = {
+  clientUsername: "",
+  view: 1,
+  page: 0,
+  numRowsPerPage: 10,
+  visibleColumns: 1 | 2 | 8,
+  recipeSearchFilter: "",
+  includeAllergensFilter: [],
+  excludeAllergensFilter: [],
+  includeIngredientsFilter: [],
+  excludeIngredientsFilter: [],
+  includeAuthorsFilter: [],
+  selectedRecipeName: "",
+  selectedRecipeReference: "",
+  selectedRecipeAuthors: [],
+  selectedRecipeIngredients: [],
+  selectedRecipeAllergens: [],
+};
+const computed = distExports.createComputed((state) => ({
+  filterProps: {
+    collection_id: -1,
+    recipe_name: state.recipeSearchFilter,
+    include_allergens: state.includeAllergensFilter,
+    exclude_allergens: state.excludeAllergensFilter,
+    include_ingredients: state.includeIngredientsFilter,
+    exclude_ingredients: state.excludeIngredientsFilter,
+    authors: state.includeAuthorsFilter,
+    view_min: -1,
+    view_max: -1,
+  },
+  selectedRecipe: {
+    name: state.selectedRecipeName,
+    reference: state.selectedRecipeReference,
+    authors: state.selectedRecipeAuthors,
+    allergens: state.selectedRecipeAllergens,
+    ingredients: state.selectedRecipeIngredients,
+  },
+}));
+const useAppStore = create()(
+  computed((set, get) => ({
+    ...initStoreState,
+    setMainView: () =>
+      set({
+        view: 1,
+        /* MAIN */
+      }),
+    setSettingsView: () =>
+      set({
+        view: 0,
+        /* SEARCH_SETTINGS */
+      }),
+    setLoginView: () =>
+      set({
+        view: 5,
+        /* LOGIN_PROMPT */
+      }),
+    setChangeUserView: () =>
+      set({
+        view: 3,
+        /* CHANGE_USERNAME */
+      }),
+    setChangePassView: () =>
+      set({
+        view: 4,
+        /* CHANGE_PASSWORD */
+      }),
+    setCollectionsView: () =>
+      set({
+        view: 2,
+        /* COLLECTIONS_LIST */
+      }),
+    setNewRecipeView: () =>
+      set({
+        view: 6,
+        /* NEW_RECIPE_FORM */
+      }),
+    setUpdateRecipeView: () =>
+      set({
+        view: 7,
+        /* UPDATE_RECIPE_FORM */
+      }),
+    setRecipeSummaryView: () =>
+      set({
+        view: 8,
+        /* RECIPE_SUMMARY */
+      }),
+    gotoFirstPage: () => set({ page: 0 }),
+    gotoPrevPage: () => set((state) => ({ page: Math.max(0, state.page - 1) })),
+    gotoNextPage: (numPages) =>
+      set((state) => ({ page: Math.min(numPages - 1, state.page + 1) })),
+    gotoLastPage: (numPages) => set(() => ({ page: numPages - 1 })),
+    setRowsPerPage: (numRowsPerPage) => set({ numRowsPerPage }),
+    getColumnVisible: (mask) => (get().visibleColumns & mask) > 0,
+    toggleColumn: (mask) =>
+      set((state) => ({ visibleColumns: state.visibleColumns ^ mask })),
+    setClientUsername: (clientUsername) => set({ clientUsername }),
+    setSelectedRecipe: (recipeData) =>
+      set({
+        selectedRecipeName: recipeData.name,
+        selectedRecipeReference: recipeData.reference,
+        selectedRecipeAllergens: recipeData.allergens,
+        selectedRecipeIngredients: recipeData.ingredients,
+        selectedRecipeAuthors: recipeData.authors,
+      }),
+    setRecipeSearchFilter: (recipeSearchFilter) => set({ recipeSearchFilter }),
+    setIncludeAllergensFilter: (includeAllergensFilter) =>
+      set({ includeAllergensFilter }),
+    setExcludeAllergensFilter: (excludeAllergensFilter) =>
+      set({ excludeAllergensFilter }),
+    setIncludeIngredientsFilter: (includeIngredientsFilter) =>
+      set({ includeIngredientsFilter }),
+    setExcludeIngredientsFilter: (excludeIngredientsFilter) =>
+      set({ excludeIngredientsFilter }),
+    setIncludeAuthorsFilter: (includeAuthorsFilter) =>
+      set({ includeAuthorsFilter }),
+  })),
+);
 async function filterRecipeCollection({
   collection_id,
   recipe_name,
@@ -34273,6 +34288,7 @@ function TableRow({ editMode, rowData }) {
     setRecipeSummaryView();
   }
   function onEditRecipe() {
+    console.log(rowData);
     setSelectedRecipe(rowData);
     setUpdateRecipeView();
   }
@@ -34944,7 +34960,10 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
   const submitAlert = A$1(null);
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
-  const [newName, setNewName] = h$2(selectedRecipeName);
+  const [newName, setNewName] = h$2("");
+  y(() => {
+    setNewName(selectedRecipeName);
+  }, [selectedRecipeName]);
   const { data: allAllergens } = useCollectionAllergens(collectionId);
   const { data: allIngredients } = useCollectionIngredients(collectionId);
   function onCloseDialog(e3) {
@@ -34954,7 +34973,8 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
     }
     setMainView();
   }
-  async function onAddRecipe(hideEvent) {
+  async function onAddRecipe() {
+    if (newName === "") return;
     try {
       if (viewState === VIEW.UPDATE_RECIPE_FORM) {
         await removeRecipe(selectedRecipe.name);
@@ -34968,7 +34988,7 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
         selectedRecipe.allergens,
       );
       await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
-      onCloseDialog(hideEvent);
+      setMainView();
       if (submitAlert.current !== null) {
         submitAlert.current.base.toast();
       }
@@ -35033,10 +35053,10 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
         tagType: TagType.Ingredient,
       }),
       /* @__PURE__ */ u$5(button_default, {
-        onClick: (e3) => {
-          void onAddRecipe(e3);
+        onClick: () => {
+          void onAddRecipe();
         },
-        children: submitLabel,
+        children: [" ", submitLabel],
       }),
     ],
   });

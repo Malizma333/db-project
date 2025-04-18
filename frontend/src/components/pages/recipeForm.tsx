@@ -16,6 +16,7 @@ import {
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useEffect } from "react";
 
 const styles = {
   inputField: {
@@ -47,7 +48,11 @@ export default function RecipeForm({
   const submitAlert = useRef(null);
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
-  const [newName, setNewName] = useState(selectedRecipeName);
+  const [newName, setNewName] = useState("");
+
+  useEffect(() => {
+    setNewName(selectedRecipeName);
+  }, [selectedRecipeName]);
 
   const { data: allAllergens } = useCollectionAllergens(collectionId);
   const { data: allIngredients } = useCollectionIngredients(collectionId);
@@ -62,7 +67,9 @@ export default function RecipeForm({
     setMainView();
   }
 
-  async function onAddRecipe(hideEvent: SlHideEvent) {
+  async function onAddRecipe() {
+    if (newName === "") return;
+
     try {
       if (viewState === VIEW.UPDATE_RECIPE_FORM) {
         await removeRecipe(selectedRecipe.name);
@@ -76,7 +83,7 @@ export default function RecipeForm({
         selectedRecipe.allergens,
       );
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
-      onCloseDialog(hideEvent);
+      setMainView();
       if (submitAlert.current !== null) {
         submitAlert.current.base.toast();
       }
@@ -147,10 +154,11 @@ export default function RecipeForm({
         tagType={TagType.Ingredient}
       ></TagPicker>
       <SlButton
-        onClick={(e) => {
-          void onAddRecipe(e);
+        onClick={() => {
+          void onAddRecipe();
         }}
       >
+        {" "}
         {submitLabel}
       </SlButton>
     </SlDialog>

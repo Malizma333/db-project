@@ -339,7 +339,7 @@ def do_thing(body):
             conn.commit()
 
         elif body["type"] == "create_allergen":
-            cursor.execute("INSERT Allergen VALUES(?,?)",
+            cursor.execute("INSERT or IGNORE INTO Allergen VALUES(?,?)",
                            (body["allergen_name"], body["collection_id"]))
             conn.commit()
 
@@ -371,7 +371,7 @@ def do_thing(body):
             conn.commit()
 
         elif body["type"] == "create_ingredient":
-            cursor.execute("INSERT Ingredient VALUES(?,?)",
+            cursor.execute("INSERT or IGNORE INTO Ingredient VALUES(?,?)",
                            (body["ingredient_name"], body["collection_id"]))
             conn.commit()
 

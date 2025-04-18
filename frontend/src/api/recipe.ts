@@ -52,10 +52,14 @@ export async function removeRecipe(recipe_name: string) {
   }
 }
 
-export async function createAllergen(allergen_name: string) {
+export async function createAllergen(
+  allergen_name: string,
+  collection_id: number,
+) {
   const response = await makeRequest({
-    type: "append_allergen",
+    type: "create_allergen",
     allergen_name,
+    collection_id,
   });
 
   const data: unknown = await response.json();
@@ -66,10 +70,14 @@ export async function createAllergen(allergen_name: string) {
   }
 }
 
-export async function createIngredient(ingredient_name: string) {
+export async function createIngredient(
+  ingredient_name: string,
+  collection_id: number,
+) {
   const response = await makeRequest({
-    type: "append_ingredient",
+    type: "create_ingredient",
     ingredient_name,
+    collection_id,
   });
 
   const data: unknown = await response.json();
