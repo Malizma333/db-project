@@ -64,7 +64,7 @@ export default function ChangeNameDialog() {
         helpText="Must be 8 - 20 characters"
         type="text"
         value={newUsername}
-        onSlChange={(e) => setNewUsername((e.target as any).value)}
+        onSlChange={(e) => setNewUsername(e.target.value)}
         placeholder="New Username"
       ></SlInput>
       <SlInput
@@ -73,7 +73,7 @@ export default function ChangeNameDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword((e.target as any).value)}
+        onSlChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>

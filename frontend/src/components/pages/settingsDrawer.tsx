@@ -145,7 +145,7 @@ export default function SettingsDrawer() {
             min={minRowsPerPage}
             max={maxRowsPerPage}
             onSlBlur={(e) => {
-              void onSetRowsPerPage(parseInt((e.target as any).value));
+              void onSetRowsPerPage(parseInt(e.target.value));
             }}
           ></SlInput>
         </div>

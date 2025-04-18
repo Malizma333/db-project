@@ -65,7 +65,7 @@ export default function LoginDialog() {
         style={styles.inputField}
         type="text"
         value={username}
-        onSlChange={(e) => setUsername((e.target as any).value)}
+        onSlChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
       ></SlInput>
       <SlInput
@@ -74,7 +74,7 @@ export default function LoginDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword((e.target as any).value)}
+        onSlChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>

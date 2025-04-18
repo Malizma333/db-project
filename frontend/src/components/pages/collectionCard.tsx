@@ -73,7 +73,7 @@ export default function CollectionCard({
           filled
           value={collectionName}
           onSlBlur={(e) => {
-            void onRenameCollection(collectionId, (e.target as any).value);
+            void onRenameCollection(collectionId, e.target.value);
           }}
         ></SlInput>
         <SlTooltip content="Open Collection">

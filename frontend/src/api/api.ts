@@ -1,9 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 
-export interface ResponseDataType {
+export interface CustomErrorResponse {
   type: string;
   message?: string;
-  [key: string]: unknown;
 }
 
 export const AUTH_ERROR = "AUTH_ERROR";
@@ -16,7 +15,7 @@ export const queryClient = new QueryClient({
   },
 });
 
-export function getErrorMessage(responseData: ResponseDataType) {
+export function getErrorMessage(responseData: CustomErrorResponse) {
   const ERROR_MSGS = {
     parse_error: "[ERROR] Parse failed!",
     bad_fetch_error: "Fetch failed! Server seems to be down...",
