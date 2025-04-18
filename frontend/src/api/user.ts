@@ -1,9 +1,16 @@
-import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
 import { useQuery } from "@tanstack/react-query";
+import { assertAuthResponse, assertErrorResponse } from "./assertions";
 
 interface AuthInfo {
   auth: string;
   user: string;
+}
+
+export interface AuthResponse {
+  type: string;
+  auth: string;
+  expiration: number;
 }
 
 export let session_auth: AuthInfo = {
@@ -28,8 +35,11 @@ export async function login(username: string, password: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
+
+  assertAuthResponse(data);
 
   session_auth = {
     auth: data.auth,
@@ -49,7 +59,8 @@ export async function logout() {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 
   session_auth = {
@@ -93,7 +104,8 @@ export async function changeUsername(password: string, new_username: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 
   session_auth.user = new_username;
@@ -111,6 +123,7 @@ export async function changePassword(password: string, new_password: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }

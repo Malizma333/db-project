@@ -118,7 +118,7 @@ export default function TagPicker({
           style={styles.addNew}
           placeholder={"New " + tagType}
           value={newTag}
-          onSlChange={(e) => setNewTag((e.target as any).value)}
+          onSlChange={(e) => setNewTag(e.target.value)}
         >
           <SlIconButton
             slot="suffix"

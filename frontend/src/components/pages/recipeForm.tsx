@@ -101,7 +101,7 @@ export default function RecipeForm({
         style={styles.inputField}
         type="text"
         value={newName}
-        onSlChange={(e) => setNewName((e.target as any).value)}
+        onSlChange={(e) => setNewName(e.target.value)}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
@@ -111,7 +111,7 @@ export default function RecipeForm({
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
-            authors: (e.target as any).value.split(","),
+            authors: e.target.value.split(","),
           })
         }
         placeholder="Authors"
@@ -123,7 +123,7 @@ export default function RecipeForm({
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
-            reference: (e.target as any).value,
+            reference: e.target.value,
           })
         }
         placeholder="Reference"

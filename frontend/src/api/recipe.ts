@@ -1,4 +1,5 @@
-import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
+import { assertErrorResponse } from "./assertions";
 import { session_auth } from "./user";
 
 export interface Recipe {
@@ -31,7 +32,8 @@ export async function addRecipe(
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }
 
@@ -45,7 +47,8 @@ export async function removeRecipe(recipe_name: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }
 
@@ -58,7 +61,8 @@ export async function createAllergen(allergen_name: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }
 
@@ -71,6 +75,7 @@ export async function createIngredient(ingredient_name: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }

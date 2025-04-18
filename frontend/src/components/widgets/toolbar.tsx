@@ -196,7 +196,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         placeholder={`Search ${collectionName || ""}...`}
         style={{ flex: "1" }}
         value={recipeSearchFilter}
-        onSlChange={(e) => setRecipeSearchFilter((e.target as any).value)}
+        onSlChange={(e) => setRecipeSearchFilter(e.target.value)}
       >
         <SlIconButton
           disabled={!collectionDef}

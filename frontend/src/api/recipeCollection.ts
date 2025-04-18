@@ -1,7 +1,8 @@
-import { getErrorMessage, makeRequest, ResponseDataType } from "./api";
+import { getErrorMessage, makeRequest } from "./api";
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { session_auth } from "./user";
 import { Recipe } from "./recipe";
+import { assertErrorResponse, assertFilterResponse } from "./assertions";
 
 export interface FilterParams {
   collection_id: number;
@@ -15,13 +16,11 @@ export interface FilterParams {
   view_max: number;
 }
 
-interface FilterReturn {
+export interface FilterResponse {
   type: string;
   table_size: number;
   recipes: Recipe[];
 }
-
-function assertFilterParams(x: unknown): asserts x is FilterReturn {}
 
 export async function filterRecipeCollection({
   collection_id,
@@ -49,11 +48,12 @@ export async function filterRecipeCollection({
 
   const data: unknown = await response.json();
 
-  assertFilterParams(data);
-
   if (response.status !== 200) {
+    assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
+
+  assertFilterResponse(data);
 
   return data.recipes.map((recipe) => ({
     ...recipe,
@@ -95,11 +95,12 @@ export async function countRecipesInFilter({
 
   const data: unknown = await response.json();
 
-  assertFilterParams(data);
-
   if (response.status !== 200) {
+    assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
+
+  assertFilterResponse(data);
 
   return data.table_size;
 }
@@ -122,7 +123,8 @@ export async function renameRecipeCollection(id: number, new_name: string) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }
 
@@ -136,7 +138,19 @@ export async function addRecipeCollection(name: string): Promise<number> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "id" in data &&
+      typeof data.id === "number"
+    )
+  ) {
+    throw new Error();
   }
 
   return data.id;
@@ -152,7 +166,8 @@ export async function removeRecipeCollection(id: number) {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
   }
 }
 
@@ -165,7 +180,20 @@ async function getOwnedRecipeCollections(): Promise<number[]> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "ids" in data &&
+      Array.isArray(data.ids) &&
+      data.ids.every((id) => typeof id === "number")
+    )
+  ) {
+    throw new Error();
   }
 
   return data.ids;
@@ -189,7 +217,20 @@ async function getAllergensFromCollection(id: number): Promise<string[]> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "allergens" in data &&
+      Array.isArray(data.allergens) &&
+      data.allergens.every((allergen) => typeof allergen === "string")
+    )
+  ) {
+    throw new Error();
   }
 
   return data.allergens;
@@ -212,7 +253,20 @@ async function getIngredientsFromCollection(id: number): Promise<string[]> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "ingredients" in data &&
+      Array.isArray(data.ingredients) &&
+      data.ingredients.every((ingredient) => typeof ingredient === "string")
+    )
+  ) {
+    throw new Error();
   }
 
   return data.ingredients;
@@ -235,7 +289,20 @@ async function getAuthorsFromCollection(id: number): Promise<string[]> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "authors" in data &&
+      Array.isArray(data.authors) &&
+      data.authors.every((author) => typeof author === "string")
+    )
+  ) {
+    throw new Error();
   }
 
   return data.authors;
@@ -258,7 +325,19 @@ export async function getRecipeCount(id: number): Promise<number> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "count" in data &&
+      typeof data.count === "number"
+    )
+  ) {
+    throw new Error();
   }
 
   return data.count;
@@ -282,7 +361,19 @@ async function getRecipeCollectionName(id: number): Promise<string> {
   const data: unknown = await response.json();
 
   if (response.status !== 200) {
-    throw new Error(getErrorMessage(data as ResponseDataType));
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+
+  if (
+    !(
+      typeof data === "object" &&
+      data !== null &&
+      "collection_name" in data &&
+      typeof data.collection_name === "string"
+    )
+  ) {
+    throw new Error();
   }
 
   return data.collection_name;
@@ -311,17 +402,7 @@ async function getCollectionExists(id: number): Promise<boolean> {
 export function useCollectionExists(collection_id: number) {
   return useQuery({
     queryKey: ["collectionExists", collection_id],
-    queryFn: async () => {
-      try {
-        await getRecipeCollectionName(collection_id);
-        return true;
-      } catch (e) {
-        if (e instanceof Error) {
-          // pass
-        }
-        return false;
-      }
-    },
+    queryFn: () => getCollectionExists(collection_id),
     staleTime: Infinity,
   });
 }

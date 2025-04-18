@@ -72,7 +72,7 @@ export default function CollectionsDrawer() {
             type="search"
             placeholder="Find a collection..."
             value={searchTerm}
-            onSlChange={(e) => setSearchTerm((e.target as any).value)}
+            onSlChange={(e) => setSearchTerm(e.target.value)}
           ></SlInput>
           {collectionIds.map((collectionId) => (
             <CollectionCard

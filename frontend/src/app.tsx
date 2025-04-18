@@ -43,7 +43,6 @@ const styles: Record<string, React.CSSProperties> = {
 // TODO confirm deletions
 // TODO submit on enter for forms
 // TODO handle invalid auth requests
-// TODO Add assertions to api reception
 // TODO fix other type errors
 // TODO refactor randomize to be less bad
 export default function App() {

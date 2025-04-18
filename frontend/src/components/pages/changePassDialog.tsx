@@ -70,7 +70,7 @@ export default function ChangePassDialog() {
         type="password"
         helpText="Must be 8 - 20 characters"
         value={oldPassword}
-        onSlChange={(e) => setOldPassword((e.target as any).value)}
+        onSlChange={(e) => setOldPassword(e.target.value)}
         placeholder="Old Password"
         passwordToggle
       ></SlInput>
@@ -78,7 +78,7 @@ export default function ChangePassDialog() {
         style={styles.inputField}
         type="password"
         value={newPassword}
-        onSlChange={(e) => setNewPassword((e.target as any).value)}
+        onSlChange={(e) => setNewPassword(e.target.value)}
         placeholder="New Password"
         passwordToggle
       ></SlInput>
@@ -88,7 +88,7 @@ export default function ChangePassDialog() {
         helpText={helpText}
         type="password"
         value={rePassword}
-        onSlChange={(e) => setRePassword((e.target as any).value)}
+        onSlChange={(e) => setRePassword(e.target.value)}
         placeholder="Retype New Password"
         passwordToggle
       ></SlInput>
