@@ -147,7 +147,7 @@ export default function CollectionCard({
         >
           <SlIcon name="share" slot="copy-icon"></SlIcon>
         </SlCopyButton>
-        <SlTooltip content="Delete Collection">
+        <SlTooltip content="Delete Collection (Hold)">
           <SlProgressRing
             value={progress}
             style="
@@ -159,7 +159,7 @@ export default function CollectionCard({
           >
             <SlIconButton
               name="trash"
-              label="Delete Collection"
+              label="Delete Collection (Hold)"
               onMouseDown={() => startHold()}
               onMouseUp={() => cancelHold()}
               onMouseLeave={() => cancelHold()}

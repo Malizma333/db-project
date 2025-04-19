@@ -26,13 +26,11 @@ sl-input.collectionsName::part(base) {
   bottom: 0;
   left: 0;
   right: auto;
-  background-color: rgba(255, 0, 0, 0.25);
   pointer-events: none;
 }
 
 .sl-toast-stack sl-alert {
   pointer-events: auto;
-  border: 3px solid green;
 }
 :host,
 .sl-theme-dark {
