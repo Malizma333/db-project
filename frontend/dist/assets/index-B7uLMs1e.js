@@ -33545,12 +33545,21 @@ async function filterRecipeCollection({
     assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
-  assertFilterResponse(data);
-  return data.recipes.map((recipe) => ({
-    ...recipe,
-    allergens: recipe.allergens.filter((allergen) => allergen !== null),
-    ingredients: recipe.ingredients.filter((ingredient) => ingredient !== null),
-  }));
+  try {
+    assertFilterResponse(data);
+    return data.recipes.map((recipe) => ({
+      ...recipe,
+      allergens: recipe.allergens.filter((allergen) => allergen !== null),
+      ingredients: recipe.ingredients.filter(
+        (ingredient) => ingredient !== null,
+      ),
+    }));
+  } catch (e3) {
+    if (e3 instanceof Error) {
+      console.error(e3.message);
+    }
+  }
+  return [];
 }
 function useFilterCollection(props) {
   return useQuery({
@@ -33569,6 +33578,18 @@ async function countRecipesInFilter({
   view_min,
   view_max,
 }) {
+  console.log({
+    type: "filter_recipe_collection",
+    collection_id,
+    recipe_name,
+    include_allergens,
+    exclude_allergens,
+    include_ingredients,
+    exclude_ingredients,
+    authors,
+    view_min,
+    view_max,
+  });
   const response = await makeRequest({
     type: "filter_recipe_collection",
     collection_id,
@@ -33586,8 +33607,15 @@ async function countRecipesInFilter({
     assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
-  assertFilterResponse(data);
-  return data.table_size;
+  try {
+    assertFilterResponse(data);
+    return data.table_size;
+  } catch (e3) {
+    if (e3 instanceof Error) {
+      console.error(e3.message);
+    }
+  }
+  return 0;
 }
 function useCountRecipesInFilter(props) {
   return useQuery({
@@ -34288,7 +34316,6 @@ function TableRow({ editMode, rowData }) {
     setRecipeSummaryView();
   }
   function onEditRecipe() {
-    console.log(rowData);
     setSelectedRecipe(rowData);
     setUpdateRecipeView();
   }

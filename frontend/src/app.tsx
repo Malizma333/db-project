@@ -39,12 +39,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-// TODO fix collection filters
-// TODO confirm deletions
-// TODO submit on enter for forms
-// TODO handle invalid auth requests gracefully
-// TODO fix other type errors
-// TODO refactor randomize to be less bad
 export default function App() {
   const { setClientUsername } = useAppStore();
   const params = useParams();
