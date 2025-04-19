@@ -6158,7 +6158,7 @@ __decorateClass(
 __decorateClass([n$6({ type: Boolean })], SlTag.prototype, "removable", 2);
 var tagName$R = "sl-tag";
 SlTag.define("sl-tag");
-var reactWrapper$i = o$8({
+var reactWrapper$j = o$8({
   tagName: tagName$R,
   elementClass: SlTag,
   react: React,
@@ -6167,7 +6167,7 @@ var reactWrapper$i = o$8({
   },
   displayName: "SlTag",
 });
-var tag_default = reactWrapper$i;
+var tag_default = reactWrapper$j;
 var tooltip_styles_default = i$8`
   :host {
     --max-width: 20rem;
@@ -8823,7 +8823,7 @@ setDefaultAnimation("tooltip.hide", {
 });
 var tagName$Q = "sl-tooltip";
 SlTooltip.define("sl-tooltip");
-var reactWrapper$h = o$8({
+var reactWrapper$i = o$8({
   tagName: tagName$Q,
   elementClass: SlTooltip,
   react: React,
@@ -8835,7 +8835,7 @@ var reactWrapper$h = o$8({
   },
   displayName: "SlTooltip",
 });
-var tooltip_default = reactWrapper$h;
+var tooltip_default = reactWrapper$i;
 var textarea_styles_default = i$8`
   :host {
     display: block;
@@ -12623,24 +12623,24 @@ SlSkeleton.styles = [component_styles_default, skeleton_styles_default];
 __decorateClass([n$6()], SlSkeleton.prototype, "effect", 2);
 var tagName$I = "sl-skeleton";
 SlSkeleton.define("sl-skeleton");
-var reactWrapper$g = o$8({
+var reactWrapper$h = o$8({
   tagName: tagName$I,
   elementClass: SlSkeleton,
   react: React,
   events: {},
   displayName: "SlSkeleton",
 });
-var skeleton_default = reactWrapper$g;
+var skeleton_default = reactWrapper$h;
 var tagName$H = "sl-spinner";
 SlSpinner.define("sl-spinner");
-var reactWrapper$f = o$8({
+var reactWrapper$g = o$8({
   tagName: tagName$H,
   elementClass: SlSpinner,
   react: React,
   events: {},
   displayName: "SlSpinner",
 });
-var spinner_default = reactWrapper$f;
+var spinner_default = reactWrapper$g;
 var split_panel_styles_default = i$8`
   :host {
     --divider-width: 4px;
@@ -13522,13 +13522,14 @@ __decorateClass(
 __decorateClass([n$6()], SlProgressRing.prototype, "label", 2);
 var tagName$C = "sl-progress-ring";
 SlProgressRing.define("sl-progress-ring");
-o$8({
+var reactWrapper$f = o$8({
   tagName: tagName$C,
   elementClass: SlProgressRing,
   react: React,
   events: {},
   displayName: "SlProgressRing",
 });
+var progress_ring_default = reactWrapper$f;
 var radio_styles_default = i$8`
   :host {
     display: block;
@@ -33652,6 +33653,18 @@ async function addRecipeCollection(name) {
   }
   return data.id;
 }
+async function removeRecipeCollection(id2) {
+  const response = await makeRequest({
+    type: "remove_recipe_collection",
+    auth: session_auth.auth,
+    id: id2,
+  });
+  const data = await response.json();
+  if (response.status !== 200) {
+    assertErrorResponse(data);
+    throw new Error(getErrorMessage(data));
+  }
+}
 async function getOwnedRecipeCollections() {
   const response = await makeRequest({
     type: "get_owned_recipe_collections",
@@ -34890,10 +34903,45 @@ function CollectionCard({ collectionId, searchTerm }) {
   const queryClient2 = useQueryClient();
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
-  const [deleteProgress, setDeleteProgress] = h$2(0);
-  const [deletePressed, setDeletePressed] = h$2(false);
   const collectionUrl = window.location.origin + "/collection/" + collectionId;
-  y(() => {}, [deletePressed]);
+  const holdTime = 2e3;
+  const [progress, setProgress] = h$2(0);
+  const intervalRef = A$1(null);
+  const timeoutRef = A$1(null);
+  const startTimeRef = A$1(null);
+  function updateProgress() {
+    startTimeRef.current = Date.now();
+    intervalRef.current = window.setInterval(() => {
+      if (startTimeRef.current) {
+        const elapsed = Date.now() - startTimeRef.current;
+        const percent = Math.min((elapsed / holdTime) * 100, 100);
+        setProgress(percent);
+      }
+    }, 50);
+  }
+  function startHold() {
+    updateProgress();
+    timeoutRef.current = window.setTimeout(async () => {
+      void (await onDeleteCollection());
+      cancelHold();
+    }, holdTime);
+  }
+  function cancelHold() {
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    if (intervalRef.current) window.clearInterval(intervalRef.current);
+    timeoutRef.current = null;
+    intervalRef.current = null;
+    startTimeRef.current = null;
+    setProgress(0);
+  }
+  async function onDeleteCollection() {
+    try {
+      await removeRecipeCollection(collectionId);
+      await queryClient2.invalidateQueries({ queryKey: ["ownedCollections"] });
+    } catch (e3) {
+      console.error(e3);
+    }
+  }
   async function onRenameCollection(id2, newName) {
     try {
       await renameRecipeCollection(id2, newName);
@@ -34944,12 +34992,20 @@ function CollectionCard({ collectionId, searchTerm }) {
               }),
               /* @__PURE__ */ u$5(tooltip_default, {
                 content: "Delete Collection",
-                children: /* @__PURE__ */ u$5(icon_button_default, {
-                  name: "trash",
-                  label: "Delete Collection",
-                  onMouseDown: () => setDeletePressed(true),
-                  onMouseUp: () => setDeletePressed(false),
-                  onMouseLeave: () => setDeletePressed(false),
+                children: /* @__PURE__ */ u$5(progress_ring_default, {
+                  value: progress,
+                  style:
+                    "\n              --size: 35px;\n              --track-width: 2px;\n              --indicator-color: red;\n              --track-color: none;\n              --indicator-transition-duration: 2;\n            ",
+                  children: /* @__PURE__ */ u$5(icon_button_default, {
+                    name: "trash",
+                    label: "Delete Collection",
+                    onMouseDown: () => startHold(),
+                    onMouseUp: () => cancelHold(),
+                    onMouseLeave: () => cancelHold(),
+                    onTouchStart: () => startHold(),
+                    onTouchEnd: () => cancelHold(),
+                    onTouchCancel: () => cancelHold(),
+                  }),
                 }),
               }),
             ],

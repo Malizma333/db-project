@@ -5,9 +5,10 @@ import {
   SlIcon,
   SlIconButton,
   SlTooltip,
+  SlProgressRing,
 } from "@shoelace-style/shoelace/dist/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import {
   removeRecipeCollection,
   renameRecipeCollection,
@@ -36,29 +37,51 @@ export default function CollectionCard({
   collectionId: number;
   searchTerm: string;
 }) {
-  let x = -1;
-
   const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
-  const [deleteProgress, setDeleteProgress] = useState(0);
-  const [deletePressed, setDeletePressed] = useState(false);
-
   const collectionUrl = window.location.origin + "/collection/" + collectionId;
 
-  useEffect(() => {
-    if (deletePressed) {
-      // x = window.setInterval(() => console.log("A"), 10);
-    } else {
-      // window.clearInterval(x);
-    }
-  }, [deletePressed]);
+  const holdTime = 2000;
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
-  async function onDeleteCollection(id: number) {
+  function updateProgress() {
+    startTimeRef.current = Date.now();
+    intervalRef.current = window.setInterval(() => {
+      if (startTimeRef.current) {
+        const elapsed = Date.now() - startTimeRef.current;
+        const percent = Math.min((elapsed / holdTime) * 100, 100);
+        setProgress(percent);
+      }
+    }, 50);
+  }
+
+  function startHold() {
+    updateProgress();
+
+    timeoutRef.current = window.setTimeout(async () => {
+      void (await onDeleteCollection());
+      cancelHold();
+    }, holdTime);
+  }
+
+  function cancelHold() {
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    if (intervalRef.current) window.clearInterval(intervalRef.current);
+    timeoutRef.current = null;
+    intervalRef.current = null;
+    startTimeRef.current = null;
+    setProgress(0);
+  }
+
+  async function onDeleteCollection() {
     try {
-      await removeRecipeCollection(id);
+      await removeRecipeCollection(collectionId);
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e) {
       console.error(e);
@@ -108,13 +131,27 @@ export default function CollectionCard({
           <SlIcon name="share" slot="copy-icon"></SlIcon>
         </SlCopyButton>
         <SlTooltip content="Delete Collection">
-          <SlIconButton
-            name="trash"
-            label="Delete Collection"
-            onMouseDown={() => setDeletePressed(true)}
-            onMouseUp={() => setDeletePressed(false)}
-            onMouseLeave={() => setDeletePressed(false)}
-          ></SlIconButton>
+          <SlProgressRing
+            value={progress}
+            style="
+              --size: 35px;
+              --track-width: 2px;
+              --indicator-color: red;
+              --track-color: none;
+              --indicator-transition-duration: 2;
+            "
+          >
+            <SlIconButton
+              name="trash"
+              label="Delete Collection"
+              onMouseDown={() => startHold()}
+              onMouseUp={() => cancelHold()}
+              onMouseLeave={() => cancelHold()}
+              onTouchStart={() => startHold()}
+              onTouchEnd={() => cancelHold()}
+              onTouchCancel={() => cancelHold()}
+            ></SlIconButton>
+          </SlProgressRing>
         </SlTooltip>
       </div>
       Included recipes: {recipeCount}
