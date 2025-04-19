@@ -61,13 +61,11 @@ export default function PageNav() {
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
-  return numPages == 0 ? (
-    <div style={styles.root}></div>
-  ) : (
+  return (
     <div style={styles.root}>
       <SlTooltip content="First Page">
         <SlIconButton
-          disabled={page === 0}
+          disabled={numPages === 0 || page === 0}
           name="chevron-double-left"
           onClick={() => {
             void onNavigateFirstPage();
@@ -77,7 +75,7 @@ export default function PageNav() {
       </SlTooltip>
       <SlTooltip content="Previous Page">
         <SlIconButton
-          disabled={page === 0}
+          disabled={numPages === 0 || page === 0}
           name="chevron-left"
           onClick={() => {
             void onNavigatePrevPage();
@@ -88,7 +86,7 @@ export default function PageNav() {
       {page + 1}
       <SlTooltip content="Next Page">
         <SlIconButton
-          disabled={page === numPages - 1}
+          disabled={numPages === 0 || page === numPages - 1}
           name="chevron-right"
           onClick={() => {
             void onNavigateNextPage();
@@ -98,7 +96,7 @@ export default function PageNav() {
       </SlTooltip>
       <SlTooltip content="Last Page">
         <SlIconButton
-          disabled={page === numPages - 1}
+          disabled={numPages === 0 || page === numPages - 1}
           name="chevron-double-right"
           onClick={() => {
             void onNavigateLastPage();

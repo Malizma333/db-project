@@ -6158,7 +6158,7 @@ __decorateClass(
 __decorateClass([n$6({ type: Boolean })], SlTag.prototype, "removable", 2);
 var tagName$R = "sl-tag";
 SlTag.define("sl-tag");
-var reactWrapper$h = o$8({
+var reactWrapper$i = o$8({
   tagName: tagName$R,
   elementClass: SlTag,
   react: React,
@@ -6167,7 +6167,7 @@ var reactWrapper$h = o$8({
   },
   displayName: "SlTag",
 });
-var tag_default = reactWrapper$h;
+var tag_default = reactWrapper$i;
 var tooltip_styles_default = i$8`
   :host {
     --max-width: 20rem;
@@ -8823,7 +8823,7 @@ setDefaultAnimation("tooltip.hide", {
 });
 var tagName$Q = "sl-tooltip";
 SlTooltip.define("sl-tooltip");
-var reactWrapper$g = o$8({
+var reactWrapper$h = o$8({
   tagName: tagName$Q,
   elementClass: SlTooltip,
   react: React,
@@ -8835,7 +8835,7 @@ var reactWrapper$g = o$8({
   },
   displayName: "SlTooltip",
 });
-var tooltip_default = reactWrapper$g;
+var tooltip_default = reactWrapper$h;
 var textarea_styles_default = i$8`
   :host {
     display: block;
@@ -12623,13 +12623,14 @@ SlSkeleton.styles = [component_styles_default, skeleton_styles_default];
 __decorateClass([n$6()], SlSkeleton.prototype, "effect", 2);
 var tagName$I = "sl-skeleton";
 SlSkeleton.define("sl-skeleton");
-o$8({
+var reactWrapper$g = o$8({
   tagName: tagName$I,
   elementClass: SlSkeleton,
   react: React,
   events: {},
   displayName: "SlSkeleton",
 });
+var skeleton_default = reactWrapper$g;
 var tagName$H = "sl-spinner";
 SlSpinner.define("sl-spinner");
 var reactWrapper$f = o$8({
@@ -34280,6 +34281,87 @@ const styles$9 = {
     justifyContent: "end",
   },
 };
+function TemplateRow({ editMode }) {
+  const { getColumnVisible } = useAppStore();
+  return /* @__PURE__ */ u$5(card_default, {
+    style: { "--border-radius": "0" },
+    children: /* @__PURE__ */ u$5("div", {
+      style: styles$9.row,
+      children: [
+        getColumnVisible(COLUMN_MASK.NAME) &&
+          /* @__PURE__ */ u$5("div", {
+            style: styles$9.cell,
+            children: /* @__PURE__ */ u$5(skeleton_default, {
+              style: { width: "10em", height: "1em" },
+            }),
+          }),
+        getColumnVisible(COLUMN_MASK.AUTHOR) &&
+          /* @__PURE__ */ u$5("div", {
+            style: styles$9.cell,
+            children: /* @__PURE__ */ u$5(skeleton_default, {
+              style: { width: "8em", height: "1em" },
+            }),
+          }),
+        getColumnVisible(COLUMN_MASK.ALLERGENS) &&
+          /* @__PURE__ */ u$5("div", {
+            style: styles$9.cell,
+            children: Array(2)
+              .fill(0)
+              .map(() =>
+                /* @__PURE__ */ u$5(skeleton_default, {
+                  style: { width: "5em", height: "1em", marginLeft: "1em" },
+                }),
+              ),
+          }),
+        getColumnVisible(COLUMN_MASK.REFERENCE) &&
+          /* @__PURE__ */ u$5("div", {
+            style: styles$9.cell,
+            children: /* @__PURE__ */ u$5(skeleton_default, {
+              style: { width: "14em", height: "1em" },
+            }),
+          }),
+        getColumnVisible(COLUMN_MASK.INGREDIENTS) &&
+          /* @__PURE__ */ u$5("div", {
+            style: styles$9.cell,
+            children: Array(3)
+              .fill(0)
+              .map(() =>
+                /* @__PURE__ */ u$5(skeleton_default, {
+                  style: { width: "4em", height: "1em", marginLeft: "1em" },
+                }),
+              ),
+          }),
+        /* @__PURE__ */ u$5("div", {
+          style: styles$9.end,
+          children: [
+            /* @__PURE__ */ u$5(skeleton_default, {
+              style: { width: "1.5em", height: "1.5em" },
+            }),
+            editMode &&
+              /* @__PURE__ */ u$5(k$3, {
+                children: [
+                  /* @__PURE__ */ u$5(skeleton_default, {
+                    style: {
+                      width: "1.5em",
+                      height: "1.5em",
+                      marginLeft: "0.5em",
+                    },
+                  }),
+                  /* @__PURE__ */ u$5(skeleton_default, {
+                    style: {
+                      width: "1.5em",
+                      height: "1.5em",
+                      marginLeft: "0.5em",
+                    },
+                  }),
+                ],
+              }),
+          ],
+        }),
+      ],
+    }),
+  });
+}
 function TableRow({ editMode, rowData }) {
   const {
     getColumnVisible,
@@ -34302,80 +34384,82 @@ function TableRow({ editMode, rowData }) {
   }
   return /* @__PURE__ */ u$5(card_default, {
     style: { "--border-radius": "0" },
-    children: /* @__PURE__ */ u$5("div", {
-      style: styles$9.row,
-      children: [
-        getColumnVisible(COLUMN_MASK.NAME) &&
-          /* @__PURE__ */ u$5("div", {
-            style: styles$9.cell,
-            children: rowData.name,
-          }),
-        getColumnVisible(COLUMN_MASK.AUTHOR) &&
-          /* @__PURE__ */ u$5("div", {
-            style: styles$9.cell,
-            children: rowData.authors.join(","),
-          }),
-        getColumnVisible(COLUMN_MASK.ALLERGENS) &&
-          /* @__PURE__ */ u$5("div", {
-            style: styles$9.cell,
-            children: /* @__PURE__ */ u$5(TagPicker, {
-              variant: "warning",
-              selected: rowData.allergens,
-              viewMode: true,
-            }),
-          }),
-        getColumnVisible(COLUMN_MASK.REFERENCE) &&
-          /* @__PURE__ */ u$5("div", {
-            style: styles$9.cell,
-            children: rowData.reference,
-          }),
-        getColumnVisible(COLUMN_MASK.INGREDIENTS) &&
-          /* @__PURE__ */ u$5("div", {
-            style: styles$9.cell,
-            children: /* @__PURE__ */ u$5(TagPicker, {
-              variant: "primary",
-              selected: rowData.ingredients,
-              viewMode: true,
-            }),
-          }),
-        /* @__PURE__ */ u$5("div", {
-          style: styles$9.end,
+    children: rowData
+      ? /* @__PURE__ */ u$5("div", {
+          style: styles$9.row,
           children: [
-            /* @__PURE__ */ u$5(tooltip_default, {
-              content: "View Recipe",
-              children: /* @__PURE__ */ u$5(icon_button_default, {
-                name: "eye",
-                label: "View Recipe",
-                onClick: () => onViewRecipe(),
+            getColumnVisible(COLUMN_MASK.NAME) &&
+              /* @__PURE__ */ u$5("div", {
+                style: styles$9.cell,
+                children: rowData.name,
               }),
+            getColumnVisible(COLUMN_MASK.AUTHOR) &&
+              /* @__PURE__ */ u$5("div", {
+                style: styles$9.cell,
+                children: rowData.authors.join(","),
+              }),
+            getColumnVisible(COLUMN_MASK.ALLERGENS) &&
+              /* @__PURE__ */ u$5("div", {
+                style: styles$9.cell,
+                children: /* @__PURE__ */ u$5(TagPicker, {
+                  variant: "warning",
+                  selected: rowData.allergens,
+                  viewMode: true,
+                }),
+              }),
+            getColumnVisible(COLUMN_MASK.REFERENCE) &&
+              /* @__PURE__ */ u$5("div", {
+                style: styles$9.cell,
+                children: rowData.reference,
+              }),
+            getColumnVisible(COLUMN_MASK.INGREDIENTS) &&
+              /* @__PURE__ */ u$5("div", {
+                style: styles$9.cell,
+                children: /* @__PURE__ */ u$5(TagPicker, {
+                  variant: "primary",
+                  selected: rowData.ingredients,
+                  viewMode: true,
+                }),
+              }),
+            /* @__PURE__ */ u$5("div", {
+              style: styles$9.end,
+              children: [
+                /* @__PURE__ */ u$5(tooltip_default, {
+                  content: "View Recipe",
+                  children: /* @__PURE__ */ u$5(icon_button_default, {
+                    name: "eye",
+                    label: "View Recipe",
+                    onClick: () => onViewRecipe(),
+                  }),
+                }),
+                editMode &&
+                  /* @__PURE__ */ u$5(k$3, {
+                    children: [
+                      /* @__PURE__ */ u$5(tooltip_default, {
+                        content: "Edit Recipe",
+                        children: /* @__PURE__ */ u$5(icon_button_default, {
+                          name: "pencil",
+                          label: "Edit Recipe",
+                          onClick: () => onEditRecipe(),
+                        }),
+                      }),
+                      /* @__PURE__ */ u$5(tooltip_default, {
+                        content: "Delete Recipe",
+                        children: /* @__PURE__ */ u$5(icon_button_default, {
+                          name: "trash",
+                          label: "Delete Recipe",
+                          onClick: () => {
+                            void onDeleteRecipe();
+                          },
+                        }),
+                      }),
+                    ],
+                  }),
+              ],
             }),
-            editMode &&
-              /* @__PURE__ */ u$5(k$3, {
-                children: [
-                  /* @__PURE__ */ u$5(tooltip_default, {
-                    content: "Edit Recipe",
-                    children: /* @__PURE__ */ u$5(icon_button_default, {
-                      name: "pencil",
-                      label: "Edit Recipe",
-                      onClick: () => onEditRecipe(),
-                    }),
-                  }),
-                  /* @__PURE__ */ u$5(tooltip_default, {
-                    content: "Delete Recipe",
-                    children: /* @__PURE__ */ u$5(icon_button_default, {
-                      name: "trash",
-                      label: "Delete Recipe",
-                      onClick: () => {
-                        void onDeleteRecipe();
-                      },
-                    }),
-                  }),
-                ],
-              }),
           ],
-        }),
-      ],
-    }),
+        })
+      : /* @__PURE__ */ u$5("div", { style: styles$9.row }),
   });
 }
 function Table({ editMode }) {
@@ -34455,10 +34539,17 @@ function Table({ editMode }) {
           ],
         }),
       }),
-      !isFetching &&
-        pageData !== void 0 &&
-        pageData.map((row) => {
-          return /* @__PURE__ */ u$5(TableRow, { editMode, rowData: row });
+      Array(numRowsPerPage)
+        .fill(0)
+        .map((_2, i3) => {
+          if (!isFetching && pageData !== void 0) {
+            return /* @__PURE__ */ u$5(TableRow, {
+              editMode,
+              rowData: pageData[i3],
+            });
+          } else {
+            return /* @__PURE__ */ u$5(TemplateRow, { editMode });
+          }
         }),
     ],
   });
@@ -34510,58 +34601,56 @@ function PageNav() {
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   };
-  return numPages == 0
-    ? /* @__PURE__ */ u$5("div", { style: styles$8.root })
-    : /* @__PURE__ */ u$5("div", {
-        style: styles$8.root,
-        children: [
-          /* @__PURE__ */ u$5(tooltip_default, {
-            content: "First Page",
-            children: /* @__PURE__ */ u$5(icon_button_default, {
-              disabled: page === 0,
-              name: "chevron-double-left",
-              onClick: () => {
-                void onNavigateFirstPage();
-              },
-              label: "First Page",
-            }),
-          }),
-          /* @__PURE__ */ u$5(tooltip_default, {
-            content: "Previous Page",
-            children: /* @__PURE__ */ u$5(icon_button_default, {
-              disabled: page === 0,
-              name: "chevron-left",
-              onClick: () => {
-                void onNavigatePrevPage();
-              },
-              label: "Previous Page",
-            }),
-          }),
-          page + 1,
-          /* @__PURE__ */ u$5(tooltip_default, {
-            content: "Next Page",
-            children: /* @__PURE__ */ u$5(icon_button_default, {
-              disabled: page === numPages - 1,
-              name: "chevron-right",
-              onClick: () => {
-                void onNavigateNextPage();
-              },
-              label: "Next Page",
-            }),
-          }),
-          /* @__PURE__ */ u$5(tooltip_default, {
-            content: "Last Page",
-            children: /* @__PURE__ */ u$5(icon_button_default, {
-              disabled: page === numPages - 1,
-              name: "chevron-double-right",
-              onClick: () => {
-                void onNavigateLastPage();
-              },
-              label: "Last Page",
-            }),
-          }),
-        ],
-      });
+  return /* @__PURE__ */ u$5("div", {
+    style: styles$8.root,
+    children: [
+      /* @__PURE__ */ u$5(tooltip_default, {
+        content: "First Page",
+        children: /* @__PURE__ */ u$5(icon_button_default, {
+          disabled: numPages === 0 || page === 0,
+          name: "chevron-double-left",
+          onClick: () => {
+            void onNavigateFirstPage();
+          },
+          label: "First Page",
+        }),
+      }),
+      /* @__PURE__ */ u$5(tooltip_default, {
+        content: "Previous Page",
+        children: /* @__PURE__ */ u$5(icon_button_default, {
+          disabled: numPages === 0 || page === 0,
+          name: "chevron-left",
+          onClick: () => {
+            void onNavigatePrevPage();
+          },
+          label: "Previous Page",
+        }),
+      }),
+      page + 1,
+      /* @__PURE__ */ u$5(tooltip_default, {
+        content: "Next Page",
+        children: /* @__PURE__ */ u$5(icon_button_default, {
+          disabled: numPages === 0 || page === numPages - 1,
+          name: "chevron-right",
+          onClick: () => {
+            void onNavigateNextPage();
+          },
+          label: "Next Page",
+        }),
+      }),
+      /* @__PURE__ */ u$5(tooltip_default, {
+        content: "Last Page",
+        children: /* @__PURE__ */ u$5(icon_button_default, {
+          disabled: numPages === 0 || page === numPages - 1,
+          name: "chevron-double-right",
+          onClick: () => {
+            void onNavigateLastPage();
+          },
+          label: "Last Page",
+        }),
+      }),
+    ],
+  });
 }
 const styles$7 = {
   inputField: {
