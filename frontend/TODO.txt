@@ -1,18 +1,18 @@
-- handle invalid auth requests gracefully
-  - notify that user needs to log in again
-  - auto log user out? and forget session creds
+- fix pages lagging behind (tanstack query issue?)
 
 - better tag display
   - Wrap tags
   - Cut off long tags w/ ellipses
   - Shorten new tag textbox
-  
-- loading thingies
-  - recipe table
-  - page nav
 
 - confirm collection deletions
 
-- fix pages lagging behind (tanstack query issue?)
+- handle invalid auth requests gracefully
+  - notify that user needs to log in again
+  - auto log user out? and forget session creds
+
+- loading thingies
+  - recipe table
+  - page nav
 
 - fix other typing errors (shoelace x preact)
