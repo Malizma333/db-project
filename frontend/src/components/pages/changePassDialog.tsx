@@ -8,7 +8,8 @@ import { useAppStore, VIEW } from "../../store";
 import { Notification } from "../widgets/notification";
 import { changePassword } from "../../api/user";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   inputField: {
@@ -17,7 +18,7 @@ const styles = {
 };
 
 export default function ChangePassDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -42,15 +43,18 @@ export default function ChangePassDialog() {
 
     try {
       await changePassword(oldPassword, newPassword);
+      onCloseDialog();
+      if (changePassAlert.current !== null) {
+        await changePassAlert.current.toast();
+      }
     } catch (e) {
       if (e instanceof Error) {
-        setHelpText(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          setHelpText(e.message);
+        }
       }
-    }
-
-    onCloseDialog();
-    if (changePassAlert.current !== null) {
-      await changePassAlert.current.toast();
     }
   }
 

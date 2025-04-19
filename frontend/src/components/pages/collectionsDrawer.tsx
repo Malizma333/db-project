@@ -14,6 +14,7 @@ import { SlHideEvent } from "@shoelace-style/shoelace";
 import CollectionCard from "../widgets/collectionCard";
 import { useQueryClient } from "@tanstack/react-query";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   root: {
@@ -32,7 +33,7 @@ const styles = {
 export default function CollectionsDrawer() {
   const queryClient = useQueryClient();
 
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -51,7 +52,11 @@ export default function CollectionsDrawer() {
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
       }
     }
   }

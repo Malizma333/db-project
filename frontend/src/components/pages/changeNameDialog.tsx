@@ -8,7 +8,8 @@ import { useAppStore, VIEW } from "../../store";
 import { Notification } from "../widgets/notification";
 import { changeUsername } from "../../api/user";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   inputField: {
@@ -17,7 +18,8 @@ const styles = {
 };
 
 export default function ChangeNameDialog() {
-  const { view, setMainView, setClientUsername } = useAppStore();
+  const { view, setMainView, setClientUsername, setSessionAlert } =
+    useAppStore();
 
   const [newUsername, setNewUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -35,16 +37,18 @@ export default function ChangeNameDialog() {
     try {
       await changeUsername(password, newUsername);
       setClientUsername(newUsername);
+      onCloseDialog();
+      if (changeNameAlert.current !== null) {
+        await changeNameAlert.current.toast();
+      }
     } catch (e) {
       if (e instanceof Error) {
-        setHelpText(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          setHelpText(e.message);
+        }
       }
-      return;
-    }
-
-    onCloseDialog();
-    if (changeNameAlert.current !== null) {
-      await changeNameAlert.current.toast();
     }
   }
 

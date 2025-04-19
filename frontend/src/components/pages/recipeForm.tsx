@@ -19,6 +19,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   inputField: {
@@ -43,6 +44,7 @@ export default function RecipeForm({
     selectedRecipeName,
     setMainView,
     setSelectedRecipe,
+    setSessionAlert,
   } = useAppStore();
 
   const queryClient = useQueryClient();
@@ -90,7 +92,13 @@ export default function RecipeForm({
         await submitAlert.current.toast();
       }
     } catch (e) {
-      console.error(e);
+      if (e instanceof Error) {
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
+      }
     }
   }
 

@@ -12,9 +12,12 @@ import CollectionsDrawer from "./components/pages/collectionsDrawer";
 import RecipeForm from "./components/pages/recipeForm";
 import RecipeSummary from "./components/pages/recipeSummary";
 import { useOwnedCollections } from "./api/recipeCollection";
-import { session_auth, useLoggedIn } from "./api/user";
+import { clearSessionAuth, session_auth, useLoggedIn } from "./api/user";
 import { useParams } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import { Notification } from "./components/widgets/notification";
+import { useQueryClient } from "@tanstack/react-query";
 
 // used for importing icons without copying into public directory
 setBasePath(
@@ -40,28 +43,42 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export default function App() {
-  const { setClientUsername } = useAppStore();
+  const { sessionAlert, setClientUsername } = useAppStore();
   const params = useParams();
+  const queryClient = useQueryClient();
   const collectionId = parseInt(params["id"] || "-1");
-
-  const collectionDef = collectionId !== -1;
-
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
+  const authExpRef = useRef<null | SlAlertElement>(null);
 
-  const editMode = !!(
-    collectionDef &&
-    loggedIn &&
-    ownedCollections &&
-    ownedCollections.includes(collectionId)
-  );
+  const collectionDef = collectionId !== -1;
+  const editMode =
+    loggedIn === true &&
+    ownedCollections !== undefined &&
+    ownedCollections.includes(collectionId);
 
   useEffect(() => {
     setClientUsername(session_auth.user);
   }, []);
 
+  useEffect(() => {
+    if (sessionAlert) {
+      if (authExpRef.current !== null) {
+        void authExpRef.current.toast();
+        void queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
+        clearSessionAuth();
+      }
+    }
+  }, [sessionAlert]);
+
   return (
     <div style={styles.root}>
+      <Notification
+        message="Session expired, please log in again"
+        variant="danger"
+        childRef={authExpRef}
+        duration={30000}
+      ></Notification>
       {collectionDef && <SettingsDrawer></SettingsDrawer>}
       <CollectionsDrawer></CollectionsDrawer>
       <LoginDialog></LoginDialog>

@@ -5,10 +5,6 @@
 
 DONE HERE
 
-- handle invalid auth requests gracefully
-  - notify that user needs to log in again
-  - auto log user out? and forget session creds
-
 - notification container hitbox covers other stuff
 
 - better mobile display

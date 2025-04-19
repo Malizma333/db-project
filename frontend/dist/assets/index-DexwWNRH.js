@@ -32965,6 +32965,14 @@ function initSessionAuth() {
     user: sessionStorage.getItem("session.user") || "",
   };
 }
+function clearSessionAuth() {
+  session_auth = {
+    auth: "",
+    user: "",
+  };
+  sessionStorage.removeItem("session.auth");
+  sessionStorage.removeItem("session.user");
+}
 async function login(username, password) {
   const response = await makeRequest({
     type: "login",
@@ -32994,13 +33002,7 @@ async function logout() {
     assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
-  session_auth = {
-    auth: "",
-    user: "",
-  };
-  sessionStorage.removeItem("session.auth");
-  sessionStorage.removeItem("session.lifetime");
-  sessionStorage.removeItem("session.user");
+  clearSessionAuth();
 }
 async function loggedIn() {
   if (!session_auth) {
@@ -33105,135 +33107,6 @@ async function createIngredient(ingredient_name, collection_id) {
     assertErrorResponse(data);
     throw new Error(getErrorMessage(data));
   }
-}
-const styles$c = {
-  root: {
-    alignItems: "center",
-    display: "flex",
-    height: "2em",
-    justifyContent: "start",
-    position: "relative",
-  },
-  menu: {
-    height: "8em",
-  },
-  addNew: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    bottom: 0,
-    margin: "auto",
-  },
-};
-var TagType = /* @__PURE__ */ ((TagType2) => {
-  TagType2["Allergen"] = "Allergy";
-  TagType2["Ingredient"] = "Ingredient";
-  return TagType2;
-})(TagType || {});
-function TagPicker({
-  variant,
-  selected,
-  available = [],
-  setSelected = void 0,
-  viewMode = false,
-  tagType = void 0,
-}) {
-  const [newTag, setNewTag] = h$2("");
-  const queryClient2 = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
-  function onRemoveTag(i3) {
-    if (setSelected !== void 0) {
-      setSelected(selected.slice(0, i3).concat(selected.slice(i3 + 1)));
-    }
-  }
-  function onAddTag(name) {
-    if (setSelected !== void 0) {
-      setSelected(selected.concat([name]));
-    }
-  }
-  async function onCreateTag() {
-    if (newTag === "") return;
-    try {
-      if (tagType === "Allergy") {
-        await createAllergen(newTag, collectionId);
-        await queryClient2.invalidateQueries({
-          queryKey: ["collectionAllergens"],
-        });
-        if (!selected.includes(newTag)) {
-          onAddTag(newTag);
-        }
-      } else if (tagType === "Ingredient") {
-        await createIngredient(newTag, collectionId);
-        await queryClient2.invalidateQueries({
-          queryKey: ["collectionIngredients"],
-        });
-        if (!selected.includes(newTag)) {
-          onAddTag(newTag);
-        }
-      }
-    } catch (e3) {
-      if (e3 instanceof Error) {
-        console.error(e3.message);
-      }
-    }
-  }
-  return /* @__PURE__ */ u$5("div", {
-    style: styles$c.root,
-    children: [
-      selected.map((tag, index) =>
-        /* @__PURE__ */ u$5(
-          tag_default,
-          {
-            variant,
-            removable: !viewMode,
-            size: "small",
-            onSlRemove: () => onRemoveTag(index),
-            children: tag,
-          },
-          index,
-        ),
-      ),
-      !viewMode &&
-        available.length > selected.length &&
-        /* @__PURE__ */ u$5(dropdown_default, {
-          children: [
-            /* @__PURE__ */ u$5(icon_button_default, {
-              slot: "trigger",
-              name: "plus",
-            }),
-            /* @__PURE__ */ u$5(menu_default, {
-              style: styles$c.menu,
-              onSlSelect: (e3) => onAddTag(e3.detail.item.value),
-              children: available
-                .filter((tag) => !selected.includes(tag))
-                .map((tag) => {
-                  return /* @__PURE__ */ u$5(menu_item_default, {
-                    value: tag,
-                    children: tag,
-                  });
-                }),
-            }),
-          ],
-        }),
-      !viewMode &&
-        tagType !== void 0 &&
-        /* @__PURE__ */ u$5(input_default, {
-          style: styles$c.addNew,
-          placeholder: "New " + tagType,
-          value: newTag,
-          onSlChange: (e3) => setNewTag(e3.target.value),
-          children: /* @__PURE__ */ u$5(icon_button_default, {
-            slot: "suffix",
-            name: "plus",
-            label: "Create Tag",
-            onClick: () => {
-              void onCreateTag();
-            },
-          }),
-        }),
-    ],
-  });
 }
 const createStoreImpl = (createState) => {
   let state;
@@ -33434,6 +33307,7 @@ const initStoreState = {
   selectedRecipeAuthors: [],
   selectedRecipeIngredients: [],
   selectedRecipeAllergens: [],
+  sessionAlert: false,
 };
 const computed = distExports.createComputed((state) => ({
   filterProps: {
@@ -33533,8 +33407,143 @@ const useAppStore = create()(
       set({ excludeIngredientsFilter }),
     setIncludeAuthorsFilter: (includeAuthorsFilter) =>
       set({ includeAuthorsFilter }),
+    setSessionAlert: (sessionAlert = true) => set({ sessionAlert }),
   })),
 );
+const styles$c = {
+  root: {
+    alignItems: "center",
+    display: "flex",
+    height: "2em",
+    justifyContent: "start",
+    position: "relative",
+  },
+  menu: {
+    height: "8em",
+  },
+  addNew: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    margin: "auto",
+  },
+};
+var TagType = /* @__PURE__ */ ((TagType2) => {
+  TagType2["Allergen"] = "Allergy";
+  TagType2["Ingredient"] = "Ingredient";
+  return TagType2;
+})(TagType || {});
+function TagPicker({
+  variant,
+  selected,
+  available = [],
+  setSelected = void 0,
+  viewMode = false,
+  tagType = void 0,
+}) {
+  const { setSessionAlert } = useAppStore();
+  const [newTag, setNewTag] = h$2("");
+  const queryClient2 = useQueryClient();
+  const params = useParams();
+  const collectionId = parseInt(params["id"] || "-1");
+  function onRemoveTag(i3) {
+    if (setSelected !== void 0) {
+      setSelected(selected.slice(0, i3).concat(selected.slice(i3 + 1)));
+    }
+  }
+  function onAddTag(name) {
+    if (setSelected !== void 0) {
+      setSelected(selected.concat([name]));
+    }
+  }
+  async function onCreateTag() {
+    if (newTag === "") return;
+    try {
+      if (tagType === "Allergy") {
+        await createAllergen(newTag, collectionId);
+        await queryClient2.invalidateQueries({
+          queryKey: ["collectionAllergens"],
+        });
+        if (!selected.includes(newTag)) {
+          onAddTag(newTag);
+        }
+      } else if (tagType === "Ingredient") {
+        await createIngredient(newTag, collectionId);
+        await queryClient2.invalidateQueries({
+          queryKey: ["collectionIngredients"],
+        });
+        if (!selected.includes(newTag)) {
+          onAddTag(newTag);
+        }
+      }
+    } catch (e3) {
+      if (e3 instanceof Error) {
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e3.message);
+        }
+      }
+    }
+  }
+  return /* @__PURE__ */ u$5("div", {
+    style: styles$c.root,
+    children: [
+      selected.map((tag, index) =>
+        /* @__PURE__ */ u$5(
+          tag_default,
+          {
+            variant,
+            removable: !viewMode,
+            size: "small",
+            onSlRemove: () => onRemoveTag(index),
+            children: tag,
+          },
+          index,
+        ),
+      ),
+      !viewMode &&
+        available.length > selected.length &&
+        /* @__PURE__ */ u$5(dropdown_default, {
+          children: [
+            /* @__PURE__ */ u$5(icon_button_default, {
+              slot: "trigger",
+              name: "plus",
+            }),
+            /* @__PURE__ */ u$5(menu_default, {
+              style: styles$c.menu,
+              onSlSelect: (e3) => onAddTag(e3.detail.item.value),
+              children: available
+                .filter((tag) => !selected.includes(tag))
+                .map((tag) => {
+                  return /* @__PURE__ */ u$5(menu_item_default, {
+                    value: tag,
+                    children: tag,
+                  });
+                }),
+            }),
+          ],
+        }),
+      !viewMode &&
+        tagType !== void 0 &&
+        /* @__PURE__ */ u$5(input_default, {
+          style: styles$c.addNew,
+          placeholder: "New " + tagType,
+          value: newTag,
+          onSlChange: (e3) => setNewTag(e3.target.value),
+          children: /* @__PURE__ */ u$5(icon_button_default, {
+            slot: "suffix",
+            name: "plus",
+            label: "Create Tag",
+            onClick: () => {
+              void onCreateTag();
+            },
+          }),
+        }),
+    ],
+  });
+}
 async function filterRecipeCollection({
   collection_id,
   recipe_name,
@@ -34059,7 +34068,12 @@ function SettingsDrawer() {
     ],
   });
 }
-function SlNotification({ message, variant = "primary", duration = 3e3 }) {
+function Notification({
+  message,
+  variant = "primary",
+  duration = 3e3,
+  childRef,
+}) {
   const icons2 = {
     primary: "info-circle",
     success: "check2-circle",
@@ -34068,6 +34082,7 @@ function SlNotification({ message, variant = "primary", duration = 3e3 }) {
     danger: "exclamation-octagon",
   };
   return /* @__PURE__ */ u$5(alert_default, {
+    ref: childRef,
     variant,
     closable: true,
     duration,
@@ -34145,7 +34160,7 @@ function Toolbar({ collectionDef }) {
     setClientUsername("");
     await queryClient2.invalidateQueries({ queryKey: ["loggedIn"] });
     if (logOutAlert.current !== null) {
-      logOutAlert.current.base.toast();
+      await logOutAlert.current.toast();
     }
   }
   async function onApplySearch() {
@@ -34170,10 +34185,10 @@ function Toolbar({ collectionDef }) {
   return /* @__PURE__ */ u$5("div", {
     style: styles$a.root,
     children: [
-      /* @__PURE__ */ u$5(SlNotification, {
+      /* @__PURE__ */ u$5(Notification, {
         variant: "success",
         message: "Logged out successfully",
-        ref: logOutAlert,
+        childRef: logOutAlert,
       }),
       /* @__PURE__ */ u$5("div", {}),
       loggedInFetching || !loggedIn2
@@ -34671,7 +34686,8 @@ const styles$7 = {
   },
 };
 function LoginDialog() {
-  const { view, setMainView, setClientUsername } = useAppStore();
+  const { view, setMainView, setClientUsername, setSessionAlert } =
+    useAppStore();
   const queryClient2 = useQueryClient();
   const [username, setUsername] = h$2("");
   const [password, setPassword] = h$2("");
@@ -34688,9 +34704,10 @@ function LoginDialog() {
       await login(username, password);
       await queryClient2.invalidateQueries({ queryKey: ["loggedIn"] });
       setClientUsername(username);
+      setSessionAlert(false);
       onCloseDialog();
       if (logInAlert.current !== null) {
-        logInAlert.current.base.toast();
+        await logInAlert.current.toast();
       }
     } catch (e3) {
       if (e3 instanceof Error) {
@@ -34704,10 +34721,10 @@ function LoginDialog() {
     onSlAfterHide: () => onCloseDialog(),
     label: "Log In",
     children: [
-      /* @__PURE__ */ u$5(SlNotification, {
+      /* @__PURE__ */ u$5(Notification, {
         message: "Logged in successfully",
         variant: "success",
-        ref: logInAlert,
+        childRef: logInAlert,
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$7.inputField,
@@ -34741,7 +34758,7 @@ const styles$6 = {
   },
 };
 function ChangePassDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
   const [oldPassword, setOldPassword] = h$2("");
   const [newPassword, setNewPassword] = h$2("");
   const [rePassword, setRePassword] = h$2("");
@@ -34761,14 +34778,18 @@ function ChangePassDialog() {
     }
     try {
       await changePassword(oldPassword, newPassword);
+      onCloseDialog();
+      if (changePassAlert.current !== null) {
+        await changePassAlert.current.toast();
+      }
     } catch (e3) {
       if (e3 instanceof Error) {
-        setHelpText(e3.message);
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          setHelpText(e3.message);
+        }
       }
-    }
-    onCloseDialog();
-    if (changePassAlert.current !== null) {
-      changePassAlert.current.base.toast();
     }
   }
   return /* @__PURE__ */ u$5(dialog_default, {
@@ -34777,10 +34798,10 @@ function ChangePassDialog() {
     onSlAfterHide: () => onCloseDialog(),
     label: "Change Password",
     children: [
-      /* @__PURE__ */ u$5(SlNotification, {
+      /* @__PURE__ */ u$5(Notification, {
         message: "Password changed successfully",
         variant: "success",
-        ref: changePassAlert,
+        childRef: changePassAlert,
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$6.inputField,
@@ -34823,7 +34844,8 @@ const styles$5 = {
   },
 };
 function ChangeNameDialog() {
-  const { view, setMainView, setClientUsername } = useAppStore();
+  const { view, setMainView, setClientUsername, setSessionAlert } =
+    useAppStore();
   const [newUsername, setNewUsername] = h$2("");
   const [password, setPassword] = h$2("");
   const [helpText, setHelpText] = h$2("");
@@ -34838,15 +34860,18 @@ function ChangeNameDialog() {
     try {
       await changeUsername(password, newUsername);
       setClientUsername(newUsername);
+      onCloseDialog();
+      if (changeNameAlert.current !== null) {
+        await changeNameAlert.current.toast();
+      }
     } catch (e3) {
       if (e3 instanceof Error) {
-        setHelpText(e3.message);
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          setHelpText(e3.message);
+        }
       }
-      return;
-    }
-    onCloseDialog();
-    if (changeNameAlert.current !== null) {
-      changeNameAlert.current.base.toast();
     }
   }
   return /* @__PURE__ */ u$5(dialog_default, {
@@ -34855,10 +34880,10 @@ function ChangeNameDialog() {
     onSlAfterHide: () => onCloseDialog(),
     label: "Change Username",
     children: [
-      /* @__PURE__ */ u$5(SlNotification, {
+      /* @__PURE__ */ u$5(Notification, {
         message: "Changed username successfully",
         variant: "success",
-        ref: changeNameAlert,
+        childRef: changeNameAlert,
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$5.inputField,
@@ -34900,6 +34925,7 @@ const styles$4 = {
   },
 };
 function CollectionCard({ collectionId, searchTerm }) {
+  const { setSessionAlert } = useAppStore();
   const queryClient2 = useQueryClient();
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
@@ -34939,7 +34965,13 @@ function CollectionCard({ collectionId, searchTerm }) {
       await removeRecipeCollection(collectionId);
       await queryClient2.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e3) {
-      console.error(e3);
+      if (e3 instanceof Error) {
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e3.message);
+        }
+      }
     }
   }
   async function onRenameCollection(id2, newName) {
@@ -34948,7 +34980,11 @@ function CollectionCard({ collectionId, searchTerm }) {
       await queryClient2.invalidateQueries({ queryKey: ["collectionName"] });
     } catch (e3) {
       if (e3 instanceof Error) {
-        console.error(e3.message);
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e3.message);
+        }
       }
     }
   }
@@ -34995,7 +35031,7 @@ function CollectionCard({ collectionId, searchTerm }) {
                 children: /* @__PURE__ */ u$5(progress_ring_default, {
                   value: progress,
                   style:
-                    "\n              --size: 35px;\n              --track-width: 2px;\n              --indicator-color: red;\n              --track-color: none;\n              --indicator-transition-duration: 2;\n            ",
+                    "\n              --size: 35px;\n              --track-width: 2px;\n              --track-color: none;\n              --indicator-transition-duration: 2;\n            ",
                   children: /* @__PURE__ */ u$5(icon_button_default, {
                     name: "trash",
                     label: "Delete Collection",
@@ -35030,7 +35066,7 @@ const styles$3 = {
 };
 function CollectionsDrawer() {
   const queryClient2 = useQueryClient();
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = h$2("");
   function onHide(e3) {
@@ -35046,7 +35082,11 @@ function CollectionsDrawer() {
       await queryClient2.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e3) {
       if (e3 instanceof Error) {
-        console.error(e3.message);
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e3.message);
+        }
       }
     }
   }
@@ -35102,6 +35142,7 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
     selectedRecipeName,
     setMainView,
     setSelectedRecipe,
+    setSessionAlert,
   } = useAppStore();
   const queryClient2 = useQueryClient();
   const submitAlert = A$1(null);
@@ -35137,10 +35178,16 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
       await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
       setMainView();
       if (submitAlert.current !== null) {
-        submitAlert.current.base.toast();
+        await submitAlert.current.toast();
       }
     } catch (e3) {
-      console.error(e3);
+      if (e3 instanceof Error) {
+        if (e3.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e3.message);
+        }
+      }
     }
   }
   return /* @__PURE__ */ u$5(dialog_default, {
@@ -35149,10 +35196,10 @@ function RecipeForm({ formTitle, submitLabel, submitMessage, viewState }) {
     onSlHide: (e3) => onCloseDialog(e3),
     label: formTitle,
     children: [
-      /* @__PURE__ */ u$5(SlNotification, {
+      /* @__PURE__ */ u$5(Notification, {
         message: submitMessage,
         variant: "success",
-        ref: submitAlert,
+        childRef: submitAlert,
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$2.inputField,
@@ -35270,24 +35317,39 @@ const styles = {
   },
 };
 function App() {
-  const { setClientUsername } = useAppStore();
+  const { sessionAlert, setClientUsername } = useAppStore();
   const params = useParams();
+  const queryClient2 = useQueryClient();
   const collectionId = parseInt(params["id"] || "-1");
-  const collectionDef = collectionId !== -1;
   const { data: loggedIn2 } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
-  const editMode = !!(
-    collectionDef &&
-    loggedIn2 &&
-    ownedCollections &&
-    ownedCollections.includes(collectionId)
-  );
+  const authExpRef = A$1(null);
+  const collectionDef = collectionId !== -1;
+  const editMode =
+    loggedIn2 === true &&
+    ownedCollections !== void 0 &&
+    ownedCollections.includes(collectionId);
   y(() => {
     setClientUsername(session_auth.user);
   }, []);
+  y(() => {
+    if (sessionAlert) {
+      if (authExpRef.current !== null) {
+        void authExpRef.current.toast();
+        void queryClient2.invalidateQueries({ queryKey: ["loggedIn"] });
+        clearSessionAuth();
+      }
+    }
+  }, [sessionAlert]);
   return /* @__PURE__ */ u$5("div", {
     style: styles.root,
     children: [
+      /* @__PURE__ */ u$5(Notification, {
+        message: "Session expired, please log in again",
+        variant: "danger",
+        childRef: authExpRef,
+        duration: 3e4,
+      }),
       collectionDef && /* @__PURE__ */ u$5(SettingsDrawer, {}),
       /* @__PURE__ */ u$5(CollectionsDrawer, {}),
       /* @__PURE__ */ u$5(LoginDialog, {}),

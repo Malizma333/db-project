@@ -19,7 +19,7 @@ import {
 } from "../../api/recipeCollection";
 import { useQueryClient } from "@tanstack/react-query";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 const styles = {
   root: {

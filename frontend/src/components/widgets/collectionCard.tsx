@@ -16,6 +16,8 @@ import {
   useRecipeCount,
 } from "src/api/recipeCollection";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import { AUTH_ERROR } from "src/api/api";
+import { useAppStore } from "src/store";
 
 const styles = {
   collectionTitle: {
@@ -38,6 +40,7 @@ export default function CollectionCard({
   collectionId: number;
   searchTerm: string;
 }) {
+  const { setSessionAlert } = useAppStore();
   const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
@@ -85,7 +88,13 @@ export default function CollectionCard({
       await removeRecipeCollection(collectionId);
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e) {
-      console.error(e);
+      if (e instanceof Error) {
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
+      }
     }
   }
 
@@ -95,7 +104,11 @@ export default function CollectionCard({
       await queryClient.invalidateQueries({ queryKey: ["collectionName"] });
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
       }
     }
   }
@@ -140,7 +153,6 @@ export default function CollectionCard({
             style="
               --size: 35px;
               --track-width: 2px;
-              --indicator-color: red;
               --track-color: none;
               --indicator-transition-duration: 2;
             "

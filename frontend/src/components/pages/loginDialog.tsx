@@ -9,7 +9,7 @@ import { Notification } from "../widgets/notification";
 import { login } from "../../api/user";
 import { useQueryClient } from "@tanstack/react-query";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 const styles = {
   inputField: {
@@ -18,7 +18,8 @@ const styles = {
 };
 
 export default function LoginDialog() {
-  const { view, setMainView, setClientUsername } = useAppStore();
+  const { view, setMainView, setClientUsername, setSessionAlert } =
+    useAppStore();
 
   const queryClient = useQueryClient();
 
@@ -39,6 +40,7 @@ export default function LoginDialog() {
       await login(username, password);
       await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       setClientUsername(username);
+      setSessionAlert(false);
       onCloseDialog();
       if (logInAlert.current !== null) {
         await logInAlert.current.toast();

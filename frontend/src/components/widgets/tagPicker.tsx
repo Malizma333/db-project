@@ -11,6 +11,8 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { createAllergen, createIngredient } from "src/api/recipe";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import { AUTH_ERROR } from "src/api/api";
+import { useAppStore } from "src/store";
 
 const styles = {
   root: {
@@ -52,6 +54,7 @@ export default function TagPicker({
   viewMode?: boolean;
   tagType?: TagType;
 }) {
+  const { setSessionAlert } = useAppStore();
   const [newTag, setNewTag] = useState("");
   const queryClient = useQueryClient();
   const params = useParams();
@@ -92,7 +95,11 @@ export default function TagPicker({
       }
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
       }
     }
   }
