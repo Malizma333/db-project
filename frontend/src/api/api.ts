@@ -22,7 +22,7 @@ export function getErrorMessage(responseData: CustomErrorResponse) {
     resource_error: "[ERROR] Invalid resource: ",
     username_error: "Invalid username or password!",
     password_error: "Invalid username or password!",
-    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
+    internal_server_error: "[ERROR] Server error: ",
   };
 
   let message = "Unknown error";

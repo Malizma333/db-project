@@ -154,7 +154,7 @@ export default function Table({ editMode }: { editMode: boolean }) {
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: pageData } = useFilterCollection({
+  const { data: pageData, isFetching } = useFilterCollection({
     ...filterProps,
     collection_id: collectionId,
     view_min: page * numRowsPerPage,
@@ -204,7 +204,8 @@ export default function Table({ editMode }: { editMode: boolean }) {
           </div>
         </div>
       </SlCard>
-      {pageData !== undefined &&
+      {!isFetching &&
+        pageData !== undefined &&
         pageData.map((row) => {
           return <TableRow editMode={editMode} rowData={row}></TableRow>;
         })}

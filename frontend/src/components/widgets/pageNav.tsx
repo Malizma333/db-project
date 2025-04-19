@@ -40,20 +40,24 @@ export default function PageNav() {
   const onNavigateFirstPage = async () => {
     gotoFirstPage();
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigatePrevPage = async () => {
     gotoPrevPage();
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigateNextPage = async () => {
     gotoNextPage(numPages);
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigateLastPage = async () => {
     gotoLastPage(numPages);
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 

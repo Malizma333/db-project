@@ -67,7 +67,7 @@ export async function filterRecipeCollection({
 
 export function useFilterCollection(props: FilterParams) {
   return useQuery({
-    queryKey: ["filterCollection", props.collection_id],
+    queryKey: ["filterCollection"],
     queryFn: () => filterRecipeCollection(props),
   });
 }
@@ -112,7 +112,7 @@ async function countRecipesInFilter({
 
 export function useCountRecipesInFilter(props: FilterParams) {
   return useQuery({
-    queryKey: ["filterCollectionCount", props.collection_id],
+    queryKey: ["filterCollectionCount"],
     queryFn: () => countRecipesInFilter(props),
   });
 }

@@ -1,9 +1,9 @@
-- fix pages lagging behind (tanstack query issue?)
-
 - better tag display
   - Wrap tags
   - Cut off long tags w/ ellipses
   - Shorten new tag textbox
+
+DONE HERE
 
 - confirm collection deletions
 
@@ -16,3 +16,9 @@
   - page nav
 
 - fix other typing errors (shoelace x preact)
+
+- notification container hitbox covers other stuff
+
+- better mobile display
+
+- Figure out better way to invalidate recipe collection list

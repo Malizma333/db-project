@@ -32807,7 +32807,7 @@ function getErrorMessage(responseData) {
     resource_error: "[ERROR] Invalid resource: ",
     username_error: "Invalid username or password!",
     password_error: "Invalid username or password!",
-    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
+    internal_server_error: "[ERROR] Server error: ",
   };
   let message = "Unknown error";
   switch (responseData.type) {
@@ -33572,7 +33572,7 @@ async function filterRecipeCollection({
 }
 function useFilterCollection(props) {
   return useQuery({
-    queryKey: ["filterCollection", props.collection_id],
+    queryKey: ["filterCollection"],
     queryFn: () => filterRecipeCollection(props),
   });
 }
@@ -33611,7 +33611,7 @@ async function countRecipesInFilter({
 }
 function useCountRecipesInFilter(props) {
   return useQuery({
-    queryKey: ["filterCollectionCount", props.collection_id],
+    queryKey: ["filterCollectionCount"],
     queryFn: () => countRecipesInFilter(props),
   });
 }
@@ -33937,6 +33937,7 @@ function SettingsDrawer() {
     }
     setRowsPerPage(Math.min(maxRowsPerPage, Math.max(minRowsPerPage, value)));
     gotoFirstPage();
+    await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   }
   function onHide(e3) {
@@ -34388,7 +34389,7 @@ function Table({ editMode }) {
   } = useAppStore();
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
-  const { data: pageData } = useFilterCollection({
+  const { data: pageData, isFetching } = useFilterCollection({
     ...filterProps,
     collection_id: collectionId,
     view_min: page * numRowsPerPage,
@@ -34454,7 +34455,8 @@ function Table({ editMode }) {
           ],
         }),
       }),
-      pageData !== void 0 &&
+      !isFetching &&
+        pageData !== void 0 &&
         pageData.map((row) => {
           return /* @__PURE__ */ u$5(TableRow, { editMode, rowData: row });
         }),
@@ -34491,17 +34493,21 @@ function PageNav() {
   const onNavigateFirstPage = async () => {
     gotoFirstPage();
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   };
   const onNavigatePrevPage = async () => {
     gotoPrevPage();
+    await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   };
   const onNavigateNextPage = async () => {
     gotoNextPage(numPages);
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   };
   const onNavigateLastPage = async () => {
     gotoLastPage(numPages);
+    await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
     await queryClient2.invalidateQueries({ queryKey: ["filterCollection"] });
   };
   return numPages == 0
@@ -34677,13 +34683,10 @@ function ChangePassDialog() {
       /* @__PURE__ */ u$5(input_default, {
         style: styles$6.inputField,
         type: "password",
-        helpText: "Must be 8 - 20 characters",
         value: oldPassword,
         onSlChange: (e3) => setOldPassword(e3.target.value),
         placeholder: "Old Password",
         passwordToggle: true,
-        minlength: 8,
-        maxlength: 20,
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$6.inputField,
@@ -34692,8 +34695,6 @@ function ChangePassDialog() {
         onSlChange: (e3) => setNewPassword(e3.target.value),
         placeholder: "New Password",
         passwordToggle: true,
-        minlength: 8,
-        maxlength: 20,
       }),
       /* @__PURE__ */ u$5(input_default, {
         className: "errorHelp",
@@ -34704,8 +34705,6 @@ function ChangePassDialog() {
         onSlChange: (e3) => setRePassword(e3.target.value),
         placeholder: "Retype New Password",
         passwordToggle: true,
-        minlength: 8,
-        maxlength: 20,
       }),
       /* @__PURE__ */ u$5(button_default, {
         onClick: () => {
@@ -34761,13 +34760,10 @@ function ChangeNameDialog() {
       }),
       /* @__PURE__ */ u$5(input_default, {
         style: styles$5.inputField,
-        helpText: "Must be 8 - 20 characters",
         type: "text",
         value: newUsername,
         onSlChange: (e3) => setNewUsername(e3.target.value),
         placeholder: "New Username",
-        minlength: 8,
-        maxlength: 20,
       }),
       /* @__PURE__ */ u$5(input_default, {
         className: "errorHelp",
@@ -34778,8 +34774,6 @@ function ChangeNameDialog() {
         onSlChange: (e3) => setPassword(e3.target.value),
         placeholder: "Password",
         passwordToggle: true,
-        minlength: 8,
-        maxlength: 20,
       }),
       /* @__PURE__ */ u$5(button_default, {
         onClick: () => {
@@ -34894,7 +34888,6 @@ function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = h$2("");
-  console.log(searchTerm);
   function onHide(e3) {
     if (e3.eventPhase === Event.AT_TARGET) {
       setMainView();
@@ -34930,8 +34923,6 @@ function CollectionsDrawer() {
             placeholder: "Find a collection...",
             value: searchTerm,
             onSlChange: (e3) => setSearchTerm(e3.target.value),
-            minlength: 3,
-            maxlength: 150,
           }),
           collectionIds.map((collectionId) =>
             /* @__PURE__ */ u$5(CollectionCard, {

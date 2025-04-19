@@ -128,7 +128,10 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         ref={logOutAlert}
       ></SlNotification>
       <div>
-        {/* This div needs to be here, otherwise the toolbar rearranges??? */}
+        {/*
+          This div needs to be here, otherwise the toolbar rearranges???
+          Login -> Logout -> Login -> Logout
+        */}
       </div>
       {loggedInFetching || !loggedIn ? (
         <SlAvatar

@@ -35,7 +35,6 @@ export default function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
-  console.log(searchTerm);
 
   function onHide(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements
