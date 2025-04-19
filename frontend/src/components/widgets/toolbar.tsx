@@ -12,7 +12,6 @@ import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 import { useRef } from "preact/hooks";
-import { useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useAppStore } from "../../store";
@@ -37,8 +36,9 @@ const styles = {
   },
 };
 
-export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
+export default function Toolbar() {
   const {
+    loadedCollectionId,
     clientUsername,
     recipeSearchFilter,
     filterProps,
@@ -54,10 +54,8 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: collectionName } = useCollectionName(collectionId);
+  const { data: collectionName } = useCollectionName(loadedCollectionId);
   const {
     status,
     data: loggedIn,
@@ -81,7 +79,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   async function onRandomRecipe() {
     const randRecipe = await filterRecipeCollection({
       ...filterProps,
-      collection_id: collectionId,
+      collection_id: loadedCollectionId,
       view_min: 0,
       view_max: 1,
       random: true,
@@ -175,7 +173,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         </SlDropdown>
       )}
       <SlIconButton
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         name="shuffle"
         label="Generate Random Recipe"
         onClick={() => {
@@ -183,13 +181,13 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         }}
       ></SlIconButton>
       <SlIconButton
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         name="sliders"
         label="Search Settings"
         onClick={() => setSettingsView()}
       ></SlIconButton>
       <SlInput
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         clearable
         type="search"
         placeholder={`Search ${collectionName || ""}...`}
@@ -200,7 +198,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         }
       >
         <SlIconButton
-          disabled={!collectionDef}
+          disabled={loadedCollectionId === -1}
           name="search"
           label="Run Search"
           slot="suffix"

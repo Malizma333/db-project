@@ -1,7 +1,6 @@
 import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
 import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
 
-import { useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useAppStore } from "../../store";
@@ -23,6 +22,7 @@ export default function PageNav() {
     page,
     numRowsPerPage,
     filterProps,
+    loadedCollectionId,
     gotoFirstPage,
     gotoPrevPage,
     gotoNextPage,
@@ -30,12 +30,10 @@ export default function PageNav() {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
   const { data: numRecipesInCollection } = useCountRecipesInFilter({
     ...filterProps,
-    collection_id: collectionId,
+    collection_id: loadedCollectionId,
   });
 
   const numPages = Math.ceil((numRecipesInCollection || 0) / numRowsPerPage);

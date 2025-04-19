@@ -5,7 +5,6 @@ import { SlHideEvent } from "@shoelace-style/shoelace";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
-import { useParams } from "react-router";
 import { useRef, useState, useEffect } from "preact/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -40,6 +39,7 @@ export default function RecipeForm({
     view,
     selectedRecipe,
     selectedRecipeName,
+    loadedCollectionId,
     setMainView,
     setSelectedRecipe,
     setSessionAlert,
@@ -48,16 +48,14 @@ export default function RecipeForm({
   const queryClient = useQueryClient();
 
   const submitAlert = useRef<null | SlAlertElement>(null);
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
   const [newName, setNewName] = useState("");
 
   useEffect(() => {
     setNewName(selectedRecipeName);
   }, [selectedRecipeName]);
 
-  const { data: allAllergens } = useCollectionAllergens(collectionId);
-  const { data: allIngredients } = useCollectionIngredients(collectionId);
+  const { data: allAllergens } = useCollectionAllergens(loadedCollectionId);
+  const { data: allIngredients } = useCollectionIngredients(loadedCollectionId);
 
   function onCloseDialog(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements
@@ -77,7 +75,7 @@ export default function RecipeForm({
         await removeRecipe(selectedRecipe.name);
       }
       await addRecipe(
-        collectionId,
+        loadedCollectionId,
         newName,
         selectedRecipe.reference,
         selectedRecipe.authors,

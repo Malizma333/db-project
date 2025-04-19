@@ -2,7 +2,6 @@ import "@shoelace-style/shoelace/dist/themes/dark.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
-import { useParams } from "react-router";
 import { useEffect, useRef } from "preact/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -45,19 +44,12 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export default function App() {
-  const { sessionAlert, setClientUsername } = useAppStore();
-  const params = useParams();
+  const { sessionAlert, loadedCollectionId, setClientUsername } = useAppStore();
+
   const queryClient = useQueryClient();
-  const collectionId = parseInt(params["id"] || "-1");
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
   const authExpRef = useRef<null | SlAlertElement>(null);
-
-  const collectionDef = collectionId !== -1;
-  const editMode =
-    loggedIn === true &&
-    ownedCollections !== undefined &&
-    ownedCollections.includes(collectionId);
 
   useEffect(() => {
     setClientUsername(session_auth.user);
@@ -81,15 +73,21 @@ export default function App() {
         childRef={authExpRef}
         duration={30000}
       ></Notification>
-      {collectionDef && <SettingsDrawer></SettingsDrawer>}
+      {loadedCollectionId !== -1 && <SettingsDrawer></SettingsDrawer>}
       <CollectionsDrawer></CollectionsDrawer>
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar collectionDef={collectionDef}></Toolbar>
-      {collectionDef ? (
+      <Toolbar></Toolbar>
+      {loadedCollectionId !== -1 ? (
         <>
-          <Table editMode={editMode}></Table>
+          <Table
+            editMode={
+              loggedIn === true &&
+              ownedCollections !== undefined &&
+              ownedCollections.includes(loadedCollectionId)
+            }
+          ></Table>
           <PageNav></PageNav>
           <RecipeForm
             formTitle="New Recipe"

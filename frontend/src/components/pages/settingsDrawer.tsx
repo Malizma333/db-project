@@ -5,7 +5,6 @@ import SlCheckbox from "@shoelace-style/shoelace/dist/react/checkbox/index.js";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
-import { useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import TagPicker from "../widgets/tagPicker";
@@ -81,6 +80,7 @@ export default function SettingsDrawer() {
     includeAuthorsFilter,
     includeIngredientsFilter,
     excludeIngredientsFilter,
+    loadedCollectionId,
     getColumnVisible,
     toggleColumn,
     setMainView,
@@ -94,12 +94,10 @@ export default function SettingsDrawer() {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: allAuthors } = useCollectionAuthors(collectionId);
-  const { data: allAllergens } = useCollectionAllergens(collectionId);
-  const { data: allIngredients } = useCollectionIngredients(collectionId);
+  const { data: allAuthors } = useCollectionAuthors(loadedCollectionId);
+  const { data: allAllergens } = useCollectionAllergens(loadedCollectionId);
+  const { data: allIngredients } = useCollectionIngredients(loadedCollectionId);
 
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;

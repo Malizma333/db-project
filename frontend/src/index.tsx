@@ -11,12 +11,19 @@ import { queryClient } from "./api/api.js";
 import FourOFourPage from "./components/pages/404";
 import { useCollectionExists } from "./api/recipeCollection";
 import { initSessionAuth } from "./api/user";
+import { useEffect } from "preact/hooks";
+import { useAppStore } from "./store";
 
 function CollectionIdGuard() {
+  const { setLoadedCollectionId } = useAppStore();
   const params = useParams();
   const collectionId = parseInt(params["id"] || "-1");
   const { data: collectionExists, isFetching } =
     useCollectionExists(collectionId);
+
+  useEffect(() => {
+    setLoadedCollectionId(parseInt(params["id"] || "-1"));
+  }, [params]);
 
   const absCenter = {
     alignItems: "center",

@@ -10,7 +10,6 @@ import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "preact/hooks";
-import { useParams } from "react-router";
 
 import { createAllergen, createIngredient } from "src/api/recipe";
 import { AUTH_ERROR } from "src/api/api";
@@ -58,11 +57,9 @@ export default function TagPicker({
   viewMode?: boolean;
   tagType?: TagType;
 }) {
-  const { setSessionAlert } = useAppStore();
+  const { loadedCollectionId, setSessionAlert } = useAppStore();
   const [newTag, setNewTag] = useState("");
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
   function onRemoveTag(i: number) {
     if (setSelected !== undefined) {
@@ -81,12 +78,12 @@ export default function TagPicker({
 
     try {
       if (tagType === TagType.Allergen) {
-        await createAllergen(newTag, collectionId);
+        await createAllergen(newTag, loadedCollectionId);
         await queryClient.invalidateQueries({
           queryKey: ["collectionAllergens"],
         });
       } else if (tagType === TagType.Ingredient) {
-        await createIngredient(newTag, collectionId);
+        await createIngredient(newTag, loadedCollectionId);
         await queryClient.invalidateQueries({
           queryKey: ["collectionIngredients"],
         });

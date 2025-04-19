@@ -4,7 +4,6 @@ import SlCard from "@shoelace-style/shoelace/dist/react/card/index.js";
 import SlSkeleton from "@shoelace-style/shoelace/dist/react/skeleton/index.js";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router";
 
 import TagPicker from "./tagPicker";
 import { COLUMN_MASK, useAppStore } from "../../store";
@@ -211,17 +210,15 @@ export default function Table({ editMode }: { editMode: boolean }) {
     page,
     numRowsPerPage,
     filterProps,
+    loadedCollectionId,
     getColumnVisible,
     setNewRecipeView,
     setSelectedRecipe,
   } = useAppStore();
 
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
-
   const { data: pageData, isFetching } = useFilterCollection({
     ...filterProps,
-    collection_id: collectionId,
+    collection_id: loadedCollectionId,
     view_min: page * numRowsPerPage,
     view_max: (page + 1) * numRowsPerPage,
   });

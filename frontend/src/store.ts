@@ -42,6 +42,7 @@ interface Store {
   excludeIngredientsFilter: string[];
   includeAuthorsFilter: string[];
   sessionAlert: boolean;
+  loadedCollectionId: number;
   setMainView: () => void;
   setSettingsView: () => void;
   setLoginView: () => void;
@@ -67,6 +68,7 @@ interface Store {
   setExcludeIngredientsFilter: (excludeIngredientsFilter: string[]) => void;
   setIncludeAuthorsFilter: (includeAuthorsFilter: string[]) => void;
   setSessionAlert: (v?: boolean) => void;
+  setLoadedCollectionId: (v: number) => void;
 }
 
 interface ComputedStore {
@@ -92,6 +94,7 @@ const initStoreState = {
   selectedRecipeIngredients: [],
   selectedRecipeAllergens: [],
   sessionAlert: false,
+  loadedCollectionId: -1,
 };
 
 const computed = createComputed(
@@ -161,5 +164,6 @@ export const useAppStore = create<Store>()(
     setIncludeAuthorsFilter: (includeAuthorsFilter: string[]) =>
       set({ includeAuthorsFilter }),
     setSessionAlert: (sessionAlert = true) => set({ sessionAlert }),
+    setLoadedCollectionId: (loadedCollectionId) => set({ loadedCollectionId }),
   })),
 );
