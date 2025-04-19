@@ -60,366 +60,320 @@ def check_auth(token):
     raise InputError("auth_token_error")
 
 
+def do_thing_safely(body):
+    ret = None
+    db_lock.acquire()
+    try:
+        conn = sqlite3.connect("recipe.db")
+        # "with conn" should auto-commit (and rollback)
+        with conn:
+            cursor = conn.cursor()
+            ret = do_thing(body, cursor)
+    except:
+        conn.close()
+        db_lock.release()
+        raise
+    conn.close()
+    db_lock.release()
+    return ret
+
 # This is where most db calls get handled. takes in parsed json. outputs object
 # ready to be run through `dumps`
-def do_thing(body):
-    # TODO: are commits needed after selects?
+def do_thing(body, cursor):
     ret = None
-    with db_lock:
-        conn = sqlite3.connect('recipe.db')
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA foreign_keys = ON;")
-        if body["type"] == "login":
-            cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?", (body["username"],))
-            results = cursor.fetchall()
-            if len(results) != 1:
-                raise InputError("username_error")
-            r = results[0]
-            hash_bytes = base64.b64decode(r[0].encode("utf-8"))
-            salt_bytes = base64.b64decode(r[1].encode("utf-8"))
-            trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", body["password"].encode("utf-8"), salt_bytes, 100_000)
-            if hash_bytes == trial_hash_bytes:
-                token = "".join(random.choices(TOKEN_CHARS, k=TOKEN_LENGTH))
-                tokens[token] = (body["username"], time.time() + TOKEN_LIFETIME)
-                ret = {"type": "login_response", "auth": token, "lifetime": TOKEN_LIFETIME}
-            else:
-                raise InputError("password_error")
-        elif body["type"] == "logout":
-            if body["auth"] in tokens:
-                del tokens[body["auth"]]
-        elif body["type"] == "is_logged_in":
-            check_auth(body["auth"])
-        elif body["type"] == "change_username":
-            print("change username doesn't work")
-        elif body["type"] == "change_password":
-            print("change_password doesn't work")
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
-        # stuff above not implemented
-        elif body["type"] == "add_recipe":
-            username = check_auth(body["auth"])
-            recipe_params = (body["recipe_name"], username, body["reference"])
-            stores_params = (body["collection_id"], body["recipe_name"], username)
-            cursor.execute("INSERT INTO Recipe VALUES(?,?,?)", recipe_params)
-            # may need to check if collection id is valid?
-            cursor.execute("INSERT INTO Stores VALUES(?,?,?)", stores_params)
+    if body["type"] == "login":
+        cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?",
+                       (body["username"],))
+        results = cursor.fetchall()
+        if len(results) != 1:
+            raise InputError("username_error")
+        r = results[0]
+        hash_bytes = base64.b64decode(r[0].encode("utf-8"))
+        salt_bytes = base64.b64decode(r[1].encode("utf-8"))
+        trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", body["password"].encode("utf-8"), salt_bytes, 100_000)
+        if hash_bytes == trial_hash_bytes:
+            token = "".join(random.choices(TOKEN_CHARS, k=TOKEN_LENGTH))
+            tokens[token] = (body["username"], time.time() + TOKEN_LIFETIME)
+            ret = {"type": "login_response", "auth": token, "lifetime": TOKEN_LIFETIME}
+        else:
+            raise InputError("password_error")
 
-            for ing in body["ingredients"]:
-                cursor.execute("INSERT or IGNORE INTO Ingredient VALUES(?,?)",
-                               (ing, body["collection_id"]))
-                cursor.execute("INSERT INTO Composes VALUES(?,?,?,?)",
-                               (body["recipe_name"], username, ing, body["collection_id"]))
-            for alg in body["allergens"]:
-                cursor.execute("INSERT or IGNORE INTO Allergen VALUES(?,?)",
-                               (alg, body["collection_id"]))
-                cursor.execute("INSERT INTO Contains VALUES(?,?,?,?)",
-                               (body["recipe_name"], username, alg, body["collection_id"]))
-            for aut in body["authors"]:
-                cursor.execute("INSERT INTO Author VALUES(?,?,?)",
-                               (aut, body["recipe_name"], username))
+    elif body["type"] == "logout":
+        if body["auth"] in tokens:
+            del tokens[body["auth"]]
 
-            conn.commit()
+    elif body["type"] == "is_logged_in":
+        check_auth(body["auth"])
 
-        elif body["type"] == "remove_recipe":
-            username = check_auth(body["auth"])
-            cursor.execute("DELETE FROM Recipe WHERE name = ? AND owner = ?",
-                           (body["recipe_name"], username))
-            conn.commit()
+    elif body["type"] == "change_username":
+        # TODO: this
+        print("change username doesn't work")
 
-        # NOTE: Collection_id does not need to be passed in since recipe name + owner is a primary key
-        elif body["type"] == "rename_recipe":
-            username = check_auth(body["auth"])
-            cursor.execute("UPDATE Recipe SET name == ? WHERE name = ? AND owner = ?",
-                           (body["new_recipe_name"], body["recipe_name"], username))
-            conn.commit()
+    elif body["type"] == "change_password":
+        # TODO: this
+        print("change_password doesn't work")
 
-        # NOTE: This is assuming all inputs that function as an "include ___" will pass ALL already in database
-        # in the case that the user does not want to specifically include an attribute (except recipe name)
-        # NOTE: View min and max go from 0 to n-1 in index
-        elif body["type"] == "filter_recipe_collection":
-            rec_name = "%" + body["recipe_name"] + "%"
-            params = tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"]) + tuple(
-                body["include_allergens"]) + tuple(body["include_ingredients"]) + tuple(
-                body["authors"]) + tuple([rec_name]) + tuple([body["collection_id"]])
+    elif body["type"] == "add_recipe":
+        username = check_auth(body["auth"])
+        recipe_params = (body["recipe_name"], username, body["reference"])
+        stores_params = (body["collection_id"], body["recipe_name"], username)
+        cursor.execute("INSERT INTO Recipe VALUES(?,?,?)", recipe_params)
+        # may need to check if collection id is valid?
+        cursor.execute("INSERT INTO Stores VALUES(?,?,?)", stores_params)
 
-            p = (body["collection_id"], "%"+body["recipe_name"]+"%",) + tuple(body["exclude_allergens"]) + tuple(body["exclude_ingredients"])
-            includes = ""
-            if len(body["include_allergens"]) != 0:
-                p += tuple(body["include_allergens"])
-                includes += f"""AND EXISTS (SELECT * FROM Contains WHERE
-                                    Contains.allergen_name IN ({",".join("?" * len(body["include_allergens"]))})
-                                    AND Stores.recipe_name = Contains.recipe_name
-                                    AND Stores.recipe_owner = Contains.recipe_owner)
-                            """
-            if len(body["include_ingredients"]) != 0:
-                p += tuple(body["include_ingredients"])
-                includes += f"""AND EXISTS (SELECT * FROM Composes WHERE
-                                    Composes.ingredient_name IN ({",".join("?" * len(body["include_ingredients"]))})
-                                    AND Stores.recipe_name = Composes.recipe_name
-                                    AND Stores.recipe_owner = Composes.recipe_owner)
-                            """
-            # Is this horribly inefficient? Who knows :D
-            # TODO: rewrite (maybe just get a list of recipes on first pass,
-            #       then get details separately?)
-            q =  f"""SELECT Recipe.name, Author.name, Recipe.reference, Contains.allergen_name, Composes.ingredient_name, Recipe.owner
-                    FROM (
-                        SELECT Stores.recipe_name, Stores.recipe_owner
-                        FROM Stores
-                        WHERE
-                            Stores.collection_id = ?
-                            AND Stores.recipe_name LIKE ?
-                            AND NOT EXISTS (SELECT * FROM Contains WHERE
-                                Contains.allergen_name IN ({",".join("?" * len(body["exclude_allergens"]))})
+        for ing in body["ingredients"]:
+            cursor.execute("INSERT or IGNORE INTO Ingredient VALUES(?,?)",
+                           (ing, body["collection_id"]))
+            cursor.execute("INSERT INTO Composes VALUES(?,?,?,?)",
+                           (body["recipe_name"], username, ing, body["collection_id"]))
+        for alg in body["allergens"]:
+            cursor.execute("INSERT or IGNORE INTO Allergen VALUES(?,?)",
+                           (alg, body["collection_id"]))
+            cursor.execute("INSERT INTO Contains VALUES(?,?,?,?)",
+                           (body["recipe_name"], username, alg, body["collection_id"]))
+        for aut in body["authors"]:
+            cursor.execute("INSERT INTO Author VALUES(?,?,?)",
+                           (aut, body["recipe_name"], username))
+
+    elif body["type"] == "remove_recipe":
+        username = check_auth(body["auth"])
+        cursor.execute("DELETE FROM Recipe WHERE name = ? AND owner = ?",
+                       (body["recipe_name"], username))
+
+    # NOTE: Collection_id does not need to be passed in since recipe name + owner is a primary key
+    elif body["type"] == "rename_recipe":
+        username = check_auth(body["auth"])
+        cursor.execute("UPDATE Recipe SET name == ? WHERE name = ? AND owner = ?",
+                       (body["new_recipe_name"], body["recipe_name"], username))
+
+    # NOTE: View min and max go from 0 to n-1 in index
+    elif body["type"] == "filter_recipe_collection":
+        p = (body["collection_id"], "%" + body["recipe_name"]+"%",)
+        p += tuple(body["exclude_allergens"])
+        p += tuple(body["exclude_ingredients"])
+
+        includes = ""
+        if len(body["include_allergens"]) != 0:
+            p += tuple(body["include_allergens"])
+            includes += f"""AND EXISTS (SELECT * FROM Contains WHERE
+                                Contains.allergen_name IN ({",".join("?" * len(body["include_allergens"]))})
                                 AND Stores.recipe_name = Contains.recipe_name
                                 AND Stores.recipe_owner = Contains.recipe_owner)
-                            AND NOT EXISTS (SELECT * FROM Composes WHERE
-                                Composes.ingredient_name IN ({",".join("?" * len(body["exclude_ingredients"]))})
+                        """
+        if len(body["include_ingredients"]) != 0:
+            p += tuple(body["include_ingredients"])
+            includes += f"""AND EXISTS (SELECT * FROM Composes WHERE
+                                Composes.ingredient_name IN ({",".join("?" * len(body["include_ingredients"]))})
                                 AND Stores.recipe_name = Composes.recipe_name
                                 AND Stores.recipe_owner = Composes.recipe_owner)
-                            {includes}
-                    ) AS FiltRecipe
+                        """
+        # Is this horribly inefficient? Probably less so *shrug*
+        # TODO: maybe use COUNT, LIMIT, and OFFSET?
+        q = f"""SELECT Stores.recipe_name, Stores.recipe_owner FROM Stores WHERE
+                    Stores.collection_id = ?
+                    AND Stores.recipe_name LIKE ?
+                    AND NOT EXISTS (SELECT * FROM Contains WHERE
+                        Contains.allergen_name IN ({",".join("?" * len(body["exclude_allergens"]))})
+                        AND Stores.recipe_name = Contains.recipe_name
+                        AND Stores.recipe_owner = Contains.recipe_owner)
+                    AND NOT EXISTS (SELECT * FROM Composes WHERE
+                        Composes.ingredient_name IN ({",".join("?" * len(body["exclude_ingredients"]))})
+                        AND Stores.recipe_name = Composes.recipe_name
+                        AND Stores.recipe_owner = Composes.recipe_owner)
+                    {includes}
+                ORDER BY Stores.recipe_name"""
+        cursor.execute(q, p)
+        temp = cursor.fetchall()
 
-                    JOIN Recipe ON
-                        FiltRecipe.recipe_name = Recipe.name
-                        AND FiltRecipe.recipe_owner = Recipe.owner
-                    LEFT JOIN Contains ON
-                        FiltRecipe.recipe_name = Contains.recipe_name
-                        AND FiltRecipe.recipe_owner = Contains.recipe_owner
-                    LEFT JOIN Composes ON
-                        FiltRecipe.recipe_name = Composes.recipe_name
-                        AND FiltRecipe.recipe_owner = Composes.recipe_owner
-                    LEFT JOIN Author ON
-                        FiltRecipe.recipe_name = Author.recipe_name
-                        AND FiltRecipe.recipe_owner = Author.recipe_owner"""
-            cursor.execute(q, p)
+        count = len(temp)
+        recipes = []
+        try:
+            recipes = temp[body["view_min"] : body["view_max"]]
+        except:
+            raise InputError("resource_error", "Bad view max/min")
 
-            temp = cursor.fetchall()
-            print(temp)
-            conn.commit()
-            recipes = []
-            result = []
-            current_dict = {}
-            names_in_rec_list = []
-            for t in temp:
-                if t[0] not in names_in_rec_list:
-                    if len(current_dict) != 0:
-                        recipes.append(current_dict)
-                        current_dict = {}
-                    names_in_rec_list.append(t[0])
-                    current_dict["name"] = t[0]
-                    if t[1] != None:
-                        current_dict["authors"] = [t[1]]
-                    else:
-                        current_dict["authors"] = []
-                    current_dict["reference"] = t[2]
-                    if t[3] != None:
-                        current_dict["allergens"] = [t[3]]
-                    else:
-                        current_dict["allergens"] = []
-                    if t[4] != None:
-                        current_dict["ingredients"] = [t[4]]
-                    else:
-                        current_dict["ingredients"] = []
-                    current_dict["owner"] = t[5]
-                else:
-                    if t[1] not in current_dict["authors"] and t[1] != None:
-                        current_dict["authors"].append(t[1])
-                    if t[3] not in current_dict["allergens"] and t[3] != None:
-                        current_dict["allergens"].append(t[3])
-                    if t[4] not in current_dict["ingredients"] and t[4] != None:
-                        current_dict["ingredients"].append(t[4])
-            if len(current_dict) != 0:
-                recipes.append(current_dict)
+        result = []
+        for recipe in recipes:
+            cur_dict = {"name": recipe[0], "owner": recipe[1]}
+            cursor.execute("SELECT reference FROM Recipe WHERE name = ? AND owner = ?",
+                           recipe)
+            cur_dict["reference"] = cursor.fetchall()[0][0]
 
-            if body["view_min"] > len(recipes)-1:
-                body["view_min"] = len(recipes) - 1
-            if body["view_max"] > len(recipes):
-                body["view_max"] = len(recipes)
-            if len(recipes) > 0:
-                for i in range(body["view_min"], body["view_max"]):
-                    result.append(recipes[i])
+            cursor.execute("SELECT allergen_name FROM Contains WHERE recipe_name = ? AND recipe_owner = ?",
+                           recipe)
+            cur_dict["allergens"] = [x[0] for x in cursor.fetchall()]
 
-            ret = {"type": "filter_recipe_collection_response", "recipes": result, "table_size": len(result)}
+            cursor.execute("SELECT ingredient_name FROM Composes WHERE recipe_name = ? AND recipe_owner = ?",
+                           recipe)
+            cur_dict["ingredients"] = [x[0] for x in cursor.fetchall()]
 
-        elif body["type"] == "rename_recipe_collection":
-            username = check_auth(body["auth"])
-            cursor.execute("UPDATE RecipeCollection SET name == ? WHERE id = ? AND manager = ?",
-                           (body["new_name"], body["id"], username))
-            conn.commit()
+            cursor.execute("SELECT name FROM Author WHERE recipe_name = ? AND recipe_owner = ?",
+                           recipe)
+            cur_dict["authors"] = [x[0] for x in cursor.fetchall()]
+            result.append(cur_dict)
 
-        # TODO: Big and random ids
-        elif body["type"] == "add_recipe_collection":
-            username = check_auth(body["auth"])
-            cursor.execute("INSERT INTO RecipeCollection VALUES(?,?,?)",
-                           (None, username, body["name"]))
-            conn.commit()
-            # TODO: make big and random? uh oh. merge conflicts inbound
-            cursor.execute("SELECT id FROM RecipeCollection WHERE name = ? AND manager = ?",
-                           (body["name"], username))
-            conn.commit()
-            temp = cursor.fetchall()
-            co_id = temp[0][0]
-            ret = {"type": "add_recipe_collection_response", "id": co_id}
+        ret = {"type": "filter_recipe_collection_response", "recipes": result, "table_size": count}
 
-        elif body["type"] == "remove_recipe_collection":
-            username = check_auth(body["auth"])
-            cursor.execute("DELETE FROM RecipeCollection WHERE id = ? AND manager = ?",
-                           (body["id"], username))
-            conn.commit()
+    elif body["type"] == "rename_recipe_collection":
+        username = check_auth(body["auth"])
+        cursor.execute("UPDATE RecipeCollection SET name == ? WHERE id = ? AND manager = ?",
+                       (body["new_name"], body["id"], username))
 
-        elif body["type"] == "get_owned_recipe_collections":
-            username = check_auth(body["auth"])
-            cursor.execute("SELECT id FROM RecipeCollection WHERE manager = ?",
-                           (username,))
-            temp = cursor.fetchall()
-            conn.commit()
-            ids = [t[0] for t in temp]
-            ret = {"type": "get_owned_recipe_collections_response", "ids": ids}
+    # TODO: Big and random ids
+    elif body["type"] == "add_recipe_collection":
+        username = check_auth(body["auth"])
+        cursor.execute("INSERT INTO RecipeCollection VALUES(?,?,?)",
+                       (None, username, body["name"]))
+        cursor.execute("SELECT id FROM RecipeCollection WHERE name = ? AND manager = ?",
+                       (body["name"], username))
+        temp = cursor.fetchall()
+        co_id = temp[0][0]
+        ret = {"type": "add_recipe_collection_response", "id": co_id}
 
-        # NOTE: This query doesn't require authentication (no auth passed)
-        elif body["type"] == "get_allergens_in_collection":
-            cursor.execute("SELECT name FROM Allergen WHERE collection_id = ?",
-                           (body["id"],))
-            temp = cursor.fetchall()
-            conn.commit()
-            allergens = [t[0] for t in temp]
-            ret = {"type": "get_allergen_in_collection_response", "allergens": allergens}
+    elif body["type"] == "remove_recipe_collection":
+        username = check_auth(body["auth"])
+        cursor.execute("DELETE FROM RecipeCollection WHERE id = ? AND manager = ?",
+                       (body["id"], username))
 
-        # NOTE: This query doesn't require authentication (no auth passed)
-        elif body["type"] == "get_ingredients_in_collection":
-            cursor.execute("SELECT name FROM Ingredient WHERE collection_id = ?",
-                           (body["id"],))
-            temp = cursor.fetchall()
-            conn.commit()
-            ingredients = [t[0] for t in temp]
-            ret = {"type": "get_ingredients_in_collection_response", "ingredients": ingredients}
+    elif body["type"] == "get_owned_recipe_collections":
+        username = check_auth(body["auth"])
+        cursor.execute("SELECT id FROM RecipeCollection WHERE manager = ?",
+                       (username,))
+        temp = cursor.fetchall()
+        ids = [t[0] for t in temp]
+        ret = {"type": "get_owned_recipe_collections_response", "ids": ids}
 
-        # NOTE: This query doesn't require authentication (no auth passed)
-        elif body["type"] == "get_authors_in_collection":
-            cursor.execute("""SELECT DISTINCT name FROM Author WHERE recipe_name =
-                              (SELECT recipe_name FROM Stores WHERE collection_id = ? AND recipe_owner =
-                              (SELECT manager FROM RecipeCollection WHERE collection_id = ?))""",
-                           (body["id"], body["id"]))
-            temp = cursor.fetchall()
-            conn.commit()
-            authors = [t[0] for t in temp]
-            ret = {"type": "get_authors_in_collection_response", "authors": authors}
+    # NOTE: This query doesn't require authentication (no auth passed)
+    elif body["type"] == "get_allergens_in_collection":
+        cursor.execute("SELECT name FROM Allergen WHERE collection_id = ?",
+                       (body["id"],))
+        temp = cursor.fetchall()
+        allergens = [t[0] for t in temp]
+        ret = {"type": "get_allergen_in_collection_response", "allergens": allergens}
 
-        elif body["type"] == "get_collection_exists":
-            cursor.execute("SELECT name FROM RecipeCollection WHERE id = ?",
-                           (body["id"],))
-            temp = cursor.fetchall()
-            conn.commit()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad collection ID")
+    # NOTE: This query doesn't require authentication (no auth passed)
+    elif body["type"] == "get_ingredients_in_collection":
+        cursor.execute("SELECT name FROM Ingredient WHERE collection_id = ?",
+                       (body["id"],))
+        temp = cursor.fetchall()
+        ingredients = [t[0] for t in temp]
+        ret = {"type": "get_ingredients_in_collection_response", "ingredients": ingredients}
 
-        elif body["type"] == "get_collection_name":
-            cursor.execute("SELECT name FROM RecipeCollection WHERE id = ?",
-                           (body["id"],))
-            temp = cursor.fetchall()
-            conn.commit()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad collection ID")
-            name = temp[0][0]
-            ret = {"type": "get_collection_name_response", "collection_name": name}
+    # NOTE: This query doesn't require authentication (no auth passed)
+    elif body["type"] == "get_authors_in_collection":
+        cursor.execute("""SELECT DISTINCT name FROM Author WHERE recipe_name =
+                          (SELECT recipe_name FROM Stores WHERE collection_id = ? AND recipe_owner =
+                          (SELECT manager FROM RecipeCollection WHERE collection_id = ?))""",
+                       (body["id"], body["id"]))
+        temp = cursor.fetchall()
+        authors = [t[0] for t in temp]
+        ret = {"type": "get_authors_in_collection_response", "authors": authors}
 
-        elif body["type"] == "count_recipes_in_collection":
-            cursor.execute("SELECT COUNT(*) FROM Stores WHERE collection_id = ?",
-                           (body["id"],))
-            temp = cursor.fetchall()
-            conn.commit()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad collection ID")
-            recipes = temp[0][0]
-            ret = {"type": "count_recipes_in_collection_response", "count": recipes}
+    elif body["type"] == "get_collection_exists":
+        cursor.execute("SELECT name FROM RecipeCollection WHERE id = ?",
+                       (body["id"],))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad collection ID")
 
-        elif body["type"] == "change_reference":
-            username = check_auth(body["auth"])
-            cursor.execute("UPDATE Recipe SET reference == ? WHERE name = ? AND owner = ?",
-                           (body["reference"], body["recipe_name"], username))
-            conn.commit()
+    elif body["type"] == "get_collection_name":
+        cursor.execute("SELECT name FROM RecipeCollection WHERE id = ?",
+                       (body["id"],))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad collection ID")
+        name = temp[0][0]
+        ret = {"type": "get_collection_name_response", "collection_name": name}
 
-        elif body["type"] == "create_allergen":
-            cursor.execute("INSERT or IGNORE INTO Allergen VALUES(?,?)",
-                           (body["allergen_name"], body["collection_id"]))
-            conn.commit()
+    elif body["type"] == "count_recipes_in_collection":
+        cursor.execute("SELECT COUNT(*) FROM Stores WHERE collection_id = ?",
+                       (body["id"],))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad collection ID")
+        recipes = temp[0][0]
+        ret = {"type": "count_recipes_in_collection_response", "count": recipes}
 
-        elif body["type"] == "add_allergen":
-            username = check_auth(body["auth"])
-            cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
-                           (body["recipe_name"], username))
-            temp = cursor.fetchall()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad recipe name")
-            col_id = temp[0][0]
-            cursor.execute("INSERT INTO Contains VALUES(?,?,?,?)",
-                           (body["recipe_name"], username, body["allergen"], col_id))
-            conn.commit()
+    elif body["type"] == "change_reference":
+        username = check_auth(body["auth"])
+        cursor.execute("UPDATE Recipe SET reference == ? WHERE name = ? AND owner = ?",
+                       (body["reference"], body["recipe_name"], username))
 
-        elif body["type"] == "remove_allergen":
-            username = check_auth(body["auth"])
-            cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
-                           (body["recipe_name"], username))
-            temp = cursor.fetchall()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad recipe name")
-            col_id = temp[0][0]
-            cursor.execute("""DELETE FROM Contains WHERE recipe_name = ?
-                              AND recipe_owner = ?
-                              AND allergen_name = ?
-                              AND allergen_collection_id = ?""",
-                           (body["recipe_name"], username, body["allergen"], col_id))
-            conn.commit()
+    elif body["type"] == "create_allergen":
+        cursor.execute("INSERT or IGNORE INTO Allergen VALUES(?,?)",
+                       (body["allergen_name"], body["collection_id"]))
 
-        elif body["type"] == "create_ingredient":
-            cursor.execute("INSERT or IGNORE INTO Ingredient VALUES(?,?)",
-                           (body["ingredient_name"], body["collection_id"]))
-            conn.commit()
+    elif body["type"] == "add_allergen":
+        username = check_auth(body["auth"])
+        cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
+                       (body["recipe_name"], username))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad recipe name")
+        col_id = temp[0][0]
+        cursor.execute("INSERT INTO Contains VALUES(?,?,?,?)",
+                       (body["recipe_name"], username, body["allergen"], col_id))
 
-        elif body["type"] == "add_ingredient":
-            username = check_auth(body["auth"])
-            cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
-                           (body["recipe_name"], username))
-            temp = cursor.fetchall()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad recipe name")
-            col_id = temp[0][0]
-            cursor.execute("INSERT INTO Composes VALUES(?,?,?,?)",
-                           (body["recipe_name"], username, body["ingredient"], col_id))
-            conn.commit()
+    elif body["type"] == "remove_allergen":
+        username = check_auth(body["auth"])
+        cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
+                        (body["recipe_name"], username))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad recipe name")
+        col_id = temp[0][0]
+        cursor.execute("""DELETE FROM Contains WHERE recipe_name = ?
+                          AND recipe_owner = ?
+                          AND allergen_name = ?
+                          AND allergen_collection_id = ?""",
+                       (body["recipe_name"], username, body["allergen"], col_id))
 
-        elif body["type"] == "remove_ingredient":
-            username = check_auth(body["auth"])
-            cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
-                           (body["recipe_name"], username))
-            temp = cursor.fetchall()
-            if len(temp) != 1:
-                raise InputError("resource_error", "Bad recipe name")
-            col_id = temp[0][0]
-            cursor.execute("""DELETE FROM Composes WHERE recipe_name = ?
-                              AND recipe_owner = ?
-                              AND ingredient_name = ?
-                              AND ingredient_collection_id = ?""",
-                           (body["recipe_name"], username, body["ingredient"], col_id))
-            conn.commit()
+    elif body["type"] == "create_ingredient":
+        cursor.execute("INSERT or IGNORE INTO Ingredient VALUES(?,?)",
+                       (body["ingredient_name"], body["collection_id"]))
 
-        elif body["type"] == "add_author":
-            username = check_auth(body["auth"])
-            cursor.execute("INSERT INTO Author VALUES(?,?,?)",
-                           (body["author"], body["recipe_name"], username))
-            conn.commit()
+    elif body["type"] == "add_ingredient":
+        username = check_auth(body["auth"])
+        cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
+                       (body["recipe_name"], username))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad recipe name")
+        col_id = temp[0][0]
+        cursor.execute("INSERT INTO Composes VALUES(?,?,?,?)",
+                       (body["recipe_name"], username, body["ingredient"], col_id))
 
-        elif body["type"] == "remove_author":
-            username = check_auth(body["auth"])
-            cursor.execute("""DELETE FROM Author WHERE recipe_name = ?
-                              AND recipe_owner = ?
-                              AND name = ?""",
-                           (body["recipe_name"], username, body["author"]))
-            conn.commit()
+    elif body["type"] == "remove_ingredient":
+        username = check_auth(body["auth"])
+        cursor.execute("SELECT collection_id FROM Stores WHERE recipe_name = ? AND owner = ?",
+                       (body["recipe_name"], username))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad recipe name")
+        col_id = temp[0][0]
+        cursor.execute("""DELETE FROM Composes WHERE recipe_name = ?
+                          AND recipe_owner = ?
+                          AND ingredient_name = ?
+                          AND ingredient_collection_id = ?""",
+                       (body["recipe_name"], username, body["ingredient"], col_id))
 
-        else:
-            raise InputError("type_error")
+    elif body["type"] == "add_author":
+        username = check_auth(body["auth"])
+        cursor.execute("INSERT INTO Author VALUES(?,?,?)",
+                       (body["author"], body["recipe_name"], username))
 
-        conn.close()
+    elif body["type"] == "remove_author":
+        username = check_auth(body["auth"])
+        cursor.execute("""DELETE FROM Author WHERE recipe_name = ?
+                          AND recipe_owner = ?
+                          AND name = ?""",
+                       (body["recipe_name"], username, body["author"]))
+
+    else:
+        raise InputError("type_error")
+
     return ret
 
 
@@ -454,7 +408,7 @@ class RequestHandler(server.BaseHTTPRequestHandler):
             ret = {"type": "internal_server_error", "message": "Eek!"}
             ret_type = 500
             try:
-                ret = do_thing(json.loads(body.decode()))
+                ret = do_thing_safely(json.loads(body.decode()))
                 ret_type = 200
             except json.decoder.JSONDecodeError as E:
                 ret = {"type": "parse_error"}
@@ -489,10 +443,11 @@ class RequestHandler(server.BaseHTTPRequestHandler):
 
 if not os.path.isfile("recipe.db"):
     conn = sqlite3.connect("recipe.db")
-    cur = conn.cursor()
-    sqlfile = open('init.sql').read().split('\n\n')
-    for table in sqlfile:
-        cur.execute(table)
+    sqlfile = open('init.sql').read()
+    with conn:
+        cur = conn.cursor()
+        cur.executescript(sqlfile)
+    # !!!!!!! THIS CODE IS INVALID, PLEASE USE "do_thing_safely" !!!!!!!!
     # testing code
     #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipes"}
     #print(do_thing(v))
@@ -517,18 +472,9 @@ if not os.path.isfile("recipe.db"):
     # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
     # add FOREIGN KEY(owned_by) REFERENCES Account(username) to Recipe
 
-    conn.commit()
-    print("meow >:3")
+    print("meow >:3 (db created)")
     conn.close()
 
-# v = {"type": "login", "username": "frankie", "password": "kibbie" }
-# print(do_thing(v))
-# v = {"type": "login", "username": "robert!!", "password": "my passwor" }
-# print(do_thing(v))
-# v = {"type": "login", "username": "robert!", "password": "my password" }
-# print(do_thing(v))
-# v = {"type": "login", "username": "robert", "password": "my passwor" }
-# print(do_thing(v))
 
 ser = server.ThreadingHTTPServer(("", 8008), RequestHandler)
 
