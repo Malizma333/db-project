@@ -203,6 +203,7 @@ with no body.
   "authors": [<string>, ...],
   "view_min": <int>,
   "view_max": <int>,
+  "random": <bool>,
 }
 ```
 

@@ -186,13 +186,13 @@ def do_thing(body, cursor):
                 ORDER BY Stores.recipe_name"""
         cursor.execute(q, p)
         temp = cursor.fetchall()
-
         count = len(temp)
+
         recipes = []
-        try:
+        if body["random"]:
+            recipes = random.choices(recipes, k=(body["view_max"] - body["view_min"]))
+        else:
             recipes = temp[body["view_min"] : body["view_max"]]
-        except:
-            raise InputError("resource_error", "Bad view max/min")
 
         result = []
         for recipe in recipes:
