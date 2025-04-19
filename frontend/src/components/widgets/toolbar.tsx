@@ -9,9 +9,8 @@ import {
   SlAvatar,
 } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore } from "../../store";
-import { SlNotification } from "./notification";
+import { Notification } from "./notification";
 import { useRef } from "preact/hooks";
-
 import { logout, useLoggedIn } from "../../api/user";
 import { useParams } from "react-router";
 import {
@@ -19,6 +18,8 @@ import {
   useCollectionName,
 } from "../../api/recipeCollection";
 import { useQueryClient } from "@tanstack/react-query";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 const styles = {
   root: {
@@ -62,7 +63,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     isFetching: loggedInFetching,
   } = useLoggedIn();
 
-  const logOutAlert = useRef(null);
+  const logOutAlert = useRef<null | SlAlertElement>(null);
 
   if (status === "error") {
     console.error(error.message);
@@ -93,7 +94,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     setClientUsername("");
     await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
     if (logOutAlert.current !== null) {
-      logOutAlert.current.base.toast();
+      await logOutAlert.current.toast();
     }
   }
 
@@ -122,11 +123,11 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
 
   return (
     <div style={styles.root}>
-      <SlNotification
+      <Notification
         variant="success"
         message="Logged out successfully"
-        ref={logOutAlert}
-      ></SlNotification>
+        childRef={logOutAlert}
+      ></Notification>
       <div>
         {/*
           This div needs to be here, otherwise the toolbar rearranges???
@@ -192,7 +193,9 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         placeholder={`Search ${collectionName || ""}...`}
         style={{ flex: "1" }}
         value={recipeSearchFilter}
-        onSlChange={(e) => setRecipeSearchFilter(e.target.value)}
+        onSlChange={(e) =>
+          setRecipeSearchFilter((e.target as SlInputElement).value)
+        }
       >
         <SlIconButton
           disabled={!collectionDef}

@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { createAllergen, createIngredient } from "src/api/recipe";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 const styles = {
   root: {
@@ -129,7 +130,7 @@ export default function TagPicker({
           style={styles.addNew}
           placeholder={"New " + tagType}
           value={newTag}
-          onSlChange={(e) => setNewTag(e.target.value)}
+          onSlChange={(e) => setNewTag((e.target as SlInputElement).value)}
         >
           <SlIconButton
             slot="suffix"

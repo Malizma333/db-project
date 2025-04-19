@@ -15,6 +15,7 @@ import {
   useCollectionName,
   useRecipeCount,
 } from "src/api/recipeCollection";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 const styles = {
   collectionTitle: {
@@ -110,7 +111,10 @@ export default function CollectionCard({
           filled
           value={collectionName}
           onSlBlur={(e) => {
-            void onRenameCollection(collectionId, e.target.value);
+            void onRenameCollection(
+              collectionId,
+              (e.target as SlInputElement).value,
+            );
           }}
         ></SlInput>
         <SlTooltip content="Open Collection">

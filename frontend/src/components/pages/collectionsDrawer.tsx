@@ -5,7 +5,6 @@ import {
   SlTooltip,
 } from "@shoelace-style/shoelace/dist/react";
 import { useAppStore, VIEW } from "../../store";
-
 import {
   addRecipeCollection,
   useOwnedCollections,
@@ -14,6 +13,7 @@ import { useState } from "preact/hooks";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import CollectionCard from "../widgets/collectionCard";
 import { useQueryClient } from "@tanstack/react-query";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 const styles = {
   root: {
@@ -72,7 +72,9 @@ export default function CollectionsDrawer() {
             type="search"
             placeholder="Find a collection..."
             value={searchTerm}
-            onSlChange={(e) => setSearchTerm(e.target.value)}
+            onSlChange={(e) =>
+              setSearchTerm((e.target as SlInputElement).value)
+            }
           ></SlInput>
           {collectionIds.map((collectionId) => (
             <CollectionCard

@@ -7,7 +7,6 @@ import {
 import TagPicker from "../widgets/tagPicker";
 import { useAppStore, VIEW, COLUMN_MASK } from "../../store";
 import { useParams } from "react-router";
-
 import {
   useCollectionAllergens,
   useCollectionAuthors,
@@ -15,6 +14,7 @@ import {
 } from "../../api/recipeCollection";
 import { SlHideEvent } from "@shoelace-style/shoelace";
 import { useQueryClient } from "@tanstack/react-query";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 const styles = {
   settingContainer: {
@@ -146,7 +146,9 @@ export default function SettingsDrawer() {
             min={minRowsPerPage}
             max={maxRowsPerPage}
             onSlBlur={(e) => {
-              void onSetRowsPerPage(parseInt(e.target.value));
+              void onSetRowsPerPage(
+                parseInt((e.target as SlInputElement).value),
+              );
             }}
           ></SlInput>
         </div>

@@ -9,8 +9,6 @@ DONE HERE
   - notify that user needs to log in again
   - auto log user out? and forget session creds
 
-- fix other typing errors (shoelace x preact)
-
 - notification container hitbox covers other stuff
 
 - better mobile display
