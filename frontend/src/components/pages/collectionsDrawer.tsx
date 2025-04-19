@@ -1,19 +1,19 @@
-import {
-  SlDrawer,
-  SlInput,
-  SlIconButton,
-  SlTooltip,
-} from "@shoelace-style/shoelace/dist/react";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDrawer from "@shoelace-style/shoelace/dist/react/drawer/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+
+import { useState } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAppStore, VIEW } from "../../store";
 import {
   addRecipeCollection,
   useOwnedCollections,
 } from "../../api/recipeCollection";
-import { useState } from "preact/hooks";
-import { SlHideEvent } from "@shoelace-style/shoelace";
 import CollectionCard from "../widgets/collectionCard";
-import { useQueryClient } from "@tanstack/react-query";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 import { AUTH_ERROR } from "src/api/api";
 
 const styles = {

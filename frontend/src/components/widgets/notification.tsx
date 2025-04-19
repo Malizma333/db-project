@@ -1,6 +1,8 @@
-import { SlAlert, SlIcon } from "@shoelace-style/shoelace/dist/react";
-import { MutableRef } from "preact/hooks";
+import SlAlert from "@shoelace-style/shoelace/dist/react/alert/index.js";
+import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { MutableRef } from "preact/hooks";
 
 export function Notification({
   message,

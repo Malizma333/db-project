@@ -1,12 +1,15 @@
-import { ContainerNode, render } from "preact";
 import "./index.css";
-import App from "./app";
-import { BrowserRouter, Route, Routes, useParams } from "react-router";
+
+import SlSpinner from "@shoelace-style/shoelace/dist/react/spinner/index";
+
 import { QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes, useParams } from "react-router";
+import { ContainerNode, render } from "preact";
+
+import App from "./app";
 import { queryClient } from "./api/api.js";
 import FourOFourPage from "./components/pages/404";
 import { useCollectionExists } from "./api/recipeCollection";
-import { SlSpinner } from "@shoelace-style/shoelace/dist/react";
 import { initSessionAuth } from "./api/user";
 
 function CollectionIdGuard() {

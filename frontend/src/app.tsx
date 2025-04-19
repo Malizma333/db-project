@@ -1,5 +1,11 @@
 import "@shoelace-style/shoelace/dist/themes/dark.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useParams } from "react-router";
+import { useEffect, useRef } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import SettingsDrawer from "./components/pages/settingsDrawer";
 import Toolbar from "./components/widgets/toolbar";
 import Table from "./components/widgets/table";
@@ -13,11 +19,7 @@ import RecipeForm from "./components/pages/recipeForm";
 import RecipeSummary from "./components/pages/recipeSummary";
 import { useOwnedCollections } from "./api/recipeCollection";
 import { clearSessionAuth, session_auth, useLoggedIn } from "./api/user";
-import { useParams } from "react-router";
-import { useEffect, useRef } from "react";
-import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { Notification } from "./components/widgets/notification";
-import { useQueryClient } from "@tanstack/react-query";
 
 // used for importing icons without copying into public directory
 setBasePath(

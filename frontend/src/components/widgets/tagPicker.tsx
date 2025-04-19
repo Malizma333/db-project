@@ -1,17 +1,18 @@
 import "./tagPicker.css";
-import {
-  SlTag,
-  SlIconButton,
-  SlDropdown,
-  SlMenu,
-  SlMenuItem,
-  SlInput,
-} from "@shoelace-style/shoelace/dist/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useParams } from "react-router";
-import { createAllergen, createIngredient } from "src/api/recipe";
+
+import SlTag from "@shoelace-style/shoelace/dist/react/tag/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlDropdown from "@shoelace-style/shoelace/dist/react/dropdown/index.js";
+import SlMenu from "@shoelace-style/shoelace/dist/react/menu/index.js";
+import SlMenuItem from "@shoelace-style/shoelace/dist/react/menu-item/index.js";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "preact/hooks";
+import { useParams } from "react-router";
+
+import { createAllergen, createIngredient } from "src/api/recipe";
 import { AUTH_ERROR } from "src/api/api";
 import { useAppStore } from "src/store";
 

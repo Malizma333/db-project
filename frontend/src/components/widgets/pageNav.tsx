@@ -1,8 +1,11 @@
-import { SlTooltip, SlIconButton } from "@shoelace-style/shoelace/dist/react";
-import { useAppStore } from "../../store";
-import { useCountRecipesInFilter } from "../../api/recipeCollection";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+
 import { useParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
+
+import { useAppStore } from "../../store";
+import { useCountRecipesInFilter } from "../../api/recipeCollection";
 
 const styles = {
   root: {

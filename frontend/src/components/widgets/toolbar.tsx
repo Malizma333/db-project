@@ -1,26 +1,27 @@
 import "./toolbar.css";
-import {
-  SlInput,
-  SlIconButton,
-  SlIcon,
-  SlDropdown,
-  SlMenu,
-  SlMenuItem,
-  SlMenuLabel,
-  SlAvatar,
-} from "@shoelace-style/shoelace/dist/react";
+
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlDropdown from "@shoelace-style/shoelace/dist/react/dropdown/index.js";
+import SlMenu from "@shoelace-style/shoelace/dist/react/menu/index.js";
+import SlMenuItem from "@shoelace-style/shoelace/dist/react/menu-item/index.js";
+import SlMenuLabel from "@shoelace-style/shoelace/dist/react/menu-label/index.js";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
+import SlAvatar from "@shoelace-style/shoelace/dist/react/avatar/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useRef } from "preact/hooks";
+import { useParams } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAppStore } from "../../store";
 import { Notification } from "./notification";
-import { useRef } from "preact/hooks";
 import { logout, useLoggedIn } from "../../api/user";
-import { useParams } from "react-router";
 import {
   filterRecipeCollection,
   useCollectionName,
 } from "../../api/recipeCollection";
-import { useQueryClient } from "@tanstack/react-query";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 const styles = {
   root: {

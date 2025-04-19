@@ -1,24 +1,22 @@
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
-import { useRef } from "preact/hooks";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useParams } from "react-router";
+import { useRef, useState, useEffect } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAppStore, VIEW } from "../../store";
 import { Notification } from "../widgets/notification";
 import TagPicker, { TagType } from "../widgets/tagPicker";
-import { useParams } from "react-router";
 import { addRecipe, removeRecipe } from "../../api/recipe";
 import {
   useCollectionAllergens,
   useCollectionIngredients,
 } from "../../api/recipeCollection";
-import { SlHideEvent } from "@shoelace-style/shoelace";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useEffect } from "react";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { AUTH_ERROR } from "src/api/api";
 
 const styles = {

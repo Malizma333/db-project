@@ -1,16 +1,15 @@
-import {
-  SlCard,
-  SlTooltip,
-  SlIconButton,
-  SlSkeleton,
-} from "@shoelace-style/shoelace/dist/react";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlCard from "@shoelace-style/shoelace/dist/react/card/index.js";
+import SlSkeleton from "@shoelace-style/shoelace/dist/react/skeleton/index.js";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router";
+
 import TagPicker from "./tagPicker";
 import { COLUMN_MASK, useAppStore } from "../../store";
-
 import { Recipe, removeRecipe } from "../../api/recipe";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFilterCollection } from "src/api/recipeCollection";
-import { useParams } from "react-router";
 
 const styles = {
   root: {

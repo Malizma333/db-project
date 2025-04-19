@@ -1,15 +1,16 @@
 import "./errorHelp.css";
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
+
 import { useRef, useState } from "preact/hooks";
+
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
 import { useAppStore, VIEW } from "../../store";
 import { Notification } from "../widgets/notification";
 import { changePassword } from "../../api/user";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { AUTH_ERROR } from "src/api/api";
 
 const styles = {

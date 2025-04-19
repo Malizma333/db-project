@@ -1,20 +1,20 @@
-import {
-  SlButton,
-  SlCheckbox,
-  SlDrawer,
-  SlInput,
-} from "@shoelace-style/shoelace/dist/react";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import SlDrawer from "@shoelace-style/shoelace/dist/react/drawer/index.js";
+import SlCheckbox from "@shoelace-style/shoelace/dist/react/checkbox/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+
+import { useParams } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+
 import TagPicker from "../widgets/tagPicker";
 import { useAppStore, VIEW, COLUMN_MASK } from "../../store";
-import { useParams } from "react-router";
 import {
   useCollectionAllergens,
   useCollectionAuthors,
   useCollectionIngredients,
 } from "../../api/recipeCollection";
-import { SlHideEvent } from "@shoelace-style/shoelace";
-import { useQueryClient } from "@tanstack/react-query";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 const styles = {
   settingContainer: {

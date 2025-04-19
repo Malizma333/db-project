@@ -1,16 +1,17 @@
 import "./errorHelp.css";
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
+
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
 import { useRef, useState } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAppStore, VIEW } from "../../store";
 import { Notification } from "../widgets/notification";
 import { login } from "../../api/user";
-import { useQueryClient } from "@tanstack/react-query";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
-import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
 
 const styles = {
   inputField: {

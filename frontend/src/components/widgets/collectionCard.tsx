@@ -1,22 +1,23 @@
 import "./collectionCard.css";
-import {
-  SlCard,
-  SlCopyButton,
-  SlInput,
-  SlIcon,
-  SlIconButton,
-  SlTooltip,
-  SlProgressRing,
-} from "@shoelace-style/shoelace/dist/react";
+
+import SlCard from "@shoelace-style/shoelace/dist/react/card/index.js";
+import SlCopyButton from "@shoelace-style/shoelace/dist/react/copy-button/index.js";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import SlProgressRing from "@shoelace-style/shoelace/dist/react/progress-ring/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useRef, useState } from "preact/hooks";
+
 import {
   removeRecipeCollection,
   renameRecipeCollection,
   useCollectionName,
   useRecipeCount,
 } from "src/api/recipeCollection";
-import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 import { AUTH_ERROR } from "src/api/api";
 import { useAppStore } from "src/store";
 
