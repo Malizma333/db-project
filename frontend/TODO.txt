@@ -12,8 +12,6 @@
   - notify that user needs to log in again
   - auto log user out? and forget session creds
 
-- error log assertions
-
 - fix other typing errors (shoelace x preact)
 
 - refactor randomize to be less bad (backend function)
