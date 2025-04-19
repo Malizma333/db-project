@@ -20,3 +20,5 @@ DONE HERE
 - Figure out better way to invalidate recipe collection list
 
 - Save search params to local store
+
+- Fix log in not updating view
