@@ -1,3 +1,4 @@
+import "./toolbar.css";
 import {
   SlInput,
   SlIconButton,

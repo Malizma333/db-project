@@ -1,3 +1,4 @@
+import "./collectionCard.css";
 import {
   SlCard,
   SlCopyButton,

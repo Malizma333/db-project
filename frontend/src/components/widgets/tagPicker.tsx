@@ -1,3 +1,4 @@
+import "./tagPicker.css";
 import {
   SlTag,
   SlIconButton,
@@ -16,26 +17,28 @@ import { useAppStore } from "src/store";
 
 const styles = {
   root: {
-    alignItems: "center",
     display: "flex",
-    height: "2em",
-    justifyContent: "start",
-    position: "relative",
+    flexDirection: "column",
+    marginBottom: "1em",
   },
   menu: {
     height: "8em",
   },
-  addNew: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    bottom: 0,
-    margin: "auto",
+  tagContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.25em",
+    marginBottom: "1em",
+  },
+  tagContent: {
+    overflow: "hidden",
+    whitespace: "nowrap",
+    textOverflow: "ellipsis",
   },
 };
 
 export enum TagType {
-  Allergen = "Allergy",
+  Allergen = "Allergen",
   Ingredient = "Ingredient",
 }
 
@@ -106,35 +109,38 @@ export default function TagPicker({
 
   return (
     <div style={styles.root}>
-      {selected.map((tag, index) => (
-        <SlTag
-          key={index}
-          variant={variant}
-          removable={!viewMode}
-          size="small"
-          onSlRemove={() => onRemoveTag(index)}
-        >
-          {tag}
-        </SlTag>
-      ))}
-      {!viewMode && available.length > selected.length && (
-        <SlDropdown>
-          <SlIconButton slot="trigger" name="plus"></SlIconButton>
-          <SlMenu
-            style={styles.menu}
-            onSlSelect={(e) => onAddTag(e.detail.item.value)}
+      <div style={styles.tagContainer}>
+        {selected.map((tag, index) => (
+          <SlTag
+            className={"pickedTag"}
+            key={index}
+            variant={variant}
+            removable={!viewMode}
+            size="small"
+            onSlRemove={() => onRemoveTag(index)}
           >
-            {available
-              .filter((tag) => !selected.includes(tag))
-              .map((tag) => {
-                return <SlMenuItem value={tag}>{tag}</SlMenuItem>;
-              })}
-          </SlMenu>
-        </SlDropdown>
-      )}
+            <p style={styles.tagContent}>{tag}</p>
+          </SlTag>
+        ))}
+        {!viewMode && available.length > selected.length && (
+          <SlDropdown>
+            <SlIconButton slot="trigger" name="plus"></SlIconButton>
+            <SlMenu
+              style={styles.menu}
+              onSlSelect={(e) => onAddTag(e.detail.item.value)}
+            >
+              {available
+                .filter((tag) => !selected.includes(tag))
+                .map((tag) => {
+                  return <SlMenuItem value={tag}>{tag}</SlMenuItem>;
+                })}
+            </SlMenu>
+          </SlDropdown>
+        )}
+      </div>
       {!viewMode && tagType !== undefined && (
         <SlInput
-          style={styles.addNew}
+          size="small"
           placeholder={"New " + tagType}
           value={newTag}
           onSlChange={(e) => setNewTag((e.target as SlInputElement).value)}

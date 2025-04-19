@@ -4,21 +4,6 @@ html {
   font-size: large;
 }
 
-sl-input.errorHelp::part(form-control-help-text) {
-  color: red;
-}
-
-sl-menu-label.userMenuLabel::part(base) {
-  font-size: x-large;
-  font-weight: bold;
-}
-
-sl-input.collectionsName::part(base) {
-  background-color: transparent;
-  font-weight: bold;
-  margin-left: -1em;
-}
-
 .sl-toast-stack {
   display: flex;
   flex-direction: column-reverse;
