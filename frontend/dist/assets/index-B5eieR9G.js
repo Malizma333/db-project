@@ -27324,12 +27324,12 @@ function $r({
       try {
         o === "Allergen"
           ? (await Wy(n, u),
-            await d.invalidateQueries({ queryKey: ["collectionAllergens"] }),
-            t.includes(n) || m(n))
+            await d.invalidateQueries({ queryKey: ["collectionAllergens"] }))
           : o === "Ingredient" &&
             (await Ky(n, u),
-            await d.invalidateQueries({ queryKey: ["collectionIngredients"] }),
-            t.includes(n) || m(n));
+            await d.invalidateQueries({ queryKey: ["collectionIngredients"] })),
+          t.includes(n) || m(n),
+          l("");
       } catch (b) {
         b instanceof Error &&
           (b.message === Sr ? a() : console.error(b.message));

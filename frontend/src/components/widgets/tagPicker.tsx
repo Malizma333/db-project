@@ -84,18 +84,16 @@ export default function TagPicker({
         await queryClient.invalidateQueries({
           queryKey: ["collectionAllergens"],
         });
-        if (!selected.includes(newTag)) {
-          onAddTag(newTag);
-        }
       } else if (tagType === TagType.Ingredient) {
         await createIngredient(newTag, collectionId);
         await queryClient.invalidateQueries({
           queryKey: ["collectionIngredients"],
         });
-        if (!selected.includes(newTag)) {
-          onAddTag(newTag);
-        }
       }
+      if (!selected.includes(newTag)) {
+        onAddTag(newTag);
+      }
+      setNewTag("");
     } catch (e) {
       if (e instanceof Error) {
         if (e.message === AUTH_ERROR) {
