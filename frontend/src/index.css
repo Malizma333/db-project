@@ -26,4 +26,9 @@ sl-input.collectionsName::part(base) {
   bottom: 0;
   left: 0;
   right: auto;
+  pointer-events: none;
+}
+
+.sl-toast-stack sl-alert {
+  pointer-events: auto;
 }

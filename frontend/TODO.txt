@@ -5,12 +5,6 @@
 
 DONE HERE
 
-- notification container hitbox covers other stuff
-
-- better mobile display
-
-- Figure out better way to invalidate recipe collection list
-
 - Save search params to local store
-
+- Figure out better way to invalidate filter query
 - Fix log in not updating view
