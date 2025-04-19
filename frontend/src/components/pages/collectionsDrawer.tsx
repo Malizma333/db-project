@@ -12,7 +12,7 @@ import {
 } from "../../api/recipeCollection";
 import { useState } from "preact/hooks";
 import { SlHideEvent } from "@shoelace-style/shoelace";
-import CollectionCard from "./collectionCard";
+import CollectionCard from "../widgets/collectionCard";
 import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
@@ -35,6 +35,7 @@ export default function CollectionsDrawer() {
   const { view, setMainView } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
+  console.log(searchTerm);
 
   function onHide(e: SlHideEvent) {
     // Prevent event bubbling caused by inner menu elements

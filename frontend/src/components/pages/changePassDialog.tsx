@@ -68,7 +68,6 @@ export default function ChangePassDialog() {
       <SlInput
         style={styles.inputField}
         type="password"
-        helpText="Must be 8 - 20 characters"
         value={oldPassword}
         onSlChange={(e) => setOldPassword(e.target.value)}
         placeholder="Old Password"

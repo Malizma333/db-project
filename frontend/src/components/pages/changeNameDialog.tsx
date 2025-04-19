@@ -61,7 +61,6 @@ export default function ChangeNameDialog() {
       ></SlNotification>
       <SlInput
         style={styles.inputField}
-        helpText="Must be 8 - 20 characters"
         type="text"
         value={newUsername}
         onSlChange={(e) => setNewUsername(e.target.value)}

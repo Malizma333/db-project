@@ -15,7 +15,6 @@ import { useRef } from "preact/hooks";
 import { logout, useLoggedIn } from "../../api/user";
 import { useParams } from "react-router";
 import {
-  countRecipesInFilter,
   filterRecipeCollection,
   useCollectionName,
 } from "../../api/recipeCollection";
@@ -77,18 +76,12 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   }
 
   async function onRandomRecipe() {
-    const numRecipes = await countRecipesInFilter({
-      ...filterProps,
-      collection_id: collectionId,
-    });
-
-    const ind = Math.floor(Math.random() * (numRecipes || 0));
-
     const randRecipe = await filterRecipeCollection({
       ...filterProps,
       collection_id: collectionId,
-      view_min: ind,
-      view_max: ind + 1,
+      view_min: 0,
+      view_max: 1,
+      random: true,
     });
 
     setSelectedRecipe(randRecipe[0]);

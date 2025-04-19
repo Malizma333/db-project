@@ -102,6 +102,7 @@ const computed = createComputed(
       authors: state.includeAuthorsFilter,
       view_min: -1,
       view_max: -1,
+      random: false,
     },
     selectedRecipe: {
       name: state.selectedRecipeName,

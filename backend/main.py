@@ -189,10 +189,11 @@ def do_thing(body, cursor):
         count = len(temp)
 
         recipes = []
-        if body["random"]:
-            recipes = random.choices(recipes, k=(body["view_max"] - body["view_min"]))
-        else:
-            recipes = temp[body["view_min"] : body["view_max"]]
+        if len(temp) != 0:
+            if body["random"]:
+                recipes = random.choices(temp, k=(body["view_max"] - body["view_min"]))
+            else:
+                recipes = temp[body["view_min"] : body["view_max"]]
 
         result = []
         for recipe in recipes:

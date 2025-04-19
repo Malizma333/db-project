@@ -38,23 +38,23 @@ export default function PageNav() {
   const numPages = Math.ceil((numRecipesInCollection || 0) / numRowsPerPage);
 
   const onNavigateFirstPage = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     gotoFirstPage();
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigatePrevPage = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     gotoPrevPage();
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigateNextPage = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     gotoNextPage(numPages);
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   const onNavigateLastPage = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
     gotoLastPage(numPages);
+    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
   };
 
   return numPages == 0 ? (

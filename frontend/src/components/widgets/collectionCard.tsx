@@ -7,6 +7,7 @@ import {
   SlTooltip,
 } from "@shoelace-style/shoelace/dist/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   removeRecipeCollection,
   renameRecipeCollection,
@@ -35,12 +36,25 @@ export default function CollectionCard({
   collectionId: number;
   searchTerm: string;
 }) {
+  let x = -1;
+
   const queryClient = useQueryClient();
 
   const { data: collectionName } = useCollectionName(collectionId);
   const { data: recipeCount } = useRecipeCount(collectionId);
 
+  const [deleteProgress, setDeleteProgress] = useState(0);
+  const [deletePressed, setDeletePressed] = useState(false);
+
   const collectionUrl = window.location.origin + "/collection/" + collectionId;
+
+  useEffect(() => {
+    if (deletePressed) {
+      // x = window.setInterval(() => console.log("A"), 10);
+    } else {
+      // window.clearInterval(x);
+    }
+  }, [deletePressed]);
 
   async function onDeleteCollection(id: number) {
     try {
@@ -97,9 +111,9 @@ export default function CollectionCard({
           <SlIconButton
             name="trash"
             label="Delete Collection"
-            onClick={() => {
-              void onDeleteCollection(collectionId);
-            }}
+            onMouseDown={() => setDeletePressed(true)}
+            onMouseUp={() => setDeletePressed(false)}
+            onMouseLeave={() => setDeletePressed(false)}
           ></SlIconButton>
         </SlTooltip>
       </div>
