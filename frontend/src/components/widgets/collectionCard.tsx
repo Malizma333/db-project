@@ -7,6 +7,7 @@ import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
 import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
 import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
 import SlProgressRing from "@shoelace-style/shoelace/dist/react/progress-ring/index.js";
+import SlSkeleton from "@shoelace-style/shoelace/dist/react/skeleton/index.js";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,6 +35,20 @@ const styles = {
     width: "100%",
   },
 };
+
+function CollectionCardSkeleton() {
+  return (
+    <SlCard style={styles.collectionCard}>
+      <div slot="header" style={styles.collectionTitle}>
+        <SlSkeleton style={{ width: "14.5em", height: "1.5em" }}></SlSkeleton>
+        <SlSkeleton style={{ width: "1.5em", height: "1.5em" }}></SlSkeleton>
+        <SlSkeleton style={{ width: "1.5em", height: "1.5em" }}></SlSkeleton>
+        <SlSkeleton style={{ width: "1.5em", height: "1.5em" }}></SlSkeleton>
+      </div>
+      <SlSkeleton style={{ width: "10em", height: "1em" }}></SlSkeleton>
+    </SlCard>
+  );
+}
 
 export default function CollectionCard({
   collectionId,
@@ -115,8 +130,9 @@ export default function CollectionCard({
     }
   }
 
-  return collectionName === undefined ||
-    !collectionName
+  return collectionName === undefined ? (
+    <CollectionCardSkeleton></CollectionCardSkeleton>
+  ) : !collectionName
       .toLocaleLowerCase()
       .includes(searchTerm.toLocaleLowerCase()) ? null : (
     <SlCard style={styles.collectionCard}>

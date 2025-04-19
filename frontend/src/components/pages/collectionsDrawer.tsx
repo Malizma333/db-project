@@ -69,36 +69,32 @@ export default function CollectionsDrawer() {
       placement="start"
       label="Collections"
     >
-      {collectionIds !== undefined && (
-        <div style={styles.root}>
-          <SlInput
-            style={styles.collectionCard}
-            clearable
-            type="search"
-            placeholder="Find a collection..."
-            value={searchTerm}
-            onSlChange={(e) =>
-              setSearchTerm((e.target as SlInputElement).value)
-            }
-          ></SlInput>
-          {collectionIds.map((collectionId) => (
-            <CollectionCard
-              collectionId={collectionId}
-              searchTerm={searchTerm}
-            ></CollectionCard>
-          ))}
-          <SlTooltip content="Add Collection">
-            <SlIconButton
-              name="plus"
-              label="Add Collection"
-              style={{ fontSize: "2em" }}
-              onClick={() => {
-                void onCreateCollection();
-              }}
-            ></SlIconButton>
-          </SlTooltip>
-        </div>
-      )}
+      <div style={styles.root}>
+        <SlInput
+          style={styles.collectionCard}
+          clearable
+          type="search"
+          placeholder="Find a collection..."
+          value={searchTerm}
+          onSlChange={(e) => setSearchTerm((e.target as SlInputElement).value)}
+        ></SlInput>
+        {(collectionIds || Array<number>(10).fill(-1)).map((collectionId) => (
+          <CollectionCard
+            collectionId={collectionId}
+            searchTerm={searchTerm}
+          ></CollectionCard>
+        ))}
+        <SlTooltip content="Add Collection">
+          <SlIconButton
+            name="plus"
+            label="Add Collection"
+            style={{ fontSize: "2em" }}
+            onClick={() => {
+              void onCreateCollection();
+            }}
+          ></SlIconButton>
+        </SlTooltip>
+      </div>
     </SlDrawer>
   );
 }
