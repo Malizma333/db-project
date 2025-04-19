@@ -112,7 +112,9 @@ export default function SettingsDrawer() {
     setRowsPerPage(Math.min(maxRowsPerPage, Math.max(minRowsPerPage, value)));
     gotoFirstPage();
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
-    await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["filterCollectionCount"],
+    });
   }
 
   function onHide(e: SlHideEvent) {

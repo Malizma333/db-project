@@ -40,10 +40,10 @@ export default function LoginDialog() {
   async function onLogIn() {
     try {
       await login(username, password);
-      await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       setClientUsername(username);
       setSessionAlert(false);
       onCloseDialog();
+      await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       if (logInAlert.current !== null) {
         await logInAlert.current.toast();
       }

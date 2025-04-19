@@ -14155,7 +14155,7 @@ async function zc({
   );
 }
 function bm(e) {
-  return ht({ queryKey: ["filterCollection"], queryFn: () => zc(e) });
+  return ht({ queryKey: ["filterCollection", e], queryFn: () => zc(e) });
 }
 async function _m({
   collection_id: e,
@@ -14187,7 +14187,7 @@ async function _m({
   return Lc(u), u.table_size;
 }
 function wm(e) {
-  return ht({ queryKey: ["filterCollectionCount"], queryFn: () => _m(e) });
+  return ht({ queryKey: ["filterCollectionCount", e], queryFn: () => _m(e) });
 }
 async function xm(e, t) {
   const r = await ae({
@@ -14455,7 +14455,7 @@ function Nm() {
       (d(Math.min(A, Math.max(R, B))),
       u(),
       await b.invalidateQueries({ queryKey: ["filterCollection"] }),
-      await b.invalidateQueries({ queryKey: ["filterCollection"] }));
+      await b.invalidateQueries({ queryKey: ["filterCollectionCount"] }));
   }
   function D(B) {
     if (B.eventPhase !== Event.AT_TARGET) {
@@ -15988,24 +15988,16 @@ function cg() {
     { data: d } = wm({ ...r, collection_id: c }),
     u = Math.ceil((d || 0) / t),
     p = async () => {
-      i(),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] }),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] });
+      i(), await a.invalidateQueries({ queryKey: ["filterCollection"] });
     },
     h = async () => {
-      n(),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] }),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] });
+      n(), await a.invalidateQueries({ queryKey: ["filterCollection"] });
     },
     f = async () => {
-      o(u),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] }),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] });
+      o(u), await a.invalidateQueries({ queryKey: ["filterCollection"] });
     },
     y = async () => {
-      s(u),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] }),
-        await a.invalidateQueries({ queryKey: ["filterCollection"] });
+      s(u), await a.invalidateQueries({ queryKey: ["filterCollection"] });
     };
   return g("div", {
     style: lg.root,
@@ -16416,10 +16408,10 @@ function pg() {
   async function h() {
     try {
       await rm(o, a),
-        await n.invalidateQueries({ queryKey: ["loggedIn"] }),
         r(o),
         i(!1),
         p(),
+        await n.invalidateQueries({ queryKey: ["loggedIn"] }),
         u.current !== null && (await u.current.toast());
     } catch (f) {
       f instanceof Error && d(f.message);

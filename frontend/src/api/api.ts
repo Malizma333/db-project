@@ -1,4 +1,28 @@
 import { QueryClient } from "@tanstack/react-query";
+import "@tanstack/react-query";
+
+type QueryKey = [
+  (
+    | "filterCollection"
+    | "filterCollectionCount"
+    | "ownedCollections"
+    | "collectionAllergens"
+    | "collectionIngredients"
+    | "collectionAuthors"
+    | "recipeCount"
+    | "collectionExists"
+    | "collectionName"
+    | "loggedIn"
+  ),
+  ...ReadonlyArray<unknown>,
+];
+
+declare module "@tanstack/react-query" {
+  interface Register {
+    queryKey: QueryKey;
+    mutationKey: QueryKey;
+  }
+}
 
 export interface CustomErrorResponse {
   type: string;
