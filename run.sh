@@ -1,4 +1,5 @@
 cd frontend
+npm i --silent
 npm run build
 cd ..
 cd backend
