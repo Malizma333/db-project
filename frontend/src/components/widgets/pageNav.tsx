@@ -16,7 +16,6 @@ const styles = {
   },
 };
 
-// For some reason, the disabled property causes a second re-render that lit complains about in the console
 export default function PageNav() {
   const {
     page,

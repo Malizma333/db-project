@@ -38,7 +38,7 @@ export default function CollectionsDrawer() {
   const [searchTerm, setSearchTerm] = useState("");
 
   function onHide(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase === Event.AT_TARGET) {
       setMainView();
     } else {

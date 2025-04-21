@@ -58,7 +58,7 @@ export default function RecipeForm({
   const { data: allIngredients } = useCollectionIngredients(loadedCollectionId);
 
   function onCloseDialog(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
       return;
@@ -83,6 +83,12 @@ export default function RecipeForm({
         selectedRecipe.allergens,
       );
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["filterCollectionCount"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["recipeCount"],
+      });
       setMainView();
       if (submitAlert.current !== null) {
         await submitAlert.current.toast();

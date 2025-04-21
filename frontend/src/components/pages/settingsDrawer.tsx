@@ -116,7 +116,7 @@ export default function SettingsDrawer() {
   }
 
   function onHide(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
       return;

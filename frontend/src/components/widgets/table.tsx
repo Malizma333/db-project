@@ -135,6 +135,12 @@ function TableRow({
   async function onDeleteRecipe() {
     await removeRecipe(rowData.name);
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["filterCollectionCount"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["recipeCount"],
+    });
   }
 
   return (
