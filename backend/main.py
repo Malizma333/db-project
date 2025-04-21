@@ -449,7 +449,10 @@ if not os.path.isfile("recipe.db"):
         cur = conn.cursor()
         cur.executescript(sqlfile)
 
-    print("meow >:3 (db created)")
+    print("""    ／l、             
+（ﾟ､ ｡ ７         
+  l  ~ヽ         
+  じしf_,)ノ (db created)""")
     conn.close()
 
 
