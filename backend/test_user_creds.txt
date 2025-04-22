@@ -1,2 +1,2 @@
-test_person
+test_user
 pass123
