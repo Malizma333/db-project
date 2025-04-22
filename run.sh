@@ -1,7 +1,9 @@
-cd frontend
-npm i --silent
-npm run build
-cd ..
 cd backend
-command -v python3 >/dev/null 2>&1 && python3 main.py
-command -v python >/dev/null 2>&1 && python main.py
+
+if command -v python3 &> /dev/null; then
+  python3 adduser.py < ./test_user_creds.txt > /dev/null
+  python3 main.py
+else
+  python adduser.py < ./test_user_creds.txt > /dev/null
+  python main.py
+fi
