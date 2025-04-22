@@ -4,6 +4,7 @@ from http import server
 import json
 import os
 import random
+import secrets
 import sqlite3
 import string
 import threading
@@ -59,6 +60,17 @@ def check_auth(token):
             del tokens[token]
     raise InputError("auth_token_error")
 
+def check_creds(cursor, username, password):
+    cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?",
+                    (username,))
+    results = cursor.fetchall()
+    if len(results) != 1:
+        return False
+    r = results[0]
+    hash_bytes = base64.b64decode(r[0].encode("utf-8"))
+    salt_bytes = base64.b64decode(r[1].encode("utf-8"))
+    trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt_bytes, 100_000)
+    return hash_bytes == trial_hash_bytes
 
 def do_thing_safely(body):
     ret = None
@@ -84,16 +96,7 @@ def do_thing(body, cursor):
     cursor.execute("PRAGMA foreign_keys = ON;")
 
     if body["type"] == "login":
-        cursor.execute("SELECT password_hash, password_salt FROM Account WHERE username = ?",
-                       (body["username"],))
-        results = cursor.fetchall()
-        if len(results) != 1:
-            raise InputError("username_error")
-        r = results[0]
-        hash_bytes = base64.b64decode(r[0].encode("utf-8"))
-        salt_bytes = base64.b64decode(r[1].encode("utf-8"))
-        trial_hash_bytes = hashlib.pbkdf2_hmac("sha256", body["password"].encode("utf-8"), salt_bytes, 100_000)
-        if hash_bytes == trial_hash_bytes:
+        if check_creds(cursor, body["username"], body["password"]):
             token = "".join(random.choices(TOKEN_CHARS, k=TOKEN_LENGTH))
             tokens[token] = (body["username"], time.time() + TOKEN_LIFETIME)
             ret = {"type": "login_response", "auth": token, "lifetime": TOKEN_LIFETIME}
@@ -108,12 +111,26 @@ def do_thing(body, cursor):
         check_auth(body["auth"])
 
     elif body["type"] == "change_username":
-        # TODO: this
-        print("change username doesn't work")
+        username = check_auth(body["auth"])
+        if check_creds(cursor, username, body["password"]):
+            tokens[body["auth"]] = (username, tokens[body["auth"]][1])
+            cursor.execute("UPDATE Account SET username == ? WHERE username = ?",
+                           (body["new_username"], username))
+        else:
+            raise InputError("password_error")
 
     elif body["type"] == "change_password":
-        # TODO: this
-        print("change_password doesn't work")
+        username = check_auth(body["auth"])
+        if check_creds(cursor, username, body["password"]):
+            salt = secrets.token_bytes(32)
+            iterations = 100_000
+            hash_bytes = hashlib.pbkdf2_hmac("sha256", body["new_password"].encode("utf-8"), salt, iterations)
+            hash_str = base64.b64encode(hash_bytes).decode("utf-8")
+            salt_str = base64.b64encode(salt).decode("utf-8")
+            cursor.execute("UPDATE Account SET password_hash == ?, password_salt == ? WHERE username = ?",
+                           (hash_str, salt_str, username))
+        else:
+            raise InputError("password_error")
 
     elif body["type"] == "add_recipe":
         username = check_auth(body["auth"])

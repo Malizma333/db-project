@@ -42,6 +42,8 @@ some other things later.
 }
 ```
 
+## deprecated, only password_error is used.
+
 ```
 400
 {
