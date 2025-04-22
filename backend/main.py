@@ -110,6 +110,7 @@ def do_thing(body, cursor):
     elif body["type"] == "is_logged_in":
         check_auth(body["auth"])
 
+    # TODO: unique constraint failed
     elif body["type"] == "change_username":
         username = check_auth(body["auth"])
         if check_creds(cursor, username, body["password"]):
