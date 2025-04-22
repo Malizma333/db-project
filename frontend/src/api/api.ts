@@ -1,4 +1,28 @@
 import { QueryClient } from "@tanstack/react-query";
+import "@tanstack/react-query";
+
+type QueryKey = [
+  (
+    | "filterCollection"
+    | "filterCollectionCount"
+    | "ownedCollections"
+    | "collectionAllergens"
+    | "collectionIngredients"
+    | "collectionAuthors"
+    | "recipeCount"
+    | "collectionExists"
+    | "collectionName"
+    | "loggedIn"
+  ),
+  ...ReadonlyArray<unknown>,
+];
+
+declare module "@tanstack/react-query" {
+  interface Register {
+    queryKey: QueryKey;
+    mutationKey: QueryKey;
+  }
+}
 
 export interface CustomErrorResponse {
   type: string;
@@ -10,7 +34,7 @@ export const AUTH_ERROR = "AUTH_ERROR";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      gcTime: 1000 * 60 * 60 * 24, // Clear old queries after 24 hours
     },
   },
 });
@@ -22,7 +46,7 @@ export function getErrorMessage(responseData: CustomErrorResponse) {
     resource_error: "[ERROR] Invalid resource: ",
     username_error: "Invalid username or password!",
     password_error: "Invalid username or password!",
-    internal_server_error: "[ERROR] Robert or Bre screwed up: ",
+    internal_server_error: "[ERROR] Server error: ",
   };
 
   let message = "Unknown error";

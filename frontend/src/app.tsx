@@ -1,5 +1,10 @@
 import "@shoelace-style/shoelace/dist/themes/dark.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useEffect, useRef } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import SettingsDrawer from "./components/pages/settingsDrawer";
 import Toolbar from "./components/widgets/toolbar";
 import Table from "./components/widgets/table";
@@ -12,9 +17,8 @@ import CollectionsDrawer from "./components/pages/collectionsDrawer";
 import RecipeForm from "./components/pages/recipeForm";
 import RecipeSummary from "./components/pages/recipeSummary";
 import { useOwnedCollections } from "./api/recipeCollection";
-import { session_auth, useLoggedIn } from "./api/user";
-import { useParams } from "react-router";
-import { useEffect } from "react";
+import { clearSessionAuth, session_auth, useLoggedIn } from "./api/user";
+import { Notification } from "./components/widgets/notification";
 
 // used for importing icons without copying into public directory
 setBasePath(
@@ -40,37 +44,50 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export default function App() {
-  const { setClientUsername } = useAppStore();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
+  const { sessionAlert, loadedCollectionId, setClientUsername } = useAppStore();
 
-  const collectionDef = collectionId !== -1;
-
+  const queryClient = useQueryClient();
   const { data: loggedIn } = useLoggedIn();
   const { data: ownedCollections } = useOwnedCollections();
-
-  const editMode = !!(
-    collectionDef &&
-    loggedIn &&
-    ownedCollections &&
-    ownedCollections.includes(collectionId)
-  );
+  const authExpRef = useRef<null | SlAlertElement>(null);
 
   useEffect(() => {
     setClientUsername(session_auth.user);
   }, []);
 
+  useEffect(() => {
+    if (sessionAlert) {
+      if (authExpRef.current !== null) {
+        void authExpRef.current.toast();
+        void queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
+        clearSessionAuth();
+      }
+    }
+  }, [sessionAlert]);
+
   return (
     <div style={styles.root}>
-      {collectionDef && <SettingsDrawer></SettingsDrawer>}
+      <Notification
+        message="Session expired, please log in again"
+        variant="danger"
+        childRef={authExpRef}
+        duration={30000}
+      ></Notification>
+      {loadedCollectionId !== -1 && <SettingsDrawer></SettingsDrawer>}
       <CollectionsDrawer></CollectionsDrawer>
       <LoginDialog></LoginDialog>
       <ChangeNameDialog></ChangeNameDialog>
       <ChangePassDialog></ChangePassDialog>
-      <Toolbar collectionDef={collectionDef}></Toolbar>
-      {collectionDef ? (
+      <Toolbar></Toolbar>
+      {loadedCollectionId !== -1 ? (
         <>
-          <Table editMode={editMode}></Table>
+          <Table
+            editMode={
+              loggedIn === true &&
+              ownedCollections !== undefined &&
+              ownedCollections.includes(loadedCollectionId)
+            }
+          ></Table>
           <PageNav></PageNav>
           <RecipeForm
             formTitle="New Recipe"

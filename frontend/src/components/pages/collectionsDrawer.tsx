@@ -1,19 +1,20 @@
-import {
-  SlDrawer,
-  SlInput,
-  SlIconButton,
-  SlTooltip,
-} from "@shoelace-style/shoelace/dist/react";
-import { useAppStore, VIEW } from "../../store";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDrawer from "@shoelace-style/shoelace/dist/react/drawer/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
 
+import { useState } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useAppStore, VIEW } from "../../store";
 import {
   addRecipeCollection,
   useOwnedCollections,
 } from "../../api/recipeCollection";
-import { useState } from "preact/hooks";
-import { SlHideEvent } from "@shoelace-style/shoelace";
-import CollectionCard from "./collectionCard";
-import { useQueryClient } from "@tanstack/react-query";
+import CollectionCard from "../widgets/collectionCard";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   root: {
@@ -32,12 +33,12 @@ const styles = {
 export default function CollectionsDrawer() {
   const queryClient = useQueryClient();
 
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
   const { data: collectionIds } = useOwnedCollections();
   const [searchTerm, setSearchTerm] = useState("");
 
   function onHide(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase === Event.AT_TARGET) {
       setMainView();
     } else {
@@ -51,7 +52,11 @@ export default function CollectionsDrawer() {
       await queryClient.invalidateQueries({ queryKey: ["ownedCollections"] });
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
       }
     }
   }
@@ -64,34 +69,32 @@ export default function CollectionsDrawer() {
       placement="start"
       label="Collections"
     >
-      {collectionIds !== undefined && (
-        <div style={styles.root}>
-          <SlInput
-            style={styles.collectionCard}
-            clearable
-            type="search"
-            placeholder="Find a collection..."
-            value={searchTerm}
-            onSlChange={(e) => setSearchTerm(e.target.value)}
-          ></SlInput>
-          {collectionIds.map((collectionId) => (
-            <CollectionCard
-              collectionId={collectionId}
-              searchTerm={searchTerm}
-            ></CollectionCard>
-          ))}
-          <SlTooltip content="Add Collection">
-            <SlIconButton
-              name="plus"
-              label="Add Collection"
-              style={{ fontSize: "2em" }}
-              onClick={() => {
-                void onCreateCollection();
-              }}
-            ></SlIconButton>
-          </SlTooltip>
-        </div>
-      )}
+      <div style={styles.root}>
+        <SlInput
+          style={styles.collectionCard}
+          clearable
+          type="search"
+          placeholder="Find a collection..."
+          value={searchTerm}
+          onSlChange={(e) => setSearchTerm((e.target as SlInputElement).value)}
+        ></SlInput>
+        {(collectionIds || Array<number>(10).fill(-1)).map((collectionId) => (
+          <CollectionCard
+            collectionId={collectionId}
+            searchTerm={searchTerm}
+          ></CollectionCard>
+        ))}
+        <SlTooltip content="Add Collection">
+          <SlIconButton
+            name="plus"
+            label="Add Collection"
+            style={{ fontSize: "2em" }}
+            onClick={() => {
+              void onCreateCollection();
+            }}
+          ></SlIconButton>
+        </SlTooltip>
+      </div>
     </SlDrawer>
   );
 }

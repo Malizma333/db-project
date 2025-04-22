@@ -206,10 +206,11 @@ def do_thing(body, cursor):
         count = len(temp)
 
         recipes = []
-        if body["random"]:
-            recipes = random.choices(recipes, k=(body["view_max"] - body["view_min"]))
-        else:
-            recipes = temp[body["view_min"] : body["view_max"]]
+        if len(temp) != 0:
+            if body["random"]:
+                recipes = random.choices(temp, k=(body["view_max"] - body["view_min"]))
+            else:
+                recipes = temp[body["view_min"] : body["view_max"]]
 
         result = []
         for recipe in recipes:
@@ -456,42 +457,6 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b"invalid post request")
         return 404
-
-
-if not os.path.isfile("recipe.db"):
-    conn = sqlite3.connect("recipe.db")
-    sqlfile = open('init.sql').read()
-    with conn:
-        cur = conn.cursor()
-        cur.executescript(sqlfile)
-    # !!!!!!! THIS CODE IS INVALID, PLEASE USE "do_thing_safely" !!!!!!!!
-    # testing code
-    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Cat Food Recipes"}
-    #print(do_thing(v))
-    #v = {"type": "add_recipe_collection", "auth": "cat", "name": "Dog Food Recipes"}
-    #print(do_thing(v))
-    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "tunamelt",
-    #     "reference": "kibbie's website", "authors": ["me", "my mom"], "ingredients": ["pecans", "butter", "kibble"],
-    #     "allergens": ["peanuts", "shellfish"]}
-    #do_thing(v)
-    #v = {"type": "add_recipe", "auth": "s", "collection_id": 1, "recipe_name": "cookies",
-    #     "reference": "Frankie's website", "authors": ["Breanna"], "ingredients": ["sugar", "spice", "chicken"],
-    #     "allergens": []}
-    #do_thing(v)
-    #v = {"type": "filter_recipe_collection", "collection_id": 1, "recipe_name": "s", "include_allergens": [],
-    #     "exclude_allergens": ["peanuts"], "include_ingredients": [], "exclude_ingredients": ["sugar"], "authors": [],
-    #     "view_min": 0, "view_max": 1,
-    #     }
-    #print(do_thing(v))
-    # testing code
-    # the following needs to be added back once account queries are implemented
-    # can't test otherwise due to foreign key constraints
-    # add FOREIGN KEY(managed_by) REFERENCES Account(username) to Recipe collection
-    # add FOREIGN KEY(owned_by) REFERENCES Account(username) to Recipe
-
-    print("meow >:3 (db created)")
-    conn.close()
-
 
 ser = server.ThreadingHTTPServer(("", 8008), RequestHandler)
 

@@ -1,25 +1,26 @@
-import {
-  SlInput,
-  SlIconButton,
-  SlIcon,
-  SlDropdown,
-  SlMenu,
-  SlMenuItem,
-  SlMenuLabel,
-  SlAvatar,
-} from "@shoelace-style/shoelace/dist/react";
-import { useAppStore } from "../../store";
-import { SlNotification } from "./notification";
-import { useRef } from "preact/hooks";
+import "./toolbar.css";
 
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlDropdown from "@shoelace-style/shoelace/dist/react/dropdown/index.js";
+import SlMenu from "@shoelace-style/shoelace/dist/react/menu/index.js";
+import SlMenuItem from "@shoelace-style/shoelace/dist/react/menu-item/index.js";
+import SlMenuLabel from "@shoelace-style/shoelace/dist/react/menu-label/index.js";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
+import SlAvatar from "@shoelace-style/shoelace/dist/react/avatar/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useRef } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useAppStore } from "../../store";
+import { Notification } from "./notification";
 import { logout, useLoggedIn } from "../../api/user";
-import { useParams } from "react-router";
 import {
-  countRecipesInFilter,
   filterRecipeCollection,
   useCollectionName,
 } from "../../api/recipeCollection";
-import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   root: {
@@ -35,8 +36,9 @@ const styles = {
   },
 };
 
-export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
+export default function Toolbar() {
   const {
+    loadedCollectionId,
     clientUsername,
     recipeSearchFilter,
     filterProps,
@@ -52,10 +54,8 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: collectionName } = useCollectionName(collectionId);
+  const { data: collectionName } = useCollectionName(loadedCollectionId);
   const {
     status,
     data: loggedIn,
@@ -63,7 +63,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     isFetching: loggedInFetching,
   } = useLoggedIn();
 
-  const logOutAlert = useRef(null);
+  const logOutAlert = useRef<null | SlAlertElement>(null);
 
   if (status === "error") {
     console.error(error.message);
@@ -77,18 +77,12 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
   }
 
   async function onRandomRecipe() {
-    const numRecipes = await countRecipesInFilter({
-      ...filterProps,
-      collection_id: collectionId,
-    });
-
-    const ind = Math.floor(Math.random() * (numRecipes || 0));
-
     const randRecipe = await filterRecipeCollection({
       ...filterProps,
-      collection_id: collectionId,
-      view_min: ind,
-      view_max: ind + 1,
+      collection_id: loadedCollectionId,
+      view_min: 0,
+      view_max: 1,
+      random: true,
     });
 
     setSelectedRecipe(randRecipe[0]);
@@ -100,7 +94,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
     setClientUsername("");
     await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
     if (logOutAlert.current !== null) {
-      logOutAlert.current.base.toast();
+      await logOutAlert.current.toast();
     }
   }
 
@@ -129,13 +123,16 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
 
   return (
     <div style={styles.root}>
-      <SlNotification
+      <Notification
         variant="success"
         message="Logged out successfully"
-        ref={logOutAlert}
-      ></SlNotification>
+        childRef={logOutAlert}
+      ></Notification>
       <div>
-        {/* This div needs to be here, otherwise the toolbar rearranges??? */}
+        {/*
+          This div needs to be here, otherwise the toolbar rearranges???
+          Login -> Logout -> Login -> Logout
+        */}
       </div>
       {loggedInFetching || !loggedIn ? (
         <SlAvatar
@@ -176,7 +173,7 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         </SlDropdown>
       )}
       <SlIconButton
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         name="shuffle"
         label="Generate Random Recipe"
         onClick={() => {
@@ -184,22 +181,24 @@ export default function Toolbar({ collectionDef }: { collectionDef: boolean }) {
         }}
       ></SlIconButton>
       <SlIconButton
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         name="sliders"
         label="Search Settings"
         onClick={() => setSettingsView()}
       ></SlIconButton>
       <SlInput
-        disabled={!collectionDef}
+        disabled={loadedCollectionId === -1}
         clearable
         type="search"
         placeholder={`Search ${collectionName || ""}...`}
         style={{ flex: "1" }}
         value={recipeSearchFilter}
-        onSlChange={(e) => setRecipeSearchFilter(e.target.value)}
+        onSlChange={(e) =>
+          setRecipeSearchFilter((e.target as SlInputElement).value)
+        }
       >
         <SlIconButton
-          disabled={!collectionDef}
+          disabled={loadedCollectionId === -1}
           name="search"
           label="Run Search"
           slot="suffix"

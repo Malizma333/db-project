@@ -1,9 +1,9 @@
+## Recipe Manager
+
+A recipe management application, created for CS2300 Introduction to File Structures and Database Systems.
+
 ## Developing Locally
 
 ```bash
-# First time frontend setup
-cd frontend && npm i
-
-# Build the frontend and start the web server
 bash run.sh
 ```

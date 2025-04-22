@@ -1,20 +1,19 @@
-import {
-  SlButton,
-  SlCheckbox,
-  SlDrawer,
-  SlInput,
-} from "@shoelace-style/shoelace/dist/react";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import SlDrawer from "@shoelace-style/shoelace/dist/react/drawer/index.js";
+import SlCheckbox from "@shoelace-style/shoelace/dist/react/checkbox/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+
+import { useQueryClient } from "@tanstack/react-query";
+
 import TagPicker from "../widgets/tagPicker";
 import { useAppStore, VIEW, COLUMN_MASK } from "../../store";
-import { useParams } from "react-router";
-
 import {
   useCollectionAllergens,
   useCollectionAuthors,
   useCollectionIngredients,
 } from "../../api/recipeCollection";
-import { SlHideEvent } from "@shoelace-style/shoelace";
-import { useQueryClient } from "@tanstack/react-query";
 
 const styles = {
   settingContainer: {
@@ -81,6 +80,7 @@ export default function SettingsDrawer() {
     includeAuthorsFilter,
     includeIngredientsFilter,
     excludeIngredientsFilter,
+    loadedCollectionId,
     getColumnVisible,
     toggleColumn,
     setMainView,
@@ -94,12 +94,10 @@ export default function SettingsDrawer() {
   } = useAppStore();
 
   const queryClient = useQueryClient();
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
 
-  const { data: allAuthors } = useCollectionAuthors(collectionId);
-  const { data: allAllergens } = useCollectionAllergens(collectionId);
-  const { data: allIngredients } = useCollectionIngredients(collectionId);
+  const { data: allAuthors } = useCollectionAuthors(loadedCollectionId);
+  const { data: allAllergens } = useCollectionAllergens(loadedCollectionId);
+  const { data: allIngredients } = useCollectionIngredients(loadedCollectionId);
 
   const minRowsPerPage = 1;
   const maxRowsPerPage = 20;
@@ -112,10 +110,13 @@ export default function SettingsDrawer() {
     setRowsPerPage(Math.min(maxRowsPerPage, Math.max(minRowsPerPage, value)));
     gotoFirstPage();
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["filterCollectionCount"],
+    });
   }
 
   function onHide(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
       return;
@@ -145,7 +146,9 @@ export default function SettingsDrawer() {
             min={minRowsPerPage}
             max={maxRowsPerPage}
             onSlBlur={(e) => {
-              void onSetRowsPerPage(parseInt(e.target.value));
+              void onSetRowsPerPage(
+                parseInt((e.target as SlInputElement).value),
+              );
             }}
           ></SlInput>
         </div>

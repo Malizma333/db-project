@@ -6,7 +6,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE RecipeCollection (
   id                INTEGER PRIMARY KEY,
   manager           VARCHAR(100) NOT NULL,
-  name              VARCHAR(100) NOT NULL
+  name              VARCHAR(100) NOT NULL,
+  FOREIGN KEY(manager) REFERENCES Account(username)
 );
 
 CREATE TABLE Account (
@@ -36,7 +37,8 @@ CREATE TABLE Recipe (
   name              VARCHAR(100) NOT NULL,
   owner             VARCHAR(100) NOT NULL,
   reference         VARCHAR(2083) NOT NULL,
-  PRIMARY KEY(name, owner)
+  PRIMARY KEY(name, owner),
+  FOREIGN KEY(owner) REFERENCES Account(username)
 );
 
 CREATE TABLE Contains (

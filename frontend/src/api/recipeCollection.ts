@@ -14,6 +14,7 @@ export interface FilterParams {
   authors: string[];
   view_min: number;
   view_max: number;
+  random: boolean;
 }
 
 export interface FilterResponse {
@@ -32,6 +33,7 @@ export async function filterRecipeCollection({
   authors,
   view_min,
   view_max,
+  random,
 }: FilterParams): Promise<Recipe[]> {
   const response = await makeRequest({
     type: "filter_recipe_collection",
@@ -44,6 +46,7 @@ export async function filterRecipeCollection({
     authors,
     view_min,
     view_max,
+    random,
   });
 
   const data: unknown = await response.json();
@@ -64,12 +67,12 @@ export async function filterRecipeCollection({
 
 export function useFilterCollection(props: FilterParams) {
   return useQuery({
-    queryKey: ["filterCollection", props.collection_id],
+    queryKey: ["filterCollection", props],
     queryFn: () => filterRecipeCollection(props),
   });
 }
 
-export async function countRecipesInFilter({
+async function countRecipesInFilter({
   collection_id,
   recipe_name,
   include_allergens,
@@ -79,6 +82,7 @@ export async function countRecipesInFilter({
   authors,
   view_min,
   view_max,
+  random,
 }: FilterParams): Promise<number> {
   const response = await makeRequest({
     type: "filter_recipe_collection",
@@ -91,6 +95,7 @@ export async function countRecipesInFilter({
     authors,
     view_min,
     view_max,
+    random,
   });
 
   const data: unknown = await response.json();
@@ -107,7 +112,7 @@ export async function countRecipesInFilter({
 
 export function useCountRecipesInFilter(props: FilterParams) {
   return useQuery({
-    queryKey: ["filterCollectionCount", props.collection_id],
+    queryKey: ["filterCollectionCount", props],
     queryFn: () => countRecipesInFilter(props),
   });
 }

@@ -1,0 +1,12 @@
+sl-tag.pickedTag::part(base) {
+  display: flex;
+  align-items: center;
+  width: 70px;
+  position: relative;
+}
+
+sl-tag.pickedTag::part(remove-button) {
+  position: absolute;
+  right: 0;
+  top: 25%;
+}

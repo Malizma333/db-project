@@ -1,4 +1,4 @@
-import { SlDialog } from "@shoelace-style/shoelace/dist/react";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
 import { useAppStore, VIEW } from "../../store";
 import TagPicker from "../widgets/tagPicker";
 

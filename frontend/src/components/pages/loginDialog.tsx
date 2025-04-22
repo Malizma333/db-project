@@ -1,14 +1,17 @@
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
-import { useRef, useState } from "preact/hooks";
-import { useAppStore, VIEW } from "../../store";
-import { SlNotification } from "../widgets/notification";
+import "./errorHelp.css";
 
-import { login } from "../../api/user";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useRef, useState } from "preact/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+
+import { useAppStore, VIEW } from "../../store";
+import { Notification } from "../widgets/notification";
+import { login } from "../../api/user";
 
 const styles = {
   inputField: {
@@ -17,14 +20,15 @@ const styles = {
 };
 
 export default function LoginDialog() {
-  const { view, setMainView, setClientUsername } = useAppStore();
+  const { view, setMainView, setClientUsername, setSessionAlert } =
+    useAppStore();
 
   const queryClient = useQueryClient();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const logInAlert = useRef(null);
+  const logInAlert = useRef<null | SlAlertElement>(null);
 
   function onCloseDialog() {
     setMainView();
@@ -36,11 +40,12 @@ export default function LoginDialog() {
   async function onLogIn() {
     try {
       await login(username, password);
-      await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       setClientUsername(username);
+      setSessionAlert(false);
       onCloseDialog();
+      await queryClient.invalidateQueries({ queryKey: ["loggedIn"] });
       if (logInAlert.current !== null) {
-        logInAlert.current.base.toast();
+        await logInAlert.current.toast();
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -56,16 +61,16 @@ export default function LoginDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Log In"
     >
-      <SlNotification
+      <Notification
         message="Logged in successfully"
         variant="success"
-        ref={logInAlert}
-      ></SlNotification>
+        childRef={logInAlert}
+      ></Notification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={username}
-        onSlChange={(e) => setUsername(e.target.value)}
+        onSlChange={(e) => setUsername((e.target as SlInputElement).value)}
         placeholder="Username"
       ></SlInput>
       <SlInput
@@ -74,7 +79,7 @@ export default function LoginDialog() {
         helpText={helpText}
         type="password"
         value={password}
-        onSlChange={(e) => setPassword(e.target.value)}
+        onSlChange={(e) => setPassword((e.target as SlInputElement).value)}
         placeholder="Password"
         passwordToggle
       ></SlInput>

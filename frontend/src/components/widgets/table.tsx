@@ -1,15 +1,14 @@
-import {
-  SlCard,
-  SlTooltip,
-  SlIconButton,
-} from "@shoelace-style/shoelace/dist/react";
+import SlTooltip from "@shoelace-style/shoelace/dist/react/tooltip/index.js";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import SlCard from "@shoelace-style/shoelace/dist/react/card/index.js";
+import SlSkeleton from "@shoelace-style/shoelace/dist/react/skeleton/index.js";
+
+import { useQueryClient } from "@tanstack/react-query";
+
 import TagPicker from "./tagPicker";
 import { COLUMN_MASK, useAppStore } from "../../store";
-
 import { Recipe, removeRecipe } from "../../api/recipe";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFilterCollection } from "src/api/recipeCollection";
-import { useParams } from "react-router";
 
 const styles = {
   root: {
@@ -46,6 +45,67 @@ const styles = {
   },
 };
 
+function TemplateRow({ editMode }: { editMode: boolean }) {
+  const { getColumnVisible } = useAppStore();
+
+  return (
+    <SlCard style={{ "--border-radius": "0" }}>
+      <div style={styles.row}>
+        {getColumnVisible(COLUMN_MASK.NAME) && (
+          <div style={styles.cell}>
+            <SlSkeleton style={{ width: "10em", height: "1em" }}></SlSkeleton>
+          </div>
+        )}
+        {getColumnVisible(COLUMN_MASK.AUTHOR) && (
+          <div style={styles.cell}>
+            <SlSkeleton style={{ width: "8em", height: "1em" }}></SlSkeleton>
+          </div>
+        )}
+        {getColumnVisible(COLUMN_MASK.ALLERGENS) && (
+          <div style={styles.cell}>
+            {Array(2)
+              .fill(0)
+              .map(() => (
+                <SlSkeleton
+                  style={{ width: "5em", height: "1em", marginLeft: "1em" }}
+                ></SlSkeleton>
+              ))}
+          </div>
+        )}
+        {getColumnVisible(COLUMN_MASK.REFERENCE) && (
+          <div style={styles.cell}>
+            <SlSkeleton style={{ width: "14em", height: "1em" }}></SlSkeleton>
+          </div>
+        )}
+        {getColumnVisible(COLUMN_MASK.INGREDIENTS) && (
+          <div style={styles.cell}>
+            {Array(3)
+              .fill(0)
+              .map(() => (
+                <SlSkeleton
+                  style={{ width: "4em", height: "1em", marginLeft: "1em" }}
+                ></SlSkeleton>
+              ))}
+          </div>
+        )}
+        <div style={styles.end}>
+          <SlSkeleton style={{ width: "1.5em", height: "1.5em" }}></SlSkeleton>
+          {editMode && (
+            <>
+              <SlSkeleton
+                style={{ width: "1.5em", height: "1.5em", marginLeft: "0.5em" }}
+              ></SlSkeleton>
+              <SlSkeleton
+                style={{ width: "1.5em", height: "1.5em", marginLeft: "0.5em" }}
+              ></SlSkeleton>
+            </>
+          )}
+        </div>
+      </div>
+    </SlCard>
+  );
+}
+
 function TableRow({
   editMode,
   rowData,
@@ -75,68 +135,78 @@ function TableRow({
   async function onDeleteRecipe() {
     await removeRecipe(rowData.name);
     await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["filterCollectionCount"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["recipeCount"],
+    });
   }
 
   return (
     <SlCard style={{ "--border-radius": "0" }}>
-      <div style={styles.row}>
-        {getColumnVisible(COLUMN_MASK.NAME) && (
-          <div style={styles.cell}>{rowData.name}</div>
-        )}
-        {getColumnVisible(COLUMN_MASK.AUTHOR) && (
-          <div style={styles.cell}>{rowData.authors.join(",")}</div>
-        )}
-        {getColumnVisible(COLUMN_MASK.ALLERGENS) && (
-          <div style={styles.cell}>
-            <TagPicker
-              variant="warning"
-              selected={rowData.allergens}
-              viewMode
-            ></TagPicker>
-          </div>
-        )}
-        {getColumnVisible(COLUMN_MASK.REFERENCE) && (
-          <div style={styles.cell}>{rowData.reference}</div>
-        )}
-        {getColumnVisible(COLUMN_MASK.INGREDIENTS) && (
-          <div style={styles.cell}>
-            <TagPicker
-              variant="primary"
-              selected={rowData.ingredients}
-              viewMode
-            ></TagPicker>
-          </div>
-        )}
-        <div style={styles.end}>
-          <SlTooltip content="View Recipe">
-            <SlIconButton
-              name="eye"
-              label="View Recipe"
-              onClick={() => onViewRecipe()}
-            ></SlIconButton>
-          </SlTooltip>
-          {editMode && (
-            <>
-              <SlTooltip content="Edit Recipe">
-                <SlIconButton
-                  name="pencil"
-                  label="Edit Recipe"
-                  onClick={() => onEditRecipe()}
-                ></SlIconButton>
-              </SlTooltip>
-              <SlTooltip content="Delete Recipe">
-                <SlIconButton
-                  name="trash"
-                  label="Delete Recipe"
-                  onClick={() => {
-                    void onDeleteRecipe();
-                  }}
-                ></SlIconButton>
-              </SlTooltip>
-            </>
+      {rowData ? (
+        <div style={styles.row}>
+          {getColumnVisible(COLUMN_MASK.NAME) && (
+            <div style={styles.cell}>{rowData.name}</div>
           )}
+          {getColumnVisible(COLUMN_MASK.AUTHOR) && (
+            <div style={styles.cell}>{rowData.authors.join(",")}</div>
+          )}
+          {getColumnVisible(COLUMN_MASK.ALLERGENS) && (
+            <div style={styles.cell}>
+              <TagPicker
+                variant="warning"
+                selected={rowData.allergens}
+                viewMode
+              ></TagPicker>
+            </div>
+          )}
+          {getColumnVisible(COLUMN_MASK.REFERENCE) && (
+            <div style={styles.cell}>{rowData.reference}</div>
+          )}
+          {getColumnVisible(COLUMN_MASK.INGREDIENTS) && (
+            <div style={styles.cell}>
+              <TagPicker
+                variant="primary"
+                selected={rowData.ingredients}
+                viewMode
+              ></TagPicker>
+            </div>
+          )}
+          <div style={styles.end}>
+            <SlTooltip content="View Recipe">
+              <SlIconButton
+                name="eye"
+                label="View Recipe"
+                onClick={() => onViewRecipe()}
+              ></SlIconButton>
+            </SlTooltip>
+            {editMode && (
+              <>
+                <SlTooltip content="Edit Recipe">
+                  <SlIconButton
+                    name="pencil"
+                    label="Edit Recipe"
+                    onClick={() => onEditRecipe()}
+                  ></SlIconButton>
+                </SlTooltip>
+                <SlTooltip content="Delete Recipe">
+                  <SlIconButton
+                    name="trash"
+                    label="Delete Recipe"
+                    onClick={() => {
+                      void onDeleteRecipe();
+                    }}
+                  ></SlIconButton>
+                </SlTooltip>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div style={styles.row}></div>
+      )}
     </SlCard>
   );
 }
@@ -146,17 +216,15 @@ export default function Table({ editMode }: { editMode: boolean }) {
     page,
     numRowsPerPage,
     filterProps,
+    loadedCollectionId,
     getColumnVisible,
     setNewRecipeView,
     setSelectedRecipe,
   } = useAppStore();
 
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
-
-  const { data: pageData } = useFilterCollection({
+  const { data: pageData, isFetching } = useFilterCollection({
     ...filterProps,
-    collection_id: collectionId,
+    collection_id: loadedCollectionId,
     view_min: page * numRowsPerPage,
     view_max: (page + 1) * numRowsPerPage,
   });
@@ -204,9 +272,16 @@ export default function Table({ editMode }: { editMode: boolean }) {
           </div>
         </div>
       </SlCard>
-      {pageData !== undefined &&
-        pageData.map((row) => {
-          return <TableRow editMode={editMode} rowData={row}></TableRow>;
+      {Array(numRowsPerPage)
+        .fill(0)
+        .map((_, i) => {
+          if (!isFetching && pageData !== undefined) {
+            return (
+              <TableRow editMode={editMode} rowData={pageData[i]}></TableRow>
+            );
+          } else {
+            return <TemplateRow editMode={editMode}></TemplateRow>;
+          }
         })}
     </div>
   );

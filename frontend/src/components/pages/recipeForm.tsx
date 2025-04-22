@@ -1,22 +1,22 @@
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
-import { useRef } from "preact/hooks";
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import { SlHideEvent } from "@shoelace-style/shoelace";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useRef, useState, useEffect } from "preact/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useAppStore, VIEW } from "../../store";
-import { SlNotification } from "../widgets/notification";
+import { Notification } from "../widgets/notification";
 import TagPicker, { TagType } from "../widgets/tagPicker";
-import { useParams } from "react-router";
 import { addRecipe, removeRecipe } from "../../api/recipe";
 import {
   useCollectionAllergens,
   useCollectionIngredients,
 } from "../../api/recipeCollection";
-import { SlHideEvent } from "@shoelace-style/shoelace";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useEffect } from "react";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   inputField: {
@@ -39,26 +39,26 @@ export default function RecipeForm({
     view,
     selectedRecipe,
     selectedRecipeName,
+    loadedCollectionId,
     setMainView,
     setSelectedRecipe,
+    setSessionAlert,
   } = useAppStore();
 
   const queryClient = useQueryClient();
 
-  const submitAlert = useRef(null);
-  const params = useParams();
-  const collectionId = parseInt(params["id"] || "-1");
+  const submitAlert = useRef<null | SlAlertElement>(null);
   const [newName, setNewName] = useState("");
 
   useEffect(() => {
     setNewName(selectedRecipeName);
   }, [selectedRecipeName]);
 
-  const { data: allAllergens } = useCollectionAllergens(collectionId);
-  const { data: allIngredients } = useCollectionIngredients(collectionId);
+  const { data: allAllergens } = useCollectionAllergens(loadedCollectionId);
+  const { data: allIngredients } = useCollectionIngredients(loadedCollectionId);
 
   function onCloseDialog(e: SlHideEvent) {
-    // Prevent event bubbling caused by inner menu elements
+    // Prevent event bubbling caused by inner menu elements being closed
     if (e.eventPhase !== Event.AT_TARGET) {
       e.preventDefault();
       return;
@@ -75,7 +75,7 @@ export default function RecipeForm({
         await removeRecipe(selectedRecipe.name);
       }
       await addRecipe(
-        collectionId,
+        loadedCollectionId,
         newName,
         selectedRecipe.reference,
         selectedRecipe.authors,
@@ -83,12 +83,24 @@ export default function RecipeForm({
         selectedRecipe.allergens,
       );
       await queryClient.invalidateQueries({ queryKey: ["filterCollection"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["filterCollectionCount"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["recipeCount"],
+      });
       setMainView();
       if (submitAlert.current !== null) {
-        submitAlert.current.base.toast();
+        await submitAlert.current.toast();
       }
     } catch (e) {
-      console.error(e);
+      if (e instanceof Error) {
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          console.error(e.message);
+        }
+      }
     }
   }
 
@@ -99,16 +111,16 @@ export default function RecipeForm({
       onSlHide={(e) => onCloseDialog(e)}
       label={formTitle}
     >
-      <SlNotification
+      <Notification
         message={submitMessage}
         variant="success"
-        ref={submitAlert}
-      ></SlNotification>
+        childRef={submitAlert}
+      ></Notification>
       <SlInput
         style={styles.inputField}
         type="text"
         value={newName}
-        onSlChange={(e) => setNewName(e.target.value)}
+        onSlChange={(e) => setNewName((e.target as SlInputElement).value)}
         placeholder="Recipe Name"
       ></SlInput>
       <SlInput
@@ -118,7 +130,7 @@ export default function RecipeForm({
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
-            authors: e.target.value.split(","),
+            authors: (e.target as SlInputElement).value.split(","),
           })
         }
         placeholder="Authors"
@@ -130,7 +142,7 @@ export default function RecipeForm({
         onSlChange={(e) =>
           setSelectedRecipe({
             ...selectedRecipe,
-            reference: e.target.value,
+            reference: (e.target as SlInputElement).value,
           })
         }
         placeholder="Reference"

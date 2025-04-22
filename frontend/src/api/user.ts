@@ -25,6 +25,16 @@ export function initSessionAuth() {
   };
 }
 
+export function clearSessionAuth() {
+  session_auth = {
+    auth: "",
+    user: "",
+  };
+
+  sessionStorage.removeItem("session.auth");
+  sessionStorage.removeItem("session.user");
+}
+
 export async function login(username: string, password: string) {
   const response = await makeRequest({
     type: "login",
@@ -63,14 +73,7 @@ export async function logout() {
     throw new Error(getErrorMessage(data));
   }
 
-  session_auth = {
-    auth: "",
-    user: "",
-  };
-
-  sessionStorage.removeItem("session.auth");
-  sessionStorage.removeItem("session.lifetime");
-  sessionStorage.removeItem("session.user");
+  clearSessionAuth();
 }
 
 async function loggedIn() {

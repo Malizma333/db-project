@@ -1,13 +1,17 @@
-import {
-  SlInput,
-  SlDialog,
-  SlButton,
-} from "@shoelace-style/shoelace/dist/react";
-import { useRef, useState } from "preact/hooks";
-import { useAppStore, VIEW } from "../../store";
-import { SlNotification } from "../widgets/notification";
+import "./errorHelp.css";
 
+import { useRef, useState } from "preact/hooks";
+
+import SlInput from "@shoelace-style/shoelace/dist/react/input/index.js";
+import SlDialog from "@shoelace-style/shoelace/dist/react/dialog/index.js";
+import SlButton from "@shoelace-style/shoelace/dist/react/button/index.js";
+import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input.js";
+import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert.js";
+
+import { useAppStore, VIEW } from "../../store";
+import { Notification } from "../widgets/notification";
 import { changePassword } from "../../api/user";
+import { AUTH_ERROR } from "src/api/api";
 
 const styles = {
   inputField: {
@@ -16,13 +20,13 @@ const styles = {
 };
 
 export default function ChangePassDialog() {
-  const { view, setMainView } = useAppStore();
+  const { view, setMainView, setSessionAlert } = useAppStore();
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
   const [helpText, setHelpText] = useState("");
-  const changePassAlert = useRef(null);
+  const changePassAlert = useRef<null | SlAlertElement>(null);
 
   function onCloseDialog() {
     setMainView();
@@ -41,15 +45,18 @@ export default function ChangePassDialog() {
 
     try {
       await changePassword(oldPassword, newPassword);
+      onCloseDialog();
+      if (changePassAlert.current !== null) {
+        await changePassAlert.current.toast();
+      }
     } catch (e) {
       if (e instanceof Error) {
-        setHelpText(e.message);
+        if (e.message === AUTH_ERROR) {
+          setSessionAlert();
+        } else {
+          setHelpText(e.message);
+        }
       }
-    }
-
-    onCloseDialog();
-    if (changePassAlert.current !== null) {
-      changePassAlert.current.base.toast();
     }
   }
 
@@ -60,17 +67,16 @@ export default function ChangePassDialog() {
       onSlAfterHide={() => onCloseDialog()}
       label="Change Password"
     >
-      <SlNotification
+      <Notification
         message="Password changed successfully"
         variant="success"
-        ref={changePassAlert}
-      ></SlNotification>
+        childRef={changePassAlert}
+      ></Notification>
       <SlInput
         style={styles.inputField}
         type="password"
-        helpText="Must be 8 - 20 characters"
         value={oldPassword}
-        onSlChange={(e) => setOldPassword(e.target.value)}
+        onSlChange={(e) => setOldPassword((e.target as SlInputElement).value)}
         placeholder="Old Password"
         passwordToggle
       ></SlInput>
@@ -78,7 +84,7 @@ export default function ChangePassDialog() {
         style={styles.inputField}
         type="password"
         value={newPassword}
-        onSlChange={(e) => setNewPassword(e.target.value)}
+        onSlChange={(e) => setNewPassword((e.target as SlInputElement).value)}
         placeholder="New Password"
         passwordToggle
       ></SlInput>
@@ -88,7 +94,7 @@ export default function ChangePassDialog() {
         helpText={helpText}
         type="password"
         value={rePassword}
-        onSlChange={(e) => setRePassword(e.target.value)}
+        onSlChange={(e) => setRePassword((e.target as SlInputElement).value)}
         placeholder="Retype New Password"
         passwordToggle
       ></SlInput>
