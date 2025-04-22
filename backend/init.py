@@ -1,4 +1,5 @@
 import os
+import sqlite3
 
 if not os.path.isfile("recipe.db"):
     conn = sqlite3.connect("recipe.db")
