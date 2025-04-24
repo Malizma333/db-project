@@ -21,7 +21,8 @@ CREATE TABLE Stores (
   recipe_name       VARCHAR(100) NOT NULL,
   recipe_owner      VARCHAR(100) NOT NULL,
   FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY(collection_id) REFERENCES RecipeCollection(id) ON DELETE CASCADE
+  FOREIGN KEY(collection_id) REFERENCES RecipeCollection(id) ON DELETE CASCADE,
+  PRIMARY KEY(collection_id, recipe_name, recipe_owner)
 );
 
 -- is the primary key needed here?
@@ -47,7 +48,8 @@ CREATE TABLE Contains (
   allergen_name             VARCHAR(100) NOT NULL,
   allergen_collection_id    INTEGER NOT NULL,
   FOREIGN KEY(allergen_name, allergen_collection_id) REFERENCES Allergen(name, collection_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (recipe_name, recipe_owner, allergen_name, allergen_collection_id)
 );
 
 CREATE TABLE Composes (
@@ -56,7 +58,8 @@ CREATE TABLE Composes (
   ingredient_name           VARCHAR(100) NOT NULL,
   ingredient_collection_id  INTEGER NOT NULL,
   FOREIGN KEY(ingredient_name, ingredient_collection_id) REFERENCES Ingredient(name, collection_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY(recipe_name, recipe_owner) REFERENCES Recipe(name, owner) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (recipe_name, recipe_owner, ingredient_name, ingredient_collection_id)
 );
 
 CREATE TABLE Allergen (

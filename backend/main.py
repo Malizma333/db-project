@@ -135,10 +135,17 @@ def do_thing(body, cursor):
 
     elif body["type"] == "add_recipe":
         username = check_auth(body["auth"])
+        cursor.execute("SELECT manager FROM RecipeCollection WHERE id = ?",
+                       (body["collection_id"],))
+        temp = cursor.fetchall()
+        if len(temp) != 1:
+            raise InputError("resource_error", "Bad collecion ID")
+        manager = temp[0][0]
+        if manager != username:
+            InputError("resource_error", "Recipe collection owned by a different user!")
         recipe_params = (body["recipe_name"], username, body["reference"])
         stores_params = (body["collection_id"], body["recipe_name"], username)
         cursor.execute("INSERT INTO Recipe VALUES(?,?,?)", recipe_params)
-        # may need to check if collection id is valid?
         cursor.execute("INSERT INTO Stores VALUES(?,?,?)", stores_params)
 
         for ing in body["ingredients"]:
