@@ -6,10 +6,20 @@ import os
 import random
 import secrets
 import sqlite3
+import sys
 import string
 import threading
 import time
 import traceback
+
+PORT = 8008
+
+if len(sys.argv) == 1:
+    pass
+elif len(sys.argv) == 2:
+    PORT = int(sys.argv[1])
+else:
+    print("Usage: main.py [PORT]")
 
 FILE_ROOT = os.path.join("..", "frontend", "dist")
 
@@ -466,6 +476,6 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         self.wfile.write(b"invalid post request")
         return 404
 
-ser = server.ThreadingHTTPServer(("", 8008), RequestHandler)
+ser = server.ThreadingHTTPServer(("", PORT), RequestHandler)
 
 ser.serve_forever()
