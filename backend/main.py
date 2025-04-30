@@ -12,14 +12,13 @@ import threading
 import time
 import traceback
 
-PORT = 8008
-
 if len(sys.argv) == 1:
-    pass
+    PORT = 8008
 elif len(sys.argv) == 2:
     PORT = int(sys.argv[1])
 else:
     print("Usage: main.py [PORT]")
+    exit(1)
 
 FILE_ROOT = os.path.join("..", "frontend", "dist")
 
@@ -477,5 +476,7 @@ class RequestHandler(server.BaseHTTPRequestHandler):
         return 404
 
 ser = server.ThreadingHTTPServer(("", PORT), RequestHandler)
+
+print(f"Opening web server on port {PORT}...")
 
 ser.serve_forever()
